@@ -35,7 +35,6 @@ class Game(SimulationInterface):
     def __init__(self):
         self.space = pymunk.Space()
         self.players = create_players()
-        self.first = True
 
     def getspace(self) -> pymunk.Space:
         return self.space
