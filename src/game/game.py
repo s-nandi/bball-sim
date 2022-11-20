@@ -3,29 +3,18 @@ from typing import List
 import logging
 import pymunk
 from visualizer.simulation_interface import SimulationInterface
-from game.scene import Player, PlayerAttributes
+from game.player import Player, generate_players
 
 
 def create_players() -> List[Player]:
-    masses = itertools.repeat(0.1)
-    sizes = itertools.repeat(10.0)
-    max_speeds = [43.0, 30.0]
-    max_accelerations = [50.0, 90.0]
-    positions = (pymunk.Vec2d(*p) for p in [(150, 150), (200, 200)])
-    return [
-        Player(
-            PlayerAttributes(
-                mass=mass,
-                size=size,
-                max_speed=max_speed,
-                max_acceleration=max_acceleration,
-            ),
-            position,
-        )
-        for mass, size, max_speed, max_acceleration, position in zip(
-            masses, sizes, max_speeds, max_accelerations, positions
-        )
-    ]
+    players = generate_players(
+        mass_generator=itertools.repeat(0.1),
+        size_generator=itertools.repeat(10.0),
+        max_speed_generator=itertools.cycle([43.0, 30.0]),
+        max_acceleration_generator=itertools.cycle([50.0, 90.0]),
+        position_generator=[(150, 150), (200, 200)],
+    )
+    return list(players)
 
 
 class Game(SimulationInterface):

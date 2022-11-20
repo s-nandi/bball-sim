@@ -3,7 +3,7 @@ import pymunk
 from physics_lib import PhysicsObject, PhysicsComponent
 from game.types import ConvertibleToVec2d
 from game.utils import limited_velocity_func
-from game.scene.player_attributes import PlayerAttributes
+from game.player.player_attributes import PlayerAttributes
 
 
 def appliable_force(
@@ -20,8 +20,9 @@ class Player(PhysicsObject):
     def __init__(
         self,
         attributes: PlayerAttributes,
-        position: pymunk.Vec2d,
+        position: ConvertibleToVec2d,
     ):
+        position = pymunk.Vec2d(*position)
         self.attributes = attributes
         self.body = self.create_body(
             attributes.mass, attributes.size, attributes.max_speed, position
