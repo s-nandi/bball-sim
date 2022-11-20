@@ -1,6 +1,6 @@
 from typing import List
 import pygame
-from visualizer.renderer import Renderer
+from visualizer.engine import Engine
 from visualizer.simulator import Simulator
 from visualizer.screen_params import ScreenParams
 from visualizer.types import SpeedScale
@@ -17,9 +17,8 @@ def should_keep_running(events: List[pygame.event.Event]) -> bool:
 
 
 class Visualizer:
-    renderer: Renderer
+    engine: Engine
     simulation: Simulator
-    game: GameInterface
     events: List[pygame.event.Event]
 
     def __init__(
@@ -28,20 +27,16 @@ class Visualizer:
         game: GameInterface,
         simulation_speed_scale: SpeedScale,
     ):
-        self.renderer = Renderer(screen_params)
-        self.simulation = Simulator(
-            game.getspace(), screen_params.fps, simulation_speed_scale
-        )
-        self.game = game
+        self.engine = Engine(screen_params)
+        self.simulation = Simulator(game, screen_params.fps, simulation_speed_scale)
         self.events = []
 
     def run(self) -> None:
-        self.game.initialize()
+        self.simulation.initialize()
         while should_keep_running(self.events):
             self.loop()
 
     def loop(self) -> None:
         self.events = pygame.event.get()
-        self.game.update()
         self.simulation.step()
-        self.renderer.render(self.simulation)
+        self.engine.render(self.simulation)

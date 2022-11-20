@@ -4,7 +4,7 @@ from visualizer.types import Fps
 from visualizer.simulator import Simulator
 
 
-class Renderer:
+class Engine:
     screen: pygame.Surface
     target_fps: Fps
     clock: pygame.time.Clock

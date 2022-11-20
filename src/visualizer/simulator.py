@@ -3,10 +3,11 @@ import pygame
 import pymunk
 import pymunk.pygame_util
 from visualizer.types import TimePerFrame, Fps, SpeedScale
+from visualizer.game_interface import GameInterface
 
 
 class Simulator:
-    space: pymunk.Space
+    game: GameInterface
     time_per_frame: TimePerFrame
 
     @classmethod
@@ -15,14 +16,22 @@ class Simulator:
 
     def __init__(
         self,
-        space: pymunk.Space,
+        game: GameInterface,
         fps: Fps,
         speed_scale: SpeedScale = 1.0,
     ):
-        self.space = space
+        self.game = game
         self.time_per_frame = speed_scale / fps
 
+    @property
+    def space(self) -> pymunk.Space:
+        return self.game.getspace()
+
+    def initialize(self) -> None:
+        self.game.initialize()
+
     def step(self) -> None:
+        self.game.update()
         substeps = math.ceil(max(1, self.time_per_frame / self.max_allowable_step()))
         for _ in range(substeps):
             self.space.step(self.time_per_frame / substeps)
