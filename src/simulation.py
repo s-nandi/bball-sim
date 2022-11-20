@@ -49,11 +49,15 @@ class SimulationParams:
         self.time_per_frame = speed_scale / fps
 
 
+InitializeFn = Callable[[pymunk.Space], None]
+UpdateFn = Callable[[pymunk.Space], None]
+
+
 @dataclasses.dataclass
 class Simulator:
     render_params: RenderParams
     simulation_params: SimulationParams
-    update: Callable[[SimulationParams], None]
+    update: UpdateFn
     running: bool = True
 
     @classmethod
@@ -63,8 +67,8 @@ class Simulator:
     def __init__(
         self,
         screen_params: ScreenParams,
-        initialize: Callable[[pymunk.Space], None],
-        update: Callable[[SimulationParams], None],
+        initialize: InitializeFn,
+        update: UpdateFn,
         simulation_speed_scale: SpeedScale,
     ):
         self.render_params = RenderParams(screen_params)
@@ -88,7 +92,7 @@ class Simulator:
 
     def loop(self) -> None:
         self.process_actions()
-        self.update(self.simulation_params)
+        self.update(self.simulation_params.space)
         self.step(self.simulation_params)
         self.draw(self.render_params, self.simulation_params)
         self.caption_fps(self.render_params)
