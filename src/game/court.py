@@ -1,98 +1,9 @@
-import dataclasses
 from typing import Iterable, List
-import pymunk
 from physics_lib import PhysicsObject, PhysicsComponent
 from game.utils import rotate
-from game.types import ConvertibleToVec2d, convert_to_vec2d
-
-
-class Boundary(PhysicsObject):
-    body: pymunk.Body
-    shape: pymunk.Shape
-
-    def __init__(
-        self,
-        endpoint_1: ConvertibleToVec2d,
-        endpoint_2: ConvertibleToVec2d,
-        thickness: float,
-    ):
-        endpoint_1 = convert_to_vec2d(endpoint_1)
-        endpoint_2 = convert_to_vec2d(endpoint_2)
-
-        self.body = self.create_body()
-        self.shape = self.create_shape(endpoint_1, endpoint_2, self.body, thickness)
-
-    def physics_components(self) -> Iterable[PhysicsComponent]:
-        yield self.body
-        yield self.shape
-
-    @staticmethod
-    def create_body() -> pymunk.Body:
-        body = pymunk.Body(body_type=pymunk.Body.STATIC)
-        return body
-
-    @staticmethod
-    def create_shape(
-        endpoint_1: pymunk.Vec2d,
-        endpoint_2: pymunk.Vec2d,
-        body: pymunk.Body,
-        radius: float,
-    ) -> pymunk.Segment:
-        segment = pymunk.Segment(body, endpoint_1, endpoint_2, radius)
-        return segment
-
-
-@dataclasses.dataclass
-class CourtDimensions:
-    width: float
-    height: float
-    boundary_thickness: float
-    rim_radius: float
-    rim_distance_from_edge: float
-    boundary_thickness_diameter: float = dataclasses.field(init=False)
-
-    def __post_init__(self):
-        self.boundary_thickness_diameter = self.boundary_thickness * 1
-
-    @property
-    def x_min(self) -> float:
-        return self.boundary_thickness_diameter
-
-    @property
-    def x_max(self) -> float:
-        return self.width - self.boundary_thickness_diameter
-
-    @property
-    def x_mid(self) -> float:
-        return (self.x_min + self.x_max) / 2
-
-    @property
-    def y_min(self) -> float:
-        return self.boundary_thickness_diameter
-
-    @property
-    def y_max(self) -> float:
-        return self.height - self.boundary_thickness_diameter
-
-    @property
-    def y_mid(self) -> float:
-        return (self.y_min + self.y_max) / 2
-
-
-@dataclasses.dataclass
-class Hoop(PhysicsObject):
-    body: pymunk.Body
-    shape: pymunk.Shape
-
-    def __init__(self, radius, position):
-        self.body = pymunk.Body(body_type=pymunk.Body.STATIC)
-        self.body.position = position
-        self.shape = pymunk.Circle(self.body, radius)
-        self.shape.sensor = True
-
-    def physics_components(self) -> Iterable[PhysicsComponent]:
-        yield self.body
-        yield self.shape
+from game.court_dimensions import CourtDimensions
+from game.boundary import Boundary
+from game.hoop import Hoop
 
 
 class Court(PhysicsObject):
@@ -120,7 +31,6 @@ class Court(PhysicsObject):
             (dimensions.x_max, dimensions.y_min),
             (dimensions.x_min, dimensions.y_min),
         ]
-        print(endpoints)
         boundaries = [
             Boundary(endpoint_1, endpoint_2, dimensions.boundary_thickness)
             for endpoint_1, endpoint_2 in zip(endpoints, rotate(endpoints))
