@@ -1,2 +1,2 @@
-from .simulator import Simulator
+from .visualizer import Visualizer
 from .screen_params import ScreenParams

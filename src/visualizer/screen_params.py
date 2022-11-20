@@ -1,5 +1,5 @@
 import dataclasses
-from simulation.types import ScreenDimension, Fps
+from visualizer.types import ScreenDimension, Fps
 
 
 @dataclasses.dataclass

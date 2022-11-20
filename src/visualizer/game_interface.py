@@ -4,9 +4,13 @@ import pymunk
 
 class GameInterface(ABC):
     @abstractmethod
-    def initialize(self, space: pymunk.Space) -> None:
+    def getspace(self) -> pymunk.Space:
         pass
 
     @abstractmethod
-    def update(self, space: pymunk.Space) -> None:
+    def initialize(self) -> None:
+        pass
+
+    @abstractmethod
+    def update(self) -> None:
         pass

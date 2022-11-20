@@ -1,10 +1,10 @@
 from game import Game
-from simulation import Simulator, ScreenParams
+from visualizer import Visualizer, ScreenParams
 
 
-def setup_simulation() -> Simulator:
+def setup_simulation() -> Visualizer:
     game = Game()
-    simulation = Simulator(
+    simulation = Visualizer(
         ScreenParams(width=600, height=800, fps=30),
         game,
         simulation_speed_scale=0.2,
