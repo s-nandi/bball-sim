@@ -1,5 +1,6 @@
 from typing import List, Iterable
 import logging
+import pygame
 import pymunk
 from visualizer.simulation_interface import SimulationInterface
 from physics_lib import PhysicsObject, PhysicsComponent
@@ -33,3 +34,6 @@ class Game(SimulationInterface, PhysicsObject):
         for player in self.players:
             player.move((1, 0), 100)
             logging.info(player)
+
+    def draw(self, screen: pygame.Surface, scale: float = 1.0) -> None:
+        SimulationInterface.draw(self, screen, scale)

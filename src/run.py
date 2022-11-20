@@ -1,5 +1,6 @@
 import itertools
 import logging
+import math
 from typing import List
 from game import Game, Player, generate_players, Court, CourtDimensions
 from visualizer import Visualizer, ScreenParams
@@ -11,24 +12,42 @@ def configure_logger() -> None:
 
 def create_players() -> List[Player]:
     players = generate_players(
-        mass_generator=itertools.cycle([0.1, 100]),
-        size_generator=itertools.repeat(10.0),
-        max_speed_generator=itertools.cycle([60.0, 40.0]),
-        max_acceleration_generator=itertools.cycle([50.0, 130.0]),
-        position_generator=[(10, 10), (30, 30)],
+        mass_generator=itertools.cycle([81.19, 98.3]),  # kg
+        size_generator=itertools.repeat(0.94),  # m
+        max_speed_generator=itertools.cycle([2.096618, 1.627226]),  # m / s
+        max_acceleration_generator=itertools.cycle([2.34, 2.5]),  # m / s ^ 2
+        position_generator=[(2, 2), (3.5, 3.5)],
     )
     return list(players)
 
 
-def create_court(width: float, height: float) -> Court:
-    return Court(CourtDimensions(width, height, boundary_thickness=2.0))
+def create_court() -> Court:
+    sideline_thickness = 0.05  # m
+    width = 28.65  # m
+    height = 15.24  # m
+    rim_radius = 0.4572  # m
+    rim_distance_from_edge = 1000  # m
+
+    padded_width = width + sideline_thickness * 2
+    padded_height = height + sideline_thickness * 2
+    return Court(
+        CourtDimensions(
+            width=padded_width,
+            height=padded_height,
+            boundary_thickness=sideline_thickness,
+            rim_radius=rim_radius,
+            rim_distance_from_edge=rim_distance_from_edge,
+        )
+    )
 
 
 def setup_simulation() -> Visualizer:
-    width = 450
-    height = 250
-    screen_params = ScreenParams(width=width, height=height, fps=30)
-    game = Game(create_players(), create_court(width, height))
+    game = Game(create_players(), create_court())
+    screen_params = ScreenParams(
+        width=game.court.dimensions.width,
+        height=game.court.dimensions.height,
+        fps=30,
+    )
     simulation = Visualizer(
         screen_params,
         game,

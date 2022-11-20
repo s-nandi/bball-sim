@@ -47,10 +47,12 @@ class CourtDimensions:
     width: float
     height: float
     boundary_thickness: float
+    rim_radius: float
+    rim_distance_from_edge: float
     boundary_thickness_diameter: float = dataclasses.field(init=False)
 
     def __post_init__(self):
-        self.boundary_thickness_diameter = self.boundary_thickness * 2
+        self.boundary_thickness_diameter = self.boundary_thickness * 1
 
     @property
     def x_min(self) -> float:
@@ -69,13 +71,23 @@ class CourtDimensions:
         return self.height - self.boundary_thickness_diameter
 
 
+@dataclasses.dataclass
+class Hoop:
+    shape: pymunk.Shape
+
+    def __init__(self, radius, _position):
+        self.shape = pymunk.Circle(None, radius)
+
+
 class Court(PhysicsObject):
     dimensions: CourtDimensions
     boundaries: List[Boundary]
+    hoop: Hoop
 
     def __init__(self, dimensions: CourtDimensions):
         self.dimensions = dimensions
         self.boundaries = self.create_boundaries(dimensions)
+        self.hoop = Hoop(dimensions.rim_radius, dimensions.rim_distance_from_edge)
 
     def physics_components(self) -> Iterable[PhysicsComponent]:
         for boundary in self.boundaries:
