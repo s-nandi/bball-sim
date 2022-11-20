@@ -47,22 +47,26 @@ class CourtDimensions:
     width: float
     height: float
     boundary_thickness: float
+    boundary_thickness_diameter: float = dataclasses.field(init=False)
+
+    def __post_init__(self):
+        self.boundary_thickness_diameter = self.boundary_thickness * 2
 
     @property
     def x_min(self) -> float:
-        return self.boundary_thickness
+        return self.boundary_thickness_diameter
 
     @property
     def x_max(self) -> float:
-        return self.width - self.boundary_thickness
+        return self.width - self.boundary_thickness_diameter
 
     @property
     def y_min(self) -> float:
-        return self.boundary_thickness
+        return self.boundary_thickness_diameter
 
     @property
     def y_max(self) -> float:
-        return self.height - self.boundary_thickness
+        return self.height - self.boundary_thickness_diameter
 
 
 class Court(PhysicsObject):

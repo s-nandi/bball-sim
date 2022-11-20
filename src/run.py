@@ -11,8 +11,8 @@ def configure_logger() -> None:
 
 def create_players() -> List[Player]:
     players = generate_players(
-        mass_generator=itertools.cycle([0.1, 1]),
-        size_generator=itertools.repeat(5.0),
+        mass_generator=itertools.cycle([0.1, 100]),
+        size_generator=itertools.repeat(10.0),
         max_speed_generator=itertools.cycle([60.0, 40.0]),
         max_acceleration_generator=itertools.cycle([50.0, 130.0]),
         position_generator=[(10, 10), (30, 30)],
@@ -21,7 +21,7 @@ def create_players() -> List[Player]:
 
 
 def create_court(width: float, height: float) -> Court:
-    return Court(CourtDimensions(width, height, boundary_thickness=1.0))
+    return Court(CourtDimensions(width, height, boundary_thickness=2.0))
 
 
 def setup_simulation() -> Visualizer:
