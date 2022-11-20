@@ -4,7 +4,7 @@ from visualizer.engine import Engine
 from visualizer.simulator import Simulator
 from visualizer.screen_params import ScreenParams
 from visualizer.types import SpeedScale
-from visualizer.game_interface import GameInterface
+from visualizer.simulation_interface import SimulationInterface
 
 
 def should_keep_running(events: List[pygame.event.Event]) -> bool:
@@ -24,11 +24,13 @@ class Visualizer:
     def __init__(
         self,
         screen_params: ScreenParams,
-        game: GameInterface,
+        simulation: SimulationInterface,
         simulation_speed_scale: SpeedScale,
     ):
         self.engine = Engine(screen_params)
-        self.simulation = Simulator(game, screen_params.fps, simulation_speed_scale)
+        self.simulation = Simulator(
+            simulation, screen_params.fps, simulation_speed_scale
+        )
         self.events = []
 
     def run(self) -> None:

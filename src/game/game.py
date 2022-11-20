@@ -1,10 +1,10 @@
 import random
 import pymunk
-from visualizer.game_interface import GameInterface
+from visualizer.simulation_interface import SimulationInterface
 from game.scene import SceneObjects
 
 
-class Game(GameInterface):
+class Game(SimulationInterface):
     scene: SceneObjects
     space: pymunk.Space
 

@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import pymunk
 
 
-class GameInterface(ABC):
+class SimulationInterface(ABC):
     @abstractmethod
     def getspace(self) -> pymunk.Space:
         pass
