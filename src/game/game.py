@@ -1,39 +1,35 @@
-import itertools
-from typing import List
+from typing import List, Iterable
 import logging
 import pymunk
 from visualizer.simulation_interface import SimulationInterface
-from game.player import Player, generate_players
+from physics_lib import PhysicsObject, PhysicsComponent
+from game.player import Player
+from game.court import Court
 
 
-def create_players() -> List[Player]:
-    players = generate_players(
-        mass_generator=itertools.repeat(0.1),
-        size_generator=itertools.repeat(10.0),
-        max_speed_generator=itertools.cycle([43.0, 30.0]),
-        max_acceleration_generator=itertools.cycle([50.0, 90.0]),
-        position_generator=[(150, 150), (200, 200)],
-    )
-    return list(players)
-
-
-class Game(SimulationInterface):
+class Game(SimulationInterface, PhysicsObject):
     players: List[Player]
+    court: Court
     space: pymunk.Space
 
-    def __init__(self):
+    def __init__(self, players: List[Player], court: Court):
         self.space = pymunk.Space()
-        self.players = create_players()
+        self.players = players
+        self.court = court
+
+    def physics_components(self) -> Iterable[PhysicsComponent]:
+        for player in self.players:
+            yield from player.physics_components()
+        yield from self.court.physics_components()
 
     def getspace(self) -> pymunk.Space:
         return self.space
 
     def initialize(self) -> None:
         self.space.sleep_time_threshold = 0.3
-        for player in self.players:
-            player.add_to_space(self.space)
+        self.add_to_space(self.space)
 
     def update(self) -> None:
         for player in self.players:
-            player.move(pymunk.Vec2d(1, 0), 100)
+            player.move((1, 0), 100)
             logging.info(player)

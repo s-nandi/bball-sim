@@ -1,3 +1,4 @@
+from typing import TypeVar, List
 import pymunk
 
 
@@ -10,3 +11,10 @@ def limited_velocity_func(max_velocity: float):
             body.velocity = body.velocity * scale
 
     return limit_velocity
+
+
+T = TypeVar("T")
+
+
+def rotate(lis: List[T], offset=1) -> List[T]:
+    return lis[offset:] + lis[:offset]
