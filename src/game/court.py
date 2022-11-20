@@ -63,6 +63,10 @@ class CourtDimensions:
         return self.width - self.boundary_thickness_diameter
 
     @property
+    def x_mid(self) -> float:
+        return (self.x_min + self.x_max) / 2
+
+    @property
     def y_min(self) -> float:
         return self.boundary_thickness_diameter
 
@@ -70,28 +74,42 @@ class CourtDimensions:
     def y_max(self) -> float:
         return self.height - self.boundary_thickness_diameter
 
+    @property
+    def y_mid(self) -> float:
+        return (self.y_min + self.y_max) / 2
+
 
 @dataclasses.dataclass
-class Hoop:
+class Hoop(PhysicsObject):
+    body: pymunk.Body
     shape: pymunk.Shape
 
-    def __init__(self, radius, _position):
-        self.shape = pymunk.Circle(None, radius)
+    def __init__(self, radius, position):
+        self.body = pymunk.Body(body_type=pymunk.Body.STATIC)
+        self.body.position = position
+        self.shape = pymunk.Circle(self.body, radius)
+        self.shape.sensor = True
+
+    def physics_components(self) -> Iterable[PhysicsComponent]:
+        yield self.body
+        yield self.shape
 
 
 class Court(PhysicsObject):
     dimensions: CourtDimensions
     boundaries: List[Boundary]
-    hoop: Hoop
+    hoops: List[Hoop]
 
     def __init__(self, dimensions: CourtDimensions):
         self.dimensions = dimensions
         self.boundaries = self.create_boundaries(dimensions)
-        self.hoop = Hoop(dimensions.rim_radius, dimensions.rim_distance_from_edge)
+        self.hoops = self.create_hoops(dimensions)
 
     def physics_components(self) -> Iterable[PhysicsComponent]:
         for boundary in self.boundaries:
             yield from boundary.physics_components()
+        for hoop in self.hoops:
+            yield from hoop.physics_components()
 
     @staticmethod
     def create_boundaries(dimensions: CourtDimensions) -> List[Boundary]:
@@ -102,8 +120,23 @@ class Court(PhysicsObject):
             (dimensions.x_max, dimensions.y_min),
             (dimensions.x_min, dimensions.y_min),
         ]
+        print(endpoints)
         boundaries = [
             Boundary(endpoint_1, endpoint_2, dimensions.boundary_thickness)
             for endpoint_1, endpoint_2 in zip(endpoints, rotate(endpoints))
         ]
         return boundaries
+
+    @staticmethod
+    def create_hoops(dimensions: CourtDimensions) -> List[Hoop]:
+        positions = [
+            (
+                dimensions.x_min + dimensions.rim_distance_from_edge,
+                dimensions.y_mid,
+            ),
+            (
+                dimensions.x_max - dimensions.rim_distance_from_edge,
+                dimensions.y_mid,
+            ),
+        ]
+        return [Hoop(dimensions.rim_radius, position) for position in positions]
