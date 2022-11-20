@@ -18,7 +18,7 @@ def should_keep_running(events: List[pygame.event.Event]) -> bool:
 
 class Visualizer:
     engine: Engine
-    simulation: Simulator
+    simulator: Simulator
     events: List[pygame.event.Event]
 
     def __init__(
@@ -28,17 +28,21 @@ class Visualizer:
         simulation_speed_scale: SpeedScale,
     ):
         self.engine = Engine(screen_params)
-        self.simulation = Simulator(
+        self.simulator = Simulator(
             simulation, screen_params.fps, simulation_speed_scale
         )
         self.events = []
 
+    @property
+    def simulation(self):
+        return self.simulator.simulation
+
     def run(self) -> None:
-        self.simulation.initialize()
+        self.simulator.initialize()
         while should_keep_running(self.events):
             self.loop()
 
     def loop(self) -> None:
         self.events = pygame.event.get()
-        self.simulation.step()
+        self.simulator.step()
         self.engine.render(self.simulation)

@@ -1,5 +1,4 @@
 import math
-import pygame
 import pymunk
 import pymunk.pygame_util
 from visualizer.types import TimePerFrame, Fps, SpeedScale
@@ -35,9 +34,3 @@ class Simulator:
         substeps = math.ceil(max(1, self.time_per_frame / self.max_allowable_step()))
         for _ in range(substeps):
             self.space.step(self.time_per_frame / substeps)
-
-    def draw(self, screen: pygame.Surface) -> None:
-        pymunk.pygame_util.positive_y_is_up = True
-        screen.fill(pygame.Color("white"))
-        self.space.debug_draw(pymunk.pygame_util.DrawOptions(screen))
-        pygame.display.flip()

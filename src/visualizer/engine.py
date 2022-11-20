@@ -1,7 +1,7 @@
 import pygame
 from visualizer.screen_params import ScreenParams
 from visualizer.types import Fps
-from visualizer.simulator import Simulator
+from visualizer.simulation_interface import SimulationInterface
 
 
 class Engine:
@@ -20,7 +20,7 @@ class Engine:
         self.clock.tick(self.target_fps)
         return round(self.clock.get_fps(), 2)
 
-    def render(self, simulation: Simulator):
+    def render(self, simulation: SimulationInterface):
         simulation.draw(self.screen)
         caption = f"fps: {str(self.tick())}"
         pygame.display.set_caption(caption)
