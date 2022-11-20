@@ -3,7 +3,7 @@ from typing import List
 import logging
 import pymunk
 from visualizer.simulation_interface import SimulationInterface
-from game.player import Player, PlayerAttributes
+from game.scene import Player, PlayerAttributes
 
 
 def create_players() -> List[Player]:

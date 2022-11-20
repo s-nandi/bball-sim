@@ -1,17 +1,9 @@
-import dataclasses
 from typing import Iterable
 import pymunk
 from physics_lib import PhysicsObject, PhysicsComponent
 from game.types import ConvertibleToVec2d
 from game.utils import limited_velocity_func
-
-
-@dataclasses.dataclass
-class PlayerAttributes:
-    mass: float
-    size: float
-    max_speed: float
-    max_acceleration: float
+from game.scene.player_attributes import PlayerAttributes
 
 
 def appliable_force(
