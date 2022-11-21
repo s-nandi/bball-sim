@@ -1,7 +1,8 @@
 import itertools
 import logging
 from typing import List
-from game import Game, Player, generate_players, Court, CourtDimensions
+from game import Game, Player, generate_players, Court
+from game.dimensions import CourtDimensions, RimDimensions, ThreePointLineDimensions
 from visualizer import Visualizer, ScreenParams
 
 
@@ -25,7 +26,11 @@ def create_court() -> Court:
     width = 28.65  # m
     height = 15.24  # m
     rim_radius = 0.4572  # m
-    rim_distance_from_edge = 1.6002  # m
+    rim_distance_from_left_edge = 1.6002  # m
+    three_point_line_distance_from_top_edge = 1.019  # m
+    three_point_line_corner_length = 3.006725  # m
+    three_point_line_outer_radius = 6.75  # m
+    three_point_line_line_thickness = 0.025  # m
 
     padded_width = width + sideline_thickness * 2
     padded_height = height + sideline_thickness * 2
@@ -34,8 +39,13 @@ def create_court() -> Court:
             width=padded_width,
             height=padded_height,
             boundary_thickness=sideline_thickness,
-            rim_radius=rim_radius,
-            rim_distance_from_edge=rim_distance_from_edge,
+            rim=RimDimensions(rim_radius, rim_distance_from_left_edge),
+            three_point_line=ThreePointLineDimensions(
+                three_point_line_distance_from_top_edge,
+                three_point_line_corner_length,
+                three_point_line_outer_radius,
+                three_point_line_line_thickness,
+            ),
         )
     )
 

@@ -2,10 +2,12 @@ from typing import List, Iterable
 import logging
 import pygame
 import pymunk
+import pymunk.pygame_util
 from visualizer.simulation_interface import SimulationInterface
 from physics_lib import PhysicsObject, PhysicsComponent
 from game.player import Player
 from game.court import Court
+from game.draw import draw_three_point_line
 
 
 class Game(SimulationInterface, PhysicsObject):
@@ -36,4 +38,5 @@ class Game(SimulationInterface, PhysicsObject):
             logging.info(player)
 
     def draw(self, screen: pygame.Surface, scale: float = 1.0) -> None:
+        draw_three_point_line(self.court.dimensions, screen, scale)
         SimulationInterface.draw(self, screen, scale)

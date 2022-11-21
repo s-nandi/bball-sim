@@ -1,5 +1,6 @@
 from typing import TypeVar, List
 import pymunk
+import pymunk.pygame_util
 
 
 def limited_velocity_func(max_velocity: float):

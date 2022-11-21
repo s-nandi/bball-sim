@@ -47,7 +47,7 @@ class Engine:
             screen_rect.width / self.screen_params.width,
             screen_rect.height / self.screen_params.height,
         )
-        simulation.draw(buffer, scale_factor)
+        simulation.complete_draw(buffer, scale_factor)
         self.screen.blit(buffer, (0, 0))
         caption = f"fps: {str(self.tick())}"
         pygame.display.set_caption(caption)

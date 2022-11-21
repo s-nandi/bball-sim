@@ -1,7 +1,7 @@
 from typing import Iterable, List
 from physics_lib import PhysicsObject, PhysicsComponent
 from game.utils import rotate
-from game.court_dimensions import CourtDimensions
+from game.dimensions import CourtDimensions
 from game.boundary import Boundary
 from game.hoop import Hoop
 
@@ -39,14 +39,5 @@ class Court(PhysicsObject):
 
     @staticmethod
     def create_hoops(dimensions: CourtDimensions) -> List[Hoop]:
-        positions = [
-            (
-                dimensions.x_min + dimensions.rim_distance_from_edge,
-                dimensions.y_mid,
-            ),
-            (
-                dimensions.x_max - dimensions.rim_distance_from_edge,
-                dimensions.y_mid,
-            ),
-        ]
-        return [Hoop(dimensions.rim_radius, position) for position in positions]
+        positions = [dimensions.left_rim_position, dimensions.right_rim_position]
+        return [Hoop(dimensions.rim.radius, position) for position in positions]
