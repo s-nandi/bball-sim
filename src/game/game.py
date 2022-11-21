@@ -7,7 +7,7 @@ from visualizer.simulation_interface import SimulationInterface
 from physics_lib import PhysicsObject, PhysicsComponent
 from game.player import Player
 from game.court import Court
-from game.draw import draw_three_point_line
+from game.draw import draw_court_markings
 
 
 class Game(SimulationInterface, PhysicsObject):
@@ -38,5 +38,5 @@ class Game(SimulationInterface, PhysicsObject):
             logging.info(player)
 
     def draw(self, screen: pygame.Surface, scale: float = 1.0) -> None:
-        draw_three_point_line(self.court.dimensions, screen, scale)
+        draw_court_markings(self.court.dimensions, screen, scale)
         SimulationInterface.draw(self, screen, scale)
