@@ -1,13 +1,10 @@
 import itertools
+import functools
 import logging
 from typing import List
-from game import Game, Player, generate_players, Court
+from game import Game, Player, generate_players, Court, behavior
 from game.dimensions import CourtDimensions, RimDimensions, ThreePointLineDimensions
 from visualizer import Visualizer, ScreenParams
-
-
-def configure_logger() -> None:
-    logging.basicConfig(filename="output/run.log", level=logging.DEBUG)
 
 
 def create_players() -> List[Player]:
@@ -16,7 +13,8 @@ def create_players() -> List[Player]:
         size_generator=itertools.repeat(0.94),  # m
         max_speed_generator=itertools.cycle([2.096618, 1.627226]),  # m / s
         max_acceleration_generator=itertools.cycle([2.34, 2.5]),  # m / s ^ 2
-        position_generator=[(2, 5), (3.5, 6.5)],
+        position_generator=[(2, 5), (28.65 - 3.5, 5.2)],
+        teams_generator=itertools.cycle([0, 1]),
     )
     return list(players)
 
@@ -51,7 +49,11 @@ def create_court() -> Court:
 
 
 def setup_simulation() -> Visualizer:
-    game = Game(create_players(), create_court())
+    game = Game(
+        create_players(),
+        create_court(),
+        functools.partial(behavior.get_close_to_basket, 10.0),
+    )
     screen_params = ScreenParams(
         width=game.court.dimensions.width,
         height=game.court.dimensions.height,
@@ -60,9 +62,13 @@ def setup_simulation() -> Visualizer:
     simulation = Visualizer(
         screen_params,
         game,
-        simulation_speed_scale=1.0,
+        simulation_speed_scale=2.0,
     )
     return simulation
+
+
+def configure_logger() -> None:
+    logging.basicConfig(filename="output/run.log", level=logging.DEBUG)
 
 
 def main() -> None:

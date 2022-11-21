@@ -2,6 +2,7 @@ import itertools
 from typing import Union, Iterable, List, Tuple, TypeVar
 from game.player.player import Player
 from game.player.player_attributes import PlayerAttributes
+from game.types import Team
 
 T = TypeVar("T")
 
@@ -54,6 +55,7 @@ def generate_players(
     max_speed_generator: Iterable[float],
     max_acceleration_generator: Iterable[float],
     position_generator: Iterable[Tuple[float, float]],
+    teams_generator: Iterable[Team],
     num_players: Union[int, None] = None,
 ) -> Iterable[Player]:
     attributes = generate_player_attributes(
@@ -64,8 +66,10 @@ def generate_players(
         num_attributes=num_players,
     )
     players: Iterable[Player] = (
-        Player(attribute, position)
-        for attribute, position in zip(attributes, position_generator)
+        Player(attribute, position, team)
+        for attribute, position, team in zip(
+            attributes, position_generator, teams_generator
+        )
     )
     if num_players is not None:
         players = list(players)

@@ -1,7 +1,7 @@
-from typing import Iterable
+from typing import Iterable, List
 import pymunk
 from physics_lib import PhysicsObject, PhysicsComponent
-from game.types import ConvertibleToVec2d, convert_to_vec2d
+from game.types import ConvertibleToVec2d, convert_to_vec2d, Team
 from game.utils import limited_velocity_func
 from game.player.player_attributes import PlayerAttributes
 
@@ -13,19 +13,34 @@ def appliable_force(
     return direction.scale_to_length(force_magnitude)
 
 
+PLAYER_DIMENSIONS_RATIO = 0.4
+
+
+def width_for_size(size: float) -> float:
+    return size * PLAYER_DIMENSIONS_RATIO
+
+
+def height_for_size(size: float) -> float:
+    return size
+
+
 class Player(PhysicsObject):
+    attributes: PlayerAttributes
     body: pymunk.Body
-    shape: pymunk.Shape
+    shapes: List[pymunk.Shape]
+    team: Team
 
     def __init__(
         self,
         attributes: PlayerAttributes,
         position: ConvertibleToVec2d,
+        team: Team,
     ):
         position = convert_to_vec2d(position)
         self.attributes = attributes
-        self.body = self.create_body(attributes.max_speed, position)
-        self.shape = self.create_shape(attributes.mass, attributes.size, self.body)
+        self.body = self.create_body(attributes, position)
+        self.shapes = self.create_shapes(attributes, self.body)
+        self.team = team
 
     def __str__(self):
         return (
@@ -34,21 +49,42 @@ class Player(PhysicsObject):
 
     def physics_components(self) -> Iterable[PhysicsComponent]:
         yield self.body
-        yield self.shape
+        yield from self.shapes
 
     @staticmethod
-    def create_body(max_speed: float, position: pymunk.Vec2d) -> pymunk.Body:
-        body = pymunk.Body()
+    def create_body(
+        attributes: PlayerAttributes, position: pymunk.Vec2d
+    ) -> pymunk.Body:
+        # moment = pymunk.moment_for_box(
+        #     attributes.mass,
+        #     (width_for_size(attributes.size), height_for_size(attributes.size)),
+        # )
+        # body = pymunk.Body(attributes.mass, moment, )
+        body = pymunk.Body(0, 0, body_type=pymunk.Body.DYNAMIC)
         body.position = position
-        body.velocity_func = limited_velocity_func(max_speed)
+        body.velocity = pymunk.Vec2d(0, 0)
+        body.force = pymunk.Vec2d(0, 0)
+        body.velocity_func = limited_velocity_func(attributes.max_speed)
         return body
 
     @staticmethod
-    def create_shape(mass: float, size: float, body: pymunk.Body) -> pymunk.Shape:
-        shape = pymunk.Circle(body, size)
-        shape.mass = mass
-        # TODO: Should player vs player collisions have friction?
-        return shape
+    def create_shapes(
+        attributes: PlayerAttributes, body: pymunk.Body
+    ) -> List[pymunk.Shape]:
+        shape = pymunk.Poly.create_box(
+            body,
+            (width_for_size(attributes.size), height_for_size(attributes.size)),
+            0.2,
+        )
+        shape.mass = attributes.mass
+        shape.elasticity = 0.01
+        shape.friction = 0
+        # shape = pymunk.Circle(body, attributes.size / 2, (0, attributes.size))
+        # shape.mass = attributes.mass / 2
+        # shape2 = pymunk.Circle(body, attributes.size / 2, (0, -attributes.size))
+        # shape2.mass = attributes.mass / 2
+        # # TODO: Should player vs player collisions have friction?
+        return [shape]
 
     @property
     def speed(self) -> float:
@@ -56,12 +92,9 @@ class Player(PhysicsObject):
 
     @property
     def acceleration(self) -> float:
-        return self.body.force.length / self.body.mass
+        return self.body.force / self.body.mass
 
-    def move(self, direction: ConvertibleToVec2d, acceleration: float) -> None:
-        direction = convert_to_vec2d(direction)
-        force = appliable_force(direction, acceleration, self.attributes)
-        self.body.apply_force_at_local_point(force)
-
-        assert self.acceleration <= self.attributes.max_acceleration
-        # assert self.speed <= self.attributes.max_speed
+    def apply_friction(self, friction_coeff: float) -> None:
+        current_force = self.body.force
+        friction_force = -current_force * friction_coeff
+        self.body.apply_force_at_local_point(friction_force)

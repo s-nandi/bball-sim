@@ -90,25 +90,46 @@ def draw_circle_arc(
         )
 
 
+def draw_circle(
+    screen: pygame.Surface,
+    center: Tuple[float, float],
+    *,
+    radius: float,
+    thickness: float,
+    outline_color: Color,
+    subdivisions: int,
+    scale: float,
+) -> None:
+    draw_circle_arc(
+        screen,
+        center,
+        radius=radius,
+        starting_angle=0,
+        total_angle=2 * math.pi,
+        thickness=thickness,
+        outline_color=outline_color,
+        subdivisions=subdivisions,
+        scale=scale,
+    )
+
+
 def draw_court_markings(
     dimensions: CourtDimensions, screen: pygame.Surface, scale: float
 ) -> None:
-    three_point_line_dimensions = dimensions.three_point_line
-
-    top_y = dimensions.y_max - three_point_line_dimensions.distance_from_top_edge
-    bottom_y = dimensions.y_min + three_point_line_dimensions.distance_from_top_edge
+    top_y = dimensions.y_max - dimensions.three_point_line.distance_from_top_edge
+    bottom_y = dimensions.y_min + dimensions.three_point_line.distance_from_top_edge
     left_x = dimensions.x_min
-    right_x = dimensions.x_min + three_point_line_dimensions.corner_length
+    right_x = dimensions.x_min + dimensions.three_point_line.corner_length
 
     line_color = Color(0, 103, 130, 255)
-    line_thickness = three_point_line_dimensions.line_thickness
+    line_thickness = dimensions.three_point_line.line_thickness
 
     opposite = (
-        three_point_line_dimensions.corner_length
+        dimensions.three_point_line.corner_length
         - dimensions.rim.distance_from_left_edge
     )
     adjacent = (
-        dimensions.height / 2 - three_point_line_dimensions.distance_from_top_edge
+        dimensions.height / 2 - dimensions.three_point_line.distance_from_top_edge
     )
     amt_radians_less_than_semicircle = math.atan2(opposite, adjacent)
 
@@ -133,7 +154,7 @@ def draw_court_markings(
             starting_angle=amt_radians_less_than_semicircle - math.pi / 2,
             total_angle=math.pi - 2 * amt_radians_less_than_semicircle,
             thickness=line_thickness,
-            radius=three_point_line_dimensions.outer_radius,
+            radius=dimensions.three_point_line.outer_radius,
             outline_color=line_color,
             subdivisions=30,
             scale=scale,
@@ -163,7 +184,7 @@ def draw_court_markings(
             starting_angle=amt_radians_less_than_semicircle + math.pi / 2,
             total_angle=math.pi - 2 * amt_radians_less_than_semicircle,
             thickness=line_thickness,
-            radius=three_point_line_dimensions.outer_radius,
+            radius=dimensions.three_point_line.outer_radius,
             outline_color=line_color,
             subdivisions=30,
             scale=scale,
