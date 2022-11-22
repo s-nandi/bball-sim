@@ -7,6 +7,7 @@ from physics_lib import PhysicsObject, PhysicsComponent
 from game.player import Player
 from game.court import Court
 from game.team import Team, TEAMS
+from game.colors import SCORE_COLOR
 
 
 class Game(SimulationInterface, PhysicsObject):
@@ -44,6 +45,7 @@ class Game(SimulationInterface, PhysicsObject):
         self.court.draw(screen, scale)
         for player in self.players:
             player.draw(screen, scale)
+        self.draw_score(screen)
 
     def initialize(self) -> None:
         self.space.damping = self.court.damping
@@ -51,3 +53,13 @@ class Game(SimulationInterface, PhysicsObject):
 
     def update(self) -> None:
         self.player_behavior(self, self.players, self.court)
+
+    def draw_score(self, screen: pygame.Surface):
+        distance_from_left = 40
+        distance_from_top = 25
+        font_size = 30
+        font = pygame.font.SysFont("freesansbold.ttf", font_size)
+
+        score_string = f"{self.scores[0]} - {self.scores[1]}"
+        img = font.render(score_string, True, SCORE_COLOR.as_int())
+        screen.blit(img, (distance_from_left, distance_from_top))
