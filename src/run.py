@@ -28,8 +28,13 @@ def create_players() -> List[Player]:
         size_generator=itertools.repeat(0.94),  # m
         max_speed_generator=itertools.cycle([2.096618, 1.627226]),  # m / s
         max_acceleration_generator=itertools.cycle([2.34, 2.5]),  # m / s ^ 2
-        position_generator=[(3.5, 7.62), (28.65 - 3.5, 7.62)],
-        teams_generator=itertools.cycle([0, 1]),
+        position_generator=[
+            (3.5, 7.62),
+            (4.5, 10.62),
+            (28.65 - 4.5, 2.3),
+            (28.65 - 3.5, 7.62),
+        ],
+        teams_generator=itertools.cycle([0, 0, 1, 1]),
     )
     return list(players)
 
@@ -69,7 +74,11 @@ def setup_simulation() -> Visualizer:
     game = Game(
         create_players(),
         create_court(),
-        functools.partial(behavior.get_close_to_basket, 10.0),
+        functools.partial(
+            behavior.get_close_to_basket_or_block,
+            distance_threshold=3.0,
+            defensive_tightness=0.75,
+        ),
     )
     screen_params = ScreenParams(
         width=game.court.dimensions.width,

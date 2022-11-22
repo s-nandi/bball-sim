@@ -6,7 +6,6 @@ from visualizer.simulation_interface import SimulationInterface
 from physics_lib import PhysicsObject, PhysicsComponent
 from game.player import Player
 from game.court import Court
-from game.draw import draw_court_markings, draw_circle, Color
 
 
 class Game(SimulationInterface, PhysicsObject):
@@ -25,6 +24,7 @@ class Game(SimulationInterface, PhysicsObject):
         self.players = players
         self.court = court
         self.player_behavior = player_behavior
+        self.players[0].has_ball = True
 
     def physics_components(self) -> Iterable[PhysicsComponent]:
         for player in self.players:
@@ -34,9 +34,10 @@ class Game(SimulationInterface, PhysicsObject):
     def getspace(self) -> pymunk.Space:
         return self.space
 
-    def draw(self, screen: pygame.Surface, scale: float = 1.0) -> None:
-        draw_court_markings(self.court.dimensions, screen, scale)
-        SimulationInterface.draw(self, screen, scale)
+    def draw(self, screen: pygame.Surface, scale: float) -> None:
+        self.court.draw(screen, scale)
+        for player in self.players:
+            player.draw(screen, scale)
 
     def initialize(self) -> None:
         self.space.damping = self.court.damping

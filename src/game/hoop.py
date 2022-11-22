@@ -1,7 +1,9 @@
 import dataclasses
 from typing import Iterable
+import pygame
 import pymunk
 from physics_lib import PhysicsObject, PhysicsComponent
+from game.draw import Color, draw_circle
 
 
 @dataclasses.dataclass
@@ -18,3 +20,16 @@ class Hoop(PhysicsObject):
     def physics_components(self) -> Iterable[PhysicsComponent]:
         yield self.body
         yield self.shape
+
+    def draw(self, screen: pygame.Surface, scale: float):
+        color = Color(30, 30, 30, 255)
+        radius = self.shape.radius
+        thickness = 8
+        draw_circle(
+            screen,
+            self.body.position,
+            radius=radius,
+            fill_color=color,
+            thickness=thickness,
+            scale=scale,
+        )

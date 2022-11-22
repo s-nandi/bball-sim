@@ -50,6 +50,28 @@ def draw_segment(
     )
 
 
+def draw_circle(
+    screen: pygame.Surface,
+    center: Tuple[float, float],
+    *,
+    radius: float,
+    fill_color: Color,
+    scale: float,
+    thickness: int = 0,
+):
+    """
+    A thickness value of 0 will result in a completely filled circle
+    Otherwise, smaller thickness values correspond to less filling
+    """
+    transform = pymunk.Transform.scaling(scale)
+    xformed_center = transform_points(transform, [center])[0]
+    xformed_radius = radius * scale
+    pygame_center = pymunk.pygame_util.to_pygame(xformed_center, screen)
+    pygame.draw.circle(
+        screen, fill_color.as_int(), pygame_center, xformed_radius, thickness
+    )
+
+
 def chord_endpoints(
     center, radius, starting_angle, total_angle, subdivisions
 ) -> List[Tuple[float, float]]:
@@ -88,29 +110,6 @@ def draw_circle_arc(
             outline_color=outline_color,
             scale=scale,
         )
-
-
-def draw_circle(
-    screen: pygame.Surface,
-    center: Tuple[float, float],
-    *,
-    radius: float,
-    thickness: float,
-    outline_color: Color,
-    subdivisions: int,
-    scale: float,
-) -> None:
-    draw_circle_arc(
-        screen,
-        center,
-        radius=radius,
-        starting_angle=0,
-        total_angle=2 * math.pi,
-        thickness=thickness,
-        outline_color=outline_color,
-        subdivisions=subdivisions,
-        scale=scale,
-    )
 
 
 def draw_court_markings(

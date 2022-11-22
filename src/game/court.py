@@ -1,9 +1,11 @@
 from typing import Iterable, List
+import pygame
 from physics_lib import PhysicsObject, PhysicsComponent
 from game.utils import rotate
 from game.dimensions import CourtDimensions
 from game.boundary import Boundary
 from game.hoop import Hoop
+from game.draw import draw_court_markings
 
 
 class Court(PhysicsObject):
@@ -43,3 +45,8 @@ class Court(PhysicsObject):
     def create_hoops(dimensions: CourtDimensions) -> List[Hoop]:
         positions = [dimensions.left_rim_position, dimensions.right_rim_position]
         return [Hoop(dimensions.rim.radius, position) for position in positions]
+
+    def draw(self, screen: pygame.Surface, scale: float):
+        draw_court_markings(self.dimensions, screen, scale)
+        for hoop in self.hoops:
+            hoop.draw(screen, scale)

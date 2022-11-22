@@ -21,7 +21,7 @@ class Simulator:
     ):
         self.simulation = simulation
         self.time_per_frame = speed_scale / fps
-        print(self.time_per_frame)
+        print("time_per_frame", self.time_per_frame)
 
     @property
     def space(self) -> pymunk.Space:
