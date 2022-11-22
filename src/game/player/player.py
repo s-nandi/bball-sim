@@ -21,7 +21,6 @@ class Player(PhysicsObject):
     body: pymunk.Body
     shapes: List[pymunk.Shape]
     team: Team
-    previous_accel: pymunk.Vec2d
 
     def __init__(
         self,
@@ -34,7 +33,6 @@ class Player(PhysicsObject):
         self.body = self.create_body(attributes, position)
         self.shapes = self.create_shapes(attributes, self.body)
         self.team = team
-        self.previous_accel = pymunk.Vec2d(0, 0)
 
     def __str__(self):
         return f"attr = {self.attributes}"

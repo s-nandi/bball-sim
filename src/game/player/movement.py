@@ -30,9 +30,7 @@ def move_in_direction(
         else pymunk.Vec2d(0, 0)
     )
     applied_force = a_new * player.body.mass
-    player.body.force = applied_force
-    # player.body.apply_impulse_at_world_point(applied_force, player.body.position)
-    player.previous_accel = a_new
+    player.body.apply_force_at_world_point(applied_force, player.body.position)
 
 
 def stop_movement(player: Player):
@@ -115,7 +113,7 @@ def determine_acceleration(
         acc = constant_acceleration_for_reaching(dist, v_curr, a_max, time_feas)
     else:
         assert False
-    return acc
+    return max(0, acc)
 
 
 def move_towards(
