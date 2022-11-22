@@ -57,8 +57,7 @@ class Game(SimulationInterface, PhysicsObject):
         SimulationInterface.draw(self, screen, scale)
 
     def initialize(self) -> None:
-        self.space.damping = 0.8
-        # self.space.sleep_time_threshold = 0.3
+        self.space.damping = self.court.damping
         self.add_to_space(self.space)
 
     def update(self) -> None:

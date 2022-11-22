@@ -10,11 +10,13 @@ class Court(PhysicsObject):
     dimensions: CourtDimensions
     boundaries: List[Boundary]
     hoops: List[Hoop]
+    damping: float
 
-    def __init__(self, dimensions: CourtDimensions):
+    def __init__(self, dimensions: CourtDimensions, damping: float):
         self.dimensions = dimensions
         self.boundaries = self.create_boundaries(dimensions)
         self.hoops = self.create_hoops(dimensions)
+        self.damping = damping
 
     def physics_components(self) -> Iterable[PhysicsComponent]:
         for boundary in self.boundaries:

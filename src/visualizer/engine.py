@@ -4,7 +4,7 @@ from visualizer.screen_params import ScreenParams
 from visualizer.types import Fps
 from visualizer.simulation_interface import SimulationInterface
 
-DISPLAY_SCALE = 0.95
+DISPLAY_SCALE = 0.5
 
 
 def scale_while_maintaining_resolution(
