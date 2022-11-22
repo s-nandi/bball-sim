@@ -4,7 +4,9 @@ import pymunk
 import pymunk.pygame_util
 import pygame
 from game.dimensions import CourtDimensions
-from game.types import Color
+from game.colors import Color, COURT_LINE_COLOR
+
+SCORE_INDICATOR_DURATION_SEC = 1
 
 
 def transform_points(
@@ -120,7 +122,6 @@ def draw_court_markings(
     left_x = dimensions.x_min
     right_x = dimensions.x_min + dimensions.three_point_line.corner_length
 
-    line_color = Color(0, 103, 130, 255)
     line_thickness = dimensions.three_point_line.line_thickness
 
     opposite = (
@@ -137,14 +138,14 @@ def draw_court_markings(
             screen,
             ((left_x, top_y), (right_x, top_y)),
             radius=line_thickness,
-            outline_color=line_color,
+            outline_color=COURT_LINE_COLOR,
             scale=scale,
         )
         draw_segment(
             screen,
             ((left_x, bottom_y), (right_x, bottom_y)),
             radius=line_thickness,
-            outline_color=line_color,
+            outline_color=COURT_LINE_COLOR,
             scale=scale,
         )
         draw_circle_arc(
@@ -154,7 +155,7 @@ def draw_court_markings(
             total_angle=math.pi - 2 * amt_radians_less_than_semicircle,
             thickness=line_thickness,
             radius=dimensions.three_point_line.outer_radius,
-            outline_color=line_color,
+            outline_color=COURT_LINE_COLOR,
             subdivisions=30,
             scale=scale,
         )
@@ -164,7 +165,7 @@ def draw_court_markings(
             screen,
             ((dimensions.width - left_x, top_y), (dimensions.width - right_x, top_y)),
             radius=line_thickness,
-            outline_color=line_color,
+            outline_color=COURT_LINE_COLOR,
             scale=scale,
         )
         draw_segment(
@@ -174,7 +175,7 @@ def draw_court_markings(
                 (dimensions.width - right_x, bottom_y),
             ),
             radius=line_thickness,
-            outline_color=line_color,
+            outline_color=COURT_LINE_COLOR,
             scale=scale,
         )
         draw_circle_arc(
@@ -184,7 +185,7 @@ def draw_court_markings(
             total_angle=math.pi - 2 * amt_radians_less_than_semicircle,
             thickness=line_thickness,
             radius=dimensions.three_point_line.outer_radius,
-            outline_color=line_color,
+            outline_color=COURT_LINE_COLOR,
             subdivisions=30,
             scale=scale,
         )
@@ -197,7 +198,7 @@ def draw_court_markings(
                 (dimensions.x_mid, dimensions.y_min),
             ),
             radius=line_thickness,
-            outline_color=line_color,
+            outline_color=COURT_LINE_COLOR,
             scale=scale,
         )
 

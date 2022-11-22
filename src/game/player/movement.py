@@ -8,16 +8,16 @@ EPS = 10**-6
 
 def face_towards(player: Player, point: ConvertibleToVec2d):
     point = convert_to_vec2d(point)
-    direction = point - player.body.position
+    direction = point - player.position
     player.body.angle = direction.angle
 
 
 def move_in_direction(
     player: Player, p_diff: ConvertibleToVec2d, attempted_acceleration: float
-) -> None:
+) -> float:
     p_diff = convert_to_vec2d(p_diff)
     if p_diff.length < EPS:
-        return
+        return 0.0
 
     if attempted_acceleration < 0:
         attempted_acceleration = -attempted_acceleration
@@ -30,13 +30,15 @@ def move_in_direction(
         else pymunk.Vec2d(0, 0)
     )
     applied_force = a_new * player.body.mass
-    player.body.apply_force_at_world_point(applied_force, player.body.position)
+    player.body.apply_force_at_world_point(applied_force, player.position)
+    return a_new.length
 
 
-def stop_movement(player: Player):
-    v_curr: pymunk.Vec2d = player.body.velocity
+def stop_movement(player: Player) -> float:
+    v_curr: pymunk.Vec2d = player.velocity
     opposite_acceleration = min(player.attributes.max_acceleration, v_curr.length)
-    move_in_direction(player, -player.body.velocity, opposite_acceleration)
+    move_in_direction(player, -player.velocity, opposite_acceleration)
+    return opposite_acceleration
 
 
 def distance_under_constant_acceleration(
@@ -121,16 +123,17 @@ def move_towards(
     p_goal: ConvertibleToVec2d,
     acceptable_distance: float,
     style: MovementStyle,
-) -> None:
+) -> float:
     p_goal = convert_to_vec2d(p_goal)
 
-    p_diff: pymunk.Vec2d = p_goal - player.body.position
+    p_diff: pymunk.Vec2d = p_goal - player.position
     dist_needed: float = p_diff.length - acceptable_distance
     if dist_needed < EPS:
-        stop_movement(player)
+        ret = stop_movement(player)
     else:
-        a_max: float = player.attributes.max_acceleration
-        v_curr: float = player.body.velocity.length
+        a_max = player.attributes.max_acceleration
+        v_curr = player.velocity.length
         a_next = determine_acceleration(dist_needed, v_curr, a_max, style)
-        move_in_direction(player, p_diff, a_next)
+        ret = move_in_direction(player, p_diff, a_next)
     face_towards(player, p_goal)
+    return ret

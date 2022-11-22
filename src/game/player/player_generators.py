@@ -2,7 +2,7 @@ import itertools
 from typing import Union, Iterable, List, Tuple, TypeVar
 from game.player.player import Player
 from game.player.player_attributes import PlayerAttributes
-from game.types import Team
+from game.team import Team
 
 T = TypeVar("T")
 

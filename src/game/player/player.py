@@ -5,7 +5,14 @@ from physics_lib import PhysicsObject, PhysicsComponent
 from game.types import ConvertibleToVec2d, convert_to_vec2d, Team
 from game.utils import limited_velocity_func
 from game.player.player_attributes import PlayerAttributes
-from game.draw import draw_polygon, Color
+from game.draw import draw_polygon
+from game.colors import (
+    Color,
+    PLAYER_COLOR_TEAM_0,
+    PLAYER_COLOR_TEAM_1,
+    PLAYER_COLOR_WITH_BALL,
+    PLAYER_COLOR_WITHOUT_BALL,
+)
 
 PLAYER_DIMENSIONS_RATIO = 0.4
 
@@ -16,12 +23,6 @@ def width_for_size(size: float) -> float:
 
 def height_for_size(size: float) -> float:
     return size
-
-
-COLOR_TEAM_0 = Color(226, 218, 219, 255)
-COLOR_TEAM_1 = Color(218, 226, 223, 255)
-COLOR_WITH_BALL = Color(238, 103, 48, 255)
-COLOR_WITHOUT_BALL = Color(255, 255, 255, 255)
 
 
 class Player(PhysicsObject):
@@ -49,6 +50,14 @@ class Player(PhysicsObject):
     def physics_components(self) -> Iterable[PhysicsComponent]:
         yield self.body
         yield self.shape
+
+    @property
+    def position(self) -> pymunk.Vec2d:
+        return self.body.position
+
+    @property
+    def velocity(self) -> pymunk.Vec2d:
+        return self.body.velocity
 
     @staticmethod
     def create_body(
@@ -89,6 +98,8 @@ class Player(PhysicsObject):
         )
 
     def player_color(self) -> Tuple[Color, Color]:
-        base_color = COLOR_TEAM_0 if self.team == 0 else COLOR_TEAM_1
-        has_ball_color = COLOR_WITH_BALL if self.has_ball else COLOR_WITHOUT_BALL
+        base_color = PLAYER_COLOR_TEAM_0 if self.team == 0 else PLAYER_COLOR_TEAM_1
+        has_ball_color = (
+            PLAYER_COLOR_WITH_BALL if self.has_ball else PLAYER_COLOR_WITHOUT_BALL
+        )
         return base_color, has_ball_color

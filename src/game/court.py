@@ -1,4 +1,4 @@
-from typing import Iterable, List
+from typing import Iterable, List, Tuple
 import pygame
 from physics_lib import PhysicsObject, PhysicsComponent
 from game.utils import rotate
@@ -6,6 +6,7 @@ from game.dimensions import CourtDimensions
 from game.boundary import Boundary
 from game.hoop import Hoop
 from game.draw import draw_court_markings
+from game.team import Team
 
 
 class Court(PhysicsObject):
@@ -50,3 +51,17 @@ class Court(PhysicsObject):
         draw_court_markings(self.dimensions, screen, scale)
         for hoop in self.hoops:
             hoop.draw(screen, scale)
+
+    def target_rim_position(self, team: Team) -> Tuple[float, float]:
+        return (
+            self.dimensions.right_rim_position
+            if team == 0
+            else self.dimensions.left_rim_position
+        )
+
+    def own_rim_position(self, team: Team) -> Tuple[float, float]:
+        return (
+            self.dimensions.right_rim_position
+            if team == 1
+            else self.dimensions.left_rim_position
+        )
