@@ -36,24 +36,6 @@ class Game(SimulationInterface, PhysicsObject):
 
     def draw(self, screen: pygame.Surface, scale: float = 1.0) -> None:
         draw_court_markings(self.court.dimensions, screen, scale)
-        draw_circle(
-            screen,
-            self.court.dimensions.left_rim_position,
-            radius=10.0,
-            thickness=0.1,
-            outline_color=Color(255, 0, 0, 255),
-            subdivisions=20,
-            scale=scale,
-        )
-        draw_circle(
-            screen,
-            self.court.dimensions.right_rim_position,
-            radius=10.0,
-            thickness=0.1,
-            outline_color=Color(255, 0, 0, 255),
-            subdivisions=20,
-            scale=scale,
-        )
         SimulationInterface.draw(self, screen, scale)
 
     def initialize(self) -> None:
