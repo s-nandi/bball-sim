@@ -126,3 +126,15 @@ def test_velocity_after_turning():
     player.step()
     assert close_to(player.velocity, (1, 0))
     assert close_to(player.position, (1, 0))
+
+
+def test_pass():
+    player_1 = create_initialized_player()
+    player_2 = create_uninitialized_player()
+    player_2.initial_position(3, 3).initial_orientation(180)
+    player_1.give_ball()
+    assert player_1.has_ball()
+    assert not player_2.has_ball()
+    player_1.pass_to(player_2)
+    assert not player_1.has_ball()
+    assert player_2.has_ball()
