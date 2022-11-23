@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from dataclasses import dataclass, field
 import pymunk
 from bball_server.utils import ZERO_VECTOR
@@ -41,7 +41,3 @@ class PhysicsObject(ABC):
     def velocity(self):
         assert self.is_initialized
         return self._velocity
-
-    @abstractmethod
-    def step(self):
-        pass
