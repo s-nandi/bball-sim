@@ -1,3 +1,4 @@
+from __future__ import annotations
 import pymunk
 from bball_server.validator import valid_multiplier
 from bball_server.player.player_attributes import PlayerAttributes
@@ -9,11 +10,13 @@ class Player:
     _attributes: PlayerAttributes
     _physics: PlayerPhysics
     _move: PlayerMove
+    _has_ball: bool
 
     def __init__(self, attributes: PlayerAttributes):
         self._attributes = attributes
         self._physics = PlayerPhysics(attributes.velocity_decay)
         self._move = PlayerMove()
+        self._has_ball = False
 
     def __repr__(self):
         if not self._physics.is_initialized:
@@ -56,4 +59,22 @@ class Player:
     def step(self):
         self._physics.step(self._move)
         self._move = PlayerMove()
+        return self
+
+    def _set_has_ball(self, has_ball_state: bool) -> Player:
+        assert self._has_ball != has_ball_state
+        self._has_ball = has_ball_state
+        return self
+
+    @property
+    def has_ball(self):
+        return self._has_ball
+
+    def give_ball(self):
+        self._set_has_ball(True)
+        return True
+
+    def pass_to(self, other: Player):
+        self._set_has_ball(False)
+        other._set_has_ball(True)
         return self
