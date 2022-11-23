@@ -182,4 +182,5 @@ cython_debug/
 .history
 .ionide
 
-# End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode
+### Mac ###
+.DS_STORE
