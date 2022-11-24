@@ -61,20 +61,21 @@ class Player:
         self._move = PlayerMove()
         return self
 
-    def _set_has_ball(self, has_ball_state: bool) -> Player:
-        assert self._has_ball != has_ball_state
-        self._has_ball = has_ball_state
-        return self
-
     @property
     def has_ball(self):
         return self._has_ball
 
+    @has_ball.setter
+    def has_ball(self, value: bool) -> Player:
+        assert self._has_ball != value
+        self._has_ball = value
+        return self
+
     def give_ball(self):
-        self._set_has_ball(True)
+        self.has_ball = True
         return True
 
     def pass_to(self, other: Player):
-        self._set_has_ball(False)
-        other._set_has_ball(True)
+        self.has_ball = False
+        other.has_ball = True
         return self
