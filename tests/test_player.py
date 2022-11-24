@@ -137,11 +137,19 @@ def test_velocity_after_turning():
 
 
 def test_pass():
-    player_1 = create_initialized_player()
+    passing_server = PassingServer()
+    player_1 = create_initialized_player(DEFAULT_PLAYER_ATTRIBUTES, (0, 0), 0)
     player_2 = create_initialized_player(DEFAULT_PLAYER_ATTRIBUTES, (3, 3), 180)
+    passing_server.add(player_1, player_2)
     player_1.give_ball()
     assert player_1.has_ball
     assert not player_2.has_ball
-    player_1.pass_to(player_2)
+
+    pass_completion_time = 3
+    passing_server.pass_to(player_1, player_2, complete_in=pass_completion_time)
+    for _ in range(pass_completion_time):
+        assert player_1.has_ball
+        assert not player_2.has_ball
+        passing_server.step()
     assert not player_1.has_ball
     assert player_2.has_ball
