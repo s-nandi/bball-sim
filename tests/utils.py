@@ -4,34 +4,34 @@ from bball_server import Player, PlayerAttributes
 T = TypeVar("T")
 
 
-def create_uninitialized_player(
+def create_player_attributes(
     max_acceleration: float = 1.0,
     max_turn_degrees: float = 90.0,
     velocity_decay: float = 0.0,
-) -> Player:
-    return Player(
-        PlayerAttributes(
-            max_acceleration=max_acceleration,
-            max_turn_degrees=max_turn_degrees,
-            velocity_decay=velocity_decay,
-        )
+) -> PlayerAttributes:
+    return PlayerAttributes(
+        max_acceleration=max_acceleration,
+        max_turn_degrees=max_turn_degrees,
+        velocity_decay=velocity_decay,
     )
+
+
+DEFAULT_PLAYER_ATTRIBUTES = create_player_attributes()
+
+
+def create_uninitialized_player(
+    attributes: PlayerAttributes = DEFAULT_PLAYER_ATTRIBUTES,
+) -> Player:
+    return Player(attributes)
 
 
 def create_initialized_player(
-    max_acceleration: float = 1.0,
-    max_turn_degrees: float = 90.0,
-    velocity_decay: float = 0.0,
+    attributes: PlayerAttributes = DEFAULT_PLAYER_ATTRIBUTES,
+    position: Tuple[float, float] = (0.0, 0.0),
+    orientation_degrees: float = 0.0,
 ) -> Player:
-    player = Player(
-        PlayerAttributes(
-            max_acceleration=max_acceleration,
-            max_turn_degrees=max_turn_degrees,
-            velocity_decay=velocity_decay,
-        )
-    )
-    player.initial_position(0, 0).initial_orientation(0)
-    return player
+    player = Player(attributes)
+    return player.initial_position(*position).initial_orientation(orientation_degrees)
 
 
 def close_to(

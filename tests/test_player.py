@@ -1,4 +1,6 @@
 from utils import (
+    create_player_attributes,
+    DEFAULT_PLAYER_ATTRIBUTES,
     create_initialized_player,
     create_uninitialized_player,
     close_to,
@@ -72,7 +74,9 @@ def test_if_displaced():
 
 
 def test_skip_accelerate():
-    player = create_initialized_player(max_acceleration=2.0, velocity_decay=0)
+    player = create_initialized_player(
+        create_player_attributes(max_acceleration=2.0, velocity_decay=0)
+    )
     player.turn(1).accelerate(0.5)
     player.step()
     assert close_to(player.position, (0, 1))
@@ -83,7 +87,9 @@ def test_skip_accelerate():
 
 
 def test_accelerate_twice():
-    player = create_initialized_player(max_acceleration=2.0, velocity_decay=0)
+    player = create_initialized_player(
+        create_player_attributes(max_acceleration=2.0, velocity_decay=0)
+    )
     player.turn(1).accelerate(0.5)
     player.step()
     assert close_to(player.position, (0, 1))
@@ -95,7 +101,9 @@ def test_accelerate_twice():
 
 
 def test_max_velocity_decay():
-    player = create_initialized_player(max_acceleration=1, velocity_decay=1.0)
+    player = create_initialized_player(
+        create_player_attributes(max_acceleration=1.0, velocity_decay=1.0)
+    )
     player.accelerate(1)
     player.step()
     assert close_to(player.position, (1, 0))
@@ -130,8 +138,7 @@ def test_velocity_after_turning():
 
 def test_pass():
     player_1 = create_initialized_player()
-    player_2 = create_uninitialized_player()
-    player_2.initial_position(3, 3).initial_orientation(180)
+    player_2 = create_initialized_player(DEFAULT_PLAYER_ATTRIBUTES, (3, 3), 180)
     player_1.give_ball()
     assert player_1.has_ball
     assert not player_2.has_ball
