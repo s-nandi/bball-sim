@@ -28,13 +28,17 @@ class PassingServer:
         self._has_active_pass = True
         self._players_involved = PassPlayers(passer, receiver)
         self._steps_to_complete_pass = complete_in
+        return self
+
+    def _complete_pass(self):
+        assert self._has_active_pass
+        self._players_involved.receiver.give_ball()
+        self._players_involved.passer.give_up_ball()
+        self._has_active_pass = False
 
     def step(self) -> PassingServer:
-        if not self._has_active_pass:
-            return
-        self._steps_to_complete_pass -= 1
-        if self._steps_to_complete_pass == 0:
-            self._players_involved.receiver.give_ball()
-            self._players_involved.passer.give_up_ball()
-            self._has_active_pass = False
+        if self._has_active_pass:
+            self._steps_to_complete_pass -= 1
+            if self._steps_to_complete_pass == 0:
+                self._complete_pass()
         return self

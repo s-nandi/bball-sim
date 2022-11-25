@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Tuple
 import pymunk
+from bball_server.utils import convert_to_tuple
 from bball_server.validator import valid_multiplier
 from bball_server.player.player_attributes import PlayerAttributes
 from bball_server.player.player_physics import PlayerPhysics
@@ -29,15 +30,21 @@ class Player:
 
     @property
     def position(self) -> Tuple[float, float]:
-        return tuple(self._physics.position)
+        return convert_to_tuple(self._physics.position)
 
     @property
     def velocity(self) -> Tuple[float, float]:
-        return tuple(self._physics.velocity)
+        return convert_to_tuple(self._physics.velocity)
 
     @property
     def has_ball(self) -> bool:
         return self._has_ball
+
+    @has_ball.setter
+    def has_ball(self, value: bool) -> Player:
+        assert self._has_ball != value
+        self._has_ball = value
+        return self
 
     def initial_orientation(self, orientation_degrees: float) -> Player:
         self._physics.init_orientation(orientation_degrees)
@@ -59,12 +66,6 @@ class Player:
         assert valid_multiplier(strength_multiplier)
         acceleration = strength_multiplier * self._attributes.max_acceleration
         self._move.accelerate(acceleration)
-        return self
-
-    @has_ball.setter
-    def has_ball(self, value: bool) -> Player:
-        assert self._has_ball != value
-        self._has_ball = value
         return self
 
     def step(self) -> Player:
