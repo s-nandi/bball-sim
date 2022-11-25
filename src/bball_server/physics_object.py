@@ -1,17 +1,23 @@
 from abc import ABC
-from dataclasses import dataclass, field
 import pymunk
 from bball_server.utils import ZERO_VECTOR
 
 
-@dataclass
 class PhysicsObject(ABC):
     _velocity_decay: float
-    _position: pymunk.Vec2d = field(init=False, default=ZERO_VECTOR)
-    _orientation_degrees: float = field(init=False, default=0)
-    _velocity: pymunk.Vec2d = field(init=False, default=ZERO_VECTOR)
-    _has_position: bool = field(init=False, default=False)
-    _has_orientation: bool = field(init=False, default=False)
+    _position: pymunk.Vec2d
+    _orientation_degrees: float
+    _velocity: pymunk.Vec2d
+    _has_position: bool
+    _has_orientation: bool
+
+    def __init__(self, velocity_decay):
+        self._velocity_decay = velocity_decay
+        self._position = ZERO_VECTOR
+        self._orientation_degrees = 0
+        self._velocity = ZERO_VECTOR
+        self._has_position = False
+        self._has_orientation = False
 
     @property
     def is_initialized(self):
