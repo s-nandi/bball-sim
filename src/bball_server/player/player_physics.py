@@ -1,9 +1,13 @@
 from bball_server.physics import add_angle, kinematic_step
 from bball_server.player.player_move import PlayerMove
 from bball_server.physics_object import PhysicsObject
+from bball_server.player.player_attributes import PlayerAttributes
 
 
 class PlayerPhysics(PhysicsObject):
+    def __init__(self, attributes: PlayerAttributes):
+        super().__init__(attributes.velocity_decay)
+
     def step(self, action: PlayerMove) -> None:
         assert self.is_initialized
         self._orientation_degrees = add_angle(

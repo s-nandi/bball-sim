@@ -16,7 +16,7 @@ class Player:
 
     def __init__(self, attributes: PlayerAttributes):
         self._attributes = attributes
-        self._physics = PlayerPhysics(attributes.velocity_decay)
+        self._physics = PlayerPhysics(attributes)
         self._move = PlayerMove()
         self._has_ball = False
 
