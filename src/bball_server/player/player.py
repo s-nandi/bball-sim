@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Tuple
 import pymunk
-from bball_server.utils import convert_to_tuple
+from bball_server.utils import convert_to_tuple, vector_to_string
 from bball_server.validator import valid_multiplier
 from bball_server.player.player_attributes import PlayerAttributes
 from bball_server.player.player_physics import PlayerPhysics
@@ -23,10 +23,9 @@ class Player:
     def __repr__(self) -> str:
         if not self._physics.is_initialized:
             return "UninitializedPlayer"
-        position_x = round(self.position[0])
-        position_y = round(self.position[1])
-        position_str = f"({position_x}, {position_y})"
-        return f"Player(position = {position_str})"
+        position_str = vector_to_string(self.position)
+        velocity_str = vector_to_string(self.velocity)
+        return f"Player(position = {position_str}, velocity = {velocity_str})"
 
     @property
     def position(self) -> Tuple[float, float]:
@@ -68,7 +67,7 @@ class Player:
         self._move.accelerate(acceleration)
         return self
 
-    def step(self) -> Player:
+    def _step(self) -> Player:
         self._physics.step(self._move)
         self._move = PlayerMove()
         return self

@@ -1,7 +1,11 @@
 from typing import Tuple, TypeVar, Callable, Any
-from bball_server import Player, PlayerAttributes
+from bball_server import Player, PlayerAttributes, Space
 
 T = TypeVar("T")
+
+
+def create_space() -> Space:
+    return Space()
 
 
 def create_player_attributes(
@@ -39,9 +43,9 @@ def create_initialized_player(
 def close_to(
     vec_1: Tuple[float, float], vec_2: Tuple[float, float], eps: float = 10**-6
 ) -> bool:
-    delta_y = vec_1[0] - vec_2[0]
+    delta_x = vec_1[0] - vec_2[0]
     delta_y = vec_1[1] - vec_2[1]
-    return abs(delta_y) < eps and abs(delta_y) < eps
+    return abs(delta_x) < eps and abs(delta_y) < eps
 
 
 def require_exception(callback: Callable[[], T], exception_type: Any):

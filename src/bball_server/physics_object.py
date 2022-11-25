@@ -1,23 +1,26 @@
 from abc import ABC
 import pymunk
-from bball_server.utils import ZERO_VECTOR
+from bball_server.utils import to_degrees, to_radians, BASE_DIRECTION
+
+
+def velocity_func_with_decay(velocity_decay: float):
+    custom_damping = 1.0 - velocity_decay
+
+    def velocity_func(body, gravity, _damping, delta_time):
+        pymunk.Body.update_velocity(body, gravity, custom_damping, delta_time)
+
+    return velocity_func
 
 
 class PhysicsObject(ABC):
-    _mass: float
-    _velocity_decay: float
-    _position: pymunk.Vec2d
-    _orientation_degrees: float
-    _velocity: pymunk.Vec2d
+    _body: pymunk.Body
     _has_position: bool
     _has_orientation: bool
 
     def __init__(self, mass: float, velocity_decay: float):
-        self._mass = mass
-        self._velocity_decay = velocity_decay
-        self._position = ZERO_VECTOR
-        self._orientation_degrees = 0
-        self._velocity = ZERO_VECTOR
+        moment = pymunk.moment_for_circle(mass, 0, 1)
+        self._body = pymunk.Body(mass, moment)
+        self._body.velocity_func = velocity_func_with_decay(velocity_decay)
         self._has_position = False
         self._has_orientation = False
 
@@ -27,25 +30,35 @@ class PhysicsObject(ABC):
 
     def init_position(self, position: pymunk.Vec2d):
         assert not self._has_position
-        self._position = position
+        self._body.position = position
         self._has_position = True
 
     def init_orientation(self, orientation_degrees: float):
         assert not self._has_orientation
-        self._orientation_degrees = orientation_degrees
+        self._body.angle = to_radians(orientation_degrees)
         self._has_orientation = True
 
     @property
     def position(self):
         assert self.is_initialized
-        return self._position
+        return self._body.position
 
     @property
     def orientation(self):
         assert self.is_initialized
-        return self._orientation_degrees
+        return to_degrees(self._body.angle)
 
     @property
     def velocity(self):
         assert self.is_initialized
-        return self._velocity
+        return self._body.velocity
+
+    def turn(self, angle: float) -> None:
+        self._body.angle += angle
+        self._body.velocity = self._body.velocity.rotated(angle)
+
+    def accelerate(self, acceleration: float, angle: float) -> None:
+        assert self.is_initialized
+        force_direction = BASE_DIRECTION.rotated(angle)
+        force = acceleration * self._body.mass * force_direction
+        self._body.apply_impulse_at_world_point(force, self._body.position)

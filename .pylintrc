@@ -421,6 +421,7 @@ disable=raw-checker-failed,
         missing-class-docstring,
         relative-beyond-top-level,
         too-few-public-methods,
+        protected-access
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
