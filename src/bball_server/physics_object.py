@@ -4,6 +4,7 @@ from bball_server.utils import ZERO_VECTOR
 
 
 class PhysicsObject(ABC):
+    _mass: float
     _velocity_decay: float
     _position: pymunk.Vec2d
     _orientation_degrees: float
@@ -11,7 +12,8 @@ class PhysicsObject(ABC):
     _has_position: bool
     _has_orientation: bool
 
-    def __init__(self, velocity_decay):
+    def __init__(self, mass: float, velocity_decay: float):
+        self._mass = mass
         self._velocity_decay = velocity_decay
         self._position = ZERO_VECTOR
         self._orientation_degrees = 0

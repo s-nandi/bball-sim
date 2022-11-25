@@ -8,6 +8,7 @@ from bball_server.validator import (
 
 @dataclass
 class PlayerAttributes:
+    mass: float
     max_acceleration: float
     max_turn_degrees: float
     velocity_decay: float
