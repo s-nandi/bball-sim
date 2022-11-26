@@ -19,6 +19,8 @@ class PassingServer:
 
     def __init__(self, passer: Player, receiver: Player, pass_velocity: float):
         assert pass_velocity > 0
+        assert passer.has_ball
+        assert not receiver.has_ball
         self._has_active_pass = True
         self._players_involved = PassPlayers(passer, receiver)
         self._original_position = pymunk.Vec2d(*passer.position)
@@ -31,8 +33,8 @@ class PassingServer:
 
     def _complete_pass(self) -> None:
         assert self._has_active_pass
-        self._players_involved.receiver.give_ball()
-        self._players_involved.passer.give_up_ball()
+        self._players_involved.receiver._give_ball()
+        self._players_involved.passer._give_up_ball()
         self._has_active_pass = False
 
     def _step(self, time_step: float) -> PassingServer:

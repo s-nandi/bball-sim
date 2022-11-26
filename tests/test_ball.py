@@ -7,6 +7,7 @@ def test_ball_initial_position():
     ball = Ball()
     ball.give_to(player)
     assert close_to(ball.position, player.position)
+    assert player.has_ball
 
 
 def test_ball_sticks_to_player():
@@ -19,3 +20,15 @@ def test_ball_sticks_to_player():
     for _ in range(num_steps):
         space.step(1)
         assert close_to(ball.position, player.position)
+
+
+def test_ball_transfer_ownership():
+    player_1 = create_initialized_player()
+    player_2 = create_initialized_player(position=(3, 3))
+    ball = Ball()
+    ball.give_to(player_1)
+    assert player_1.has_ball
+    assert not player_2.has_ball
+    ball.give_to(player_2)
+    assert player_2.has_ball
+    assert not player_1.has_ball

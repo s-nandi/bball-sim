@@ -75,10 +75,10 @@ class Player:
         self._move.reset()
         return self
 
-    def give_ball(self) -> Player:
+    def _give_ball(self) -> Player:
         self.has_ball = True
         return self
 
-    def give_up_ball(self) -> Player:
+    def _give_up_ball(self) -> Player:
         self.has_ball = False
         return self
