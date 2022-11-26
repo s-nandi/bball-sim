@@ -1,4 +1,4 @@
-from tests.utils import (
+from ..utils import (
     create_space,
     create_player_attributes,
     create_initialized_player,

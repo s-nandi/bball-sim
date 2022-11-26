@@ -1,11 +1,11 @@
 import math
 from dataclasses import dataclass
-from tests.utils import (
+from bball_server import Player, PassingServer, Space
+from ..utils import (
     create_space,
     DEFAULT_PLAYER_ATTRIBUTES,
     create_initialized_player,
 )
-from bball_server import Player, PassingServer, Space
 
 
 def check_pass_completes_after(space, passer, receiver, expected_time: int):
@@ -26,15 +26,14 @@ class PassingTest:
 
 
 def setup_passing_test(pass_distance, pass_velocity) -> PassingTest:
-    passing_server = PassingServer()
-    pass_distance = 3
     passer = create_initialized_player(DEFAULT_PLAYER_ATTRIBUTES, (0, 0), 0)
     receiver = create_initialized_player(position=(pass_distance, 0))
-    space = create_space().add(passing_server).add(passer).add(receiver)
+    space = create_space().add(passer).add(receiver)
     passer.give_ball()
     assert passer.has_ball
     assert not receiver.has_ball
-    passing_server.pass_between(passer, receiver, pass_velocity=pass_velocity)
+    passing_server = PassingServer(passer, receiver, pass_velocity=pass_velocity)
+    space.add(passing_server)
     return PassingTest(space, passing_server, passer, receiver)
 
 
@@ -44,6 +43,26 @@ def test_standstill_pass():
     test = setup_passing_test(pass_distance, pass_velocity)
     time_to_complete = pass_distance
     check_pass_completes_after(test.space, test.passer, test.receiver, time_to_complete)
+
+
+def test_handoff():
+    pass_distance = 0
+    pass_velocity = 0.01
+    test = setup_passing_test(pass_distance, pass_velocity)
+    test.space.step(10**-6)
+    assert not test.passer.has_ball
+    assert test.receiver.has_ball
+
+
+def test_step_passing_server_after_completion():
+    pass_distance = 1
+    pass_velocity = 1
+    test = setup_passing_test(pass_distance, pass_velocity)
+    time_to_complete = pass_distance
+    check_pass_completes_after(test.space, test.passer, test.receiver, time_to_complete)
+    extra_steps = 3
+    for _ in range(extra_steps):
+        test.space.step(1)
 
 
 def test_pass_from_moving_passer():

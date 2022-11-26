@@ -23,8 +23,7 @@ class Space:
             return self._add_player(obj)
         if isinstance(obj, PassingServer):
             return self._add_passing_server(obj)
-        else:
-            assert False, f"Cannot add object of type {type(obj)} to space"
+        assert False, f"Cannot add object of type {type(obj)} to space"
 
     def _add_player(self, player: Player) -> Space:
         self._add_physics_object(player._physics)
@@ -43,11 +42,26 @@ class Space:
         substeps_per_unit_time = 1
         time_per_substep = time_frame / substeps_per_unit_time
         for _ in range(substeps_per_unit_time):
-            for player in self._players:
-                player._step(time_per_substep)
-            self._space.step(time_per_substep)
-            for passing_server in self._passing_servers:
-                passing_server._step(time_per_substep)
+            self._substep(time_per_substep)
         for player in self._players:
             player._reset()
         return self
+
+    def _substep(self, time_frame: float):
+        self._step_players(time_frame)
+        self._space.step(time_frame)
+        self._step_passing_servers(time_frame)
+        self._trim_completed_passing_servers()
+
+    def _step_players(self, time_frame: float):
+        for player in self._players:
+            player._step(time_frame)
+
+    def _step_passing_servers(self, time_frame: float):
+        for passing_server in self._passing_servers:
+            passing_server._step(time_frame)
+
+    def _trim_completed_passing_servers(self):
+        self._passing_servers = [
+            server for server in self._passing_servers if not server.completed
+        ]
