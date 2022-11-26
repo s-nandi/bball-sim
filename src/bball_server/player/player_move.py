@@ -2,12 +2,14 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 
-@dataclass
 class PlayerMove:
-    _acceleration: float = field(init=False, default=0)
-    _turn_degrees: float = field(init=False, default=0)
-    _was_accelerated: bool = field(init=False, default=False)
-    _was_turned: bool = field(init=False, default=False)
+    _acceleration: float
+    _turn_degrees: float
+    _was_accelerated: bool
+    _was_turned: bool
+
+    def __init__(self):
+        self.reset()
 
     def turn(self, turn_degrees: float):
         assert not self._was_turned
@@ -21,6 +23,12 @@ class PlayerMove:
         assert not self._was_accelerated
         self._acceleration = acceleration
         self._was_accelerated = True
+
+    def reset(self):
+        self._acceleration = 0
+        self._turn_degrees = 0
+        self._was_accelerated = False
+        self._was_turned = False
 
     @property
     def acceleration(self) -> float:

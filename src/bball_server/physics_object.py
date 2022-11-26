@@ -1,4 +1,3 @@
-from abc import ABC
 import pymunk
 from bball_server.utils import to_degrees, to_radians, BASE_DIRECTION
 
@@ -12,7 +11,7 @@ def velocity_func_with_decay(velocity_decay: float):
     return velocity_func
 
 
-class PhysicsObject(ABC):
+class PhysicsObject:
     _body: pymunk.Body
     _has_position: bool
     _has_orientation: bool
@@ -53,12 +52,14 @@ class PhysicsObject(ABC):
         assert self.is_initialized
         return self._body.velocity
 
-    def turn(self, angle: float) -> None:
-        self._body.angle += angle
-        self._body.velocity = self._body.velocity.rotated(angle)
+    def turn(self, angle: float, time_step: float) -> None:
+        assert self.is_initialized
+        self._body.angular_velocity = angle
+        self._body.velocity = self._body.velocity.rotated(angle * time_step)
 
-    def accelerate(self, acceleration: float, angle: float) -> None:
+    def accelerate(self, acceleration: float, angle: float, time_step: float) -> None:
         assert self.is_initialized
         force_direction = BASE_DIRECTION.rotated(angle)
         force = acceleration * self._body.mass * force_direction
-        self._body.apply_impulse_at_world_point(force, self._body.position)
+        impulse = force * time_step
+        self._body.apply_impulse_at_world_point(impulse, self._body.position)

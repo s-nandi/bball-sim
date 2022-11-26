@@ -13,7 +13,7 @@ class PassPlayers:
 class PassingServer:
     _has_active_pass: bool
     _players_involved: Optional[PassPlayers]
-    _steps_to_complete_pass: int
+    _steps_to_complete_pass: float
 
     def __init__(self):
         self._has_active_pass = False
@@ -21,7 +21,7 @@ class PassingServer:
         self._steps_to_complete_pass = 0
 
     def pass_between(
-        self, passer: Player, receiver: Player, complete_in: int
+        self, passer: Player, receiver: Player, complete_in: float
     ) -> PassingServer:
         assert not self._has_active_pass
         assert complete_in > 0
@@ -36,9 +36,9 @@ class PassingServer:
         self._players_involved.passer.give_up_ball()
         self._has_active_pass = False
 
-    def step(self) -> PassingServer:
+    def _step(self, time_step: float) -> PassingServer:
         if self._has_active_pass:
-            self._steps_to_complete_pass -= 1
-            if self._steps_to_complete_pass == 0:
+            self._steps_to_complete_pass -= time_step
+            if self._steps_to_complete_pass <= 0:
                 self._complete_pass()
         return self
