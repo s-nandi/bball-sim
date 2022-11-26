@@ -54,12 +54,11 @@ class PhysicsObject:
 
     def turn(self, angle: float, time_step: float) -> None:
         assert self.is_initialized
-        self._body.angular_velocity = angle
+        self._body.angle += angle
         self._body.velocity = self._body.velocity.rotated(angle * time_step)
 
-    def accelerate(self, acceleration: float, angle: float, time_step: float) -> None:
+    def accelerate(self, acceleration: float, time_step: float) -> None:
         assert self.is_initialized
-        force_direction = BASE_DIRECTION.rotated(angle)
-        force = acceleration * self._body.mass * force_direction
+        force = acceleration * self._body.mass * BASE_DIRECTION
         impulse = force * time_step
-        self._body.apply_impulse_at_world_point(impulse, self._body.position)
+        self._body.apply_impulse_at_local_point(impulse)

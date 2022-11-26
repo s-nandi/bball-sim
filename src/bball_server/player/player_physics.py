@@ -11,4 +11,4 @@ class PlayerPhysics(PhysicsObject):
     def step(self, action: PlayerMove, time_step: float) -> None:
         assert self.is_initialized
         super().turn(to_radians(action.turn_degrees), time_step)
-        super().accelerate(action.acceleration, self._body.angle, time_step)
+        super().accelerate(action.acceleration, time_step)
