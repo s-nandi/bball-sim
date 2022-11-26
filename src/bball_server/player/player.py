@@ -1,19 +1,21 @@
 from __future__ import annotations
-from typing import Tuple, Optional
+from typing import Tuple, Optional, TYPE_CHECKING
 import pymunk
-from bball_server import ball as bball_ball
 from bball_server.utils import convert_to_tuple, vector_to_string
 from bball_server.validator import valid_multiplier
 from bball_server.player.player_attributes import PlayerAttributes
 from bball_server.player.player_physics import PlayerPhysics
 from bball_server.player.player_move import PlayerMove
 
+if TYPE_CHECKING:
+    from bball_server.ball import Ball
+
 
 class Player:
     _attributes: PlayerAttributes
     _physics: PlayerPhysics
     _move: PlayerMove
-    _ball: Optional[bball_ball.Ball]
+    _ball: Optional[Ball]
 
     def __init__(self, attributes: PlayerAttributes):
         self._attributes = attributes
@@ -70,7 +72,7 @@ class Player:
         self._move.reset()
         return self
 
-    def _give_ball(self, ball: bball_ball.Ball) -> Player:
+    def _give_ball(self, ball: Ball) -> Player:
         self._ball = ball
         return self
 

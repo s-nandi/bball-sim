@@ -1,12 +1,14 @@
 from __future__ import annotations
-from typing import Tuple, Optional
-from bball_server import player as bball_player
+from typing import Tuple, Optional, TYPE_CHECKING
 from bball_server.utils import vector_to_string
+
+if TYPE_CHECKING:
+    from bball_server.player import Player
 
 
 class Ball:
     _position: Tuple[float, float]
-    _belongs_to: Optional[bball_player.Player]
+    _belongs_to: Optional[Player]
 
     def __init__(self):
         self._position = (0, 0)
@@ -19,7 +21,7 @@ class Ball:
     def position(self) -> Tuple[float, float]:
         return self._position
 
-    def give_to(self, player: bball_player.Player) -> Ball:
+    def give_to(self, player: Player) -> Ball:
         if self._belongs_to is not None:
             self._belongs_to._give_up_ball()
         player._give_ball(self)
