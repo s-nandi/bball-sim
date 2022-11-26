@@ -18,7 +18,12 @@ class Space:
         self._players = []
         self._passing_servers = []
 
-    def add(self, obj: AddableObject) -> Space:
+    def add(self, *objs: AddableObject) -> Space:
+        for obj in objs:
+            self._add_single_object(obj)
+        return self
+
+    def _add_single_object(self, obj: AddableObject) -> Space:
         if isinstance(obj, Player):
             return self._add_player(obj)
         if isinstance(obj, PassingServer):

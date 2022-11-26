@@ -27,7 +27,7 @@ class PassingTest:
 def setup_passing_test(pass_distance, pass_velocity) -> PassingTest:
     passer = create_initialized_player(DEFAULT_PLAYER_ATTRIBUTES, (0, 0), 0)
     receiver = create_initialized_player(position=(pass_distance, 0))
-    space = create_space().add(passer).add(receiver)
+    space = create_space().add(passer, receiver)
     passer.give_ball()
     assert passer.has_ball
     assert not receiver.has_ball
