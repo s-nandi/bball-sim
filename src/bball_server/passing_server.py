@@ -33,8 +33,9 @@ class PassingServer:
 
     def _complete_pass(self) -> None:
         assert self._has_active_pass
-        self._players_involved.receiver._give_ball()
-        self._players_involved.passer._give_up_ball()
+        ball = self._players_involved.passer._ball
+        assert ball is not None
+        ball.give_to(self._players_involved.receiver)
         self._has_active_pass = False
 
     def _step(self, time_step: float) -> PassingServer:

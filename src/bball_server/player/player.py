@@ -1,6 +1,7 @@
 from __future__ import annotations
-from typing import Tuple
+from typing import Tuple, Optional
 import pymunk
+from bball_server import ball as bball_ball
 from bball_server.utils import convert_to_tuple, vector_to_string
 from bball_server.validator import valid_multiplier
 from bball_server.player.player_attributes import PlayerAttributes
@@ -12,20 +13,20 @@ class Player:
     _attributes: PlayerAttributes
     _physics: PlayerPhysics
     _move: PlayerMove
-    _has_ball: bool
+    _ball: Optional[bball_ball.Ball]
 
     def __init__(self, attributes: PlayerAttributes):
         self._attributes = attributes
         self._physics = PlayerPhysics(attributes)
         self._move = PlayerMove()
-        self._has_ball = False
+        self._ball = None
 
     def __repr__(self) -> str:
         if not self._physics.is_initialized:
             return "UninitializedPlayer"
         position_str = "position = " + vector_to_string(self.position)
         velocity_str = "velocity = " + vector_to_string(self.velocity)
-        has_ball_str = "HasBall" if self._has_ball else ""
+        has_ball_str = "HasBall" if self.has_ball else ""
         concat_str = ", ".join(filter(None, [position_str, velocity_str, has_ball_str]))
         return f"Player({concat_str})"
 
@@ -39,13 +40,7 @@ class Player:
 
     @property
     def has_ball(self) -> bool:
-        return self._has_ball
-
-    @has_ball.setter
-    def has_ball(self, value: bool) -> Player:
-        assert self._has_ball != value
-        self._has_ball = value
-        return self
+        return self._ball is not None
 
     def initial_orientation(self, orientation_degrees: float) -> Player:
         self._physics.init_orientation(orientation_degrees)
@@ -75,10 +70,10 @@ class Player:
         self._move.reset()
         return self
 
-    def _give_ball(self) -> Player:
-        self.has_ball = True
+    def _give_ball(self, ball: bball_ball.Ball) -> Player:
+        self._ball = ball
         return self
 
     def _give_up_ball(self) -> Player:
-        self.has_ball = False
+        self._ball = None
         return self
