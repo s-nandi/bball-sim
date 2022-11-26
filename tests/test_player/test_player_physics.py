@@ -36,10 +36,6 @@ def test_skip_accelerate():
     space.step(1)
     player.accelerate(0.5)
     space.step(1)
-
-    body = player._physics._body
-    print(player, body.force, len(body.space.bodies), body.mass)
-
     assert close_to(player.position, (0, 1))
     assert close_to(player.velocity, (0, 1))
     space.step(1)

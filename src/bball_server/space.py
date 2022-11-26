@@ -45,9 +45,9 @@ class Space:
         for _ in range(substeps_per_unit_time):
             for player in self._players:
                 player._step(time_per_substep)
+            self._space.step(time_per_substep)
             for passing_server in self._passing_servers:
                 passing_server._step(time_per_substep)
-            self._space.step(time_per_substep)
         for player in self._players:
             player._reset()
         return self
