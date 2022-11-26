@@ -20,7 +20,6 @@ def check_pass_completes_after(space, passer, receiver, expected_time: int):
 @dataclass
 class PassingTest:
     space: Space
-    passing_server: PassingServer
     passer: Player
     receiver: Player
 
@@ -32,9 +31,8 @@ def setup_passing_test(pass_distance, pass_velocity) -> PassingTest:
     passer.give_ball()
     assert passer.has_ball
     assert not receiver.has_ball
-    passing_server = PassingServer(passer, receiver, pass_velocity=pass_velocity)
-    space.add(passing_server)
-    return PassingTest(space, passing_server, passer, receiver)
+    space.add(PassingServer(passer, receiver, pass_velocity=pass_velocity))
+    return PassingTest(space, passer, receiver)
 
 
 def test_standstill_pass():
