@@ -35,16 +35,26 @@ class Ball:
 
     def give_to(self, player: Player) -> Ball:
         if self._mode == BallMode.HELD:
-            self._belongs_to._give_up_ball()
+            self._remove_posession()
         elif self._mode == BallMode.MIDPASS:
-            self._belongs_to._give_up_ball()
+            self._remove_posession()
             self._passing_server = None
         elif self._mode == BallMode.LOOSE:
             pass
         else:
             assert False
         self._mode = BallMode.HELD
-        player._give_ball(self)
+        self._give_posession(player)
+        return self
+
+    def _give_posession(self, player: Player) -> None:
+        self._belongs_to = player
+        self._belongs_to._ball = self
+        return self
+
+    def _remove_posession(self) -> None:
+        self._belongs_to._ball = None
+        self._belongs_to = None
         return self
 
     def pass_to(self, receiver: Player, pass_velocity: float) -> Ball:

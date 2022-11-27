@@ -81,13 +81,3 @@ class Player:
     def _reset(self) -> Player:
         self._move.reset()
         return self
-
-    def _give_ball(self, ball: Ball) -> Player:
-        ball._belongs_to = self
-        self._ball = ball
-        return self
-
-    def _give_up_ball(self) -> Player:
-        self._ball._belongs_to = None
-        self._ball = None
-        return self
