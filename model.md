@@ -39,6 +39,11 @@
         - Position
         - Velocity
         - Orientation
+    - States
+        - Belongs to player
+        - Mid pass
+        - Mid shot
+        - Loose ball
     
 
 - Game
