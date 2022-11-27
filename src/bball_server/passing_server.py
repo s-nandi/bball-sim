@@ -10,8 +10,7 @@ class PassPlayers:
     receiver: Player
 
 
-class PassingServer:
-    _has_active_pass: bool
+class _PassingServer:
     _players_involved: PassPlayers
     _pass_velocity: float
     _original_position: pymunk.Vec2d
@@ -21,25 +20,16 @@ class PassingServer:
         assert pass_velocity > 0
         assert passer.has_ball
         assert not receiver.has_ball
-        self._has_active_pass = True
         self._players_involved = PassPlayers(passer, receiver)
         self._original_position = pymunk.Vec2d(*passer.position)
         self._pass_velocity = pass_velocity
         self._time_since_pass = 0
 
-    @property
-    def completed(self):
-        return not self._has_active_pass
-
     def _complete_pass(self) -> None:
-        assert self._has_active_pass
-        ball = self._players_involved.passer._ball
-        assert ball is not None
+        ball = self._players_involved.passer.ball
         ball.give_to(self._players_involved.receiver)
-        self._has_active_pass = False
 
-    def _step(self, time_step: float) -> PassingServer:
-        assert self._has_active_pass
+    def _step(self, time_step: float) -> _PassingServer:
         self._time_since_pass += time_step
         receiver_position = self._players_involved.receiver.position
         distance = self._original_position.get_distance(receiver_position)

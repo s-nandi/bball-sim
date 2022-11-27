@@ -3,23 +3,20 @@ from typing import List, Union, Iterable
 import pymunk
 from bball_server.ball import Ball
 from bball_server.player import Player
-from bball_server.passing_server import PassingServer
 from bball_server.physics_object import PhysicsObject
 
-AddableObject = Union[Player, PassingServer, Ball]
+AddableObject = Union[Player, Ball]
 
 
 class Space:
     _space: pymunk.Space
     _players: List[Player]
     _balls: List[Ball]
-    _passing_servers: List[PassingServer]
 
     def __init__(self):
         self._space = pymunk.Space()
         self._players = []
         self._balls = []
-        self._passing_servers = []
 
     def add(self, *objs: AddableObject) -> Space:
         for obj in objs:
@@ -29,8 +26,6 @@ class Space:
     def _add_single_object(self, obj: AddableObject) -> Space:
         if isinstance(obj, Player):
             return self._add_player(obj)
-        if isinstance(obj, PassingServer):
-            return self._add_passing_server(obj)
         if isinstance(obj, Ball):
             return self._add_ball(obj)
         assert False, f"Cannot add object of type {type(obj)} to space"
@@ -42,11 +37,6 @@ class Space:
 
     def _add_physics_object(self, physics_object: PhysicsObject) -> Space:
         self._space.add(physics_object._body)
-        return self
-
-    def _add_passing_server(self, passing_server: PassingServer) -> Space:
-        assert len(self._passing_servers) == 0
-        self._passing_servers.append(passing_server)
         return self
 
     def _add_ball(self, ball: Ball) -> Space:
@@ -67,14 +57,7 @@ class Space:
         self._step_each(self._players, time_frame)
         self._space.step(time_frame)
         self._step_each(self._balls, time_frame)
-        self._step_each(self._passing_servers, time_frame)
-        self._trim_completed_passing_servers()
 
     def _step_each(self, objs: Iterable[AddableObject], time_frame: float):
         for obj in objs:
             obj._step(time_frame)
-
-    def _trim_completed_passing_servers(self):
-        self._passing_servers = [
-            server for server in self._passing_servers if not server.completed
-        ]

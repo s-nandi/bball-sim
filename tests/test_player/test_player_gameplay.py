@@ -1,6 +1,6 @@
 import math
 from dataclasses import dataclass
-from bball_server import Player, PassingServer, Space, Ball
+from bball_server import Player, Space, Ball
 from ..utils import (
     create_space,
     DEFAULT_PLAYER_ATTRIBUTES,
@@ -8,7 +8,9 @@ from ..utils import (
 )
 
 
-def check_pass_completes_after(space, passer, receiver, expected_time: int):
+def check_pass_completes_after(
+    space: Space, passer: Player, receiver: Player, expected_time: int
+):
     for _ in range(expected_time):
         assert passer.has_ball
         assert not receiver.has_ball
@@ -27,16 +29,17 @@ class PassingTest:
 def setup_passing_test(pass_distance, pass_velocity) -> PassingTest:
     passer = create_initialized_player(DEFAULT_PLAYER_ATTRIBUTES, (0, 0), 0)
     receiver = create_initialized_player(position=(pass_distance, 0))
-    space = create_space().add(passer, receiver)
-    Ball().give_to(passer)
+    ball = Ball()
+    space = create_space().add(passer, receiver, ball)
+    ball.give_to(passer)
     assert passer.has_ball
     assert not receiver.has_ball
-    space.add(PassingServer(passer, receiver, pass_velocity=pass_velocity))
+    passer.pass_to(receiver, pass_velocity=pass_velocity)
     return PassingTest(space, passer, receiver)
 
 
 def test_standstill_pass():
-    pass_distance = 3
+    pass_distance = 1
     pass_velocity = 1
     test = setup_passing_test(pass_distance, pass_velocity)
     time_to_complete = pass_distance
