@@ -12,6 +12,7 @@ class BallMode(Enum):
     MIDPASS = auto()
     HELD = auto()
     LOOSE = auto()
+    MIDSHOT = auto()
 
 
 class Ball:
@@ -33,6 +34,14 @@ class Ball:
     def position(self) -> Tuple[float, float]:
         return self._position
 
+    def _unsafe_belongs_to(self) -> Player:
+        assert self._belongs_to is not None
+        return self._belongs_to
+
+    def _unsafe_passing_server(self) -> _PassingServer:
+        assert self._passing_server is not None
+        return self._passing_server
+
     def give_to(self, player: Player) -> Ball:
         if self._mode == BallMode.HELD:
             self._remove_posession()
@@ -49,28 +58,34 @@ class Ball:
 
     def _give_posession(self, player: Player) -> None:
         self._belongs_to = player
-        self._belongs_to._ball = self
-        return self
+        self._unsafe_belongs_to()._ball = self
 
     def _remove_posession(self) -> None:
-        self._belongs_to._ball = None
+        self._unsafe_belongs_to()._ball = None
         self._belongs_to = None
-        return self
 
     def pass_to(self, receiver: Player, pass_velocity: float) -> Ball:
         assert self._mode == BallMode.HELD
         self._mode = BallMode.MIDPASS
-        passer = self._belongs_to
-        self._passing_server = _PassingServer(passer, receiver, pass_velocity)
+        self._passing_server = _PassingServer(
+            self._unsafe_belongs_to(), receiver, pass_velocity
+        )
         return self
+
+    def shoot_at(self, _target: Tuple[float, float]):
+        assert self._mode == BallMode.HELD
+        self._mode = BallMode.MIDSHOT
+        self._remove_posession()
 
     def _step(self, time_frame: float):
         if self._mode == BallMode.LOOSE:
             return
         if self._mode == BallMode.HELD:
-            self._position = self._belongs_to.position
+            self._position = self._unsafe_belongs_to().position
             return
         if self._mode == BallMode.MIDPASS:
-            self._passing_server._step(time_frame)
+            self._unsafe_passing_server()._step(time_frame)
+            return
+        if self._mode == BallMode.MIDSHOT:
             return
         assert False, f"Invalid ball mode {self._mode}"

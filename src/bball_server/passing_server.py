@@ -1,7 +1,11 @@
 from __future__ import annotations
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 import pymunk
-from bball_server.player import Player
+
+if TYPE_CHECKING:
+    from bball_server.player import Player
+    from bball_server.ball import Ball
 
 
 @dataclass
@@ -12,6 +16,7 @@ class PassPlayers:
 
 class _PassingServer:
     _players_involved: PassPlayers
+    _ball: Ball
     _pass_velocity: float
     _original_position: pymunk.Vec2d
     _time_since_pass: float
@@ -21,13 +26,13 @@ class _PassingServer:
         assert passer.has_ball
         assert not receiver.has_ball
         self._players_involved = PassPlayers(passer, receiver)
+        self._ball = passer._unsafe_ball()
         self._original_position = pymunk.Vec2d(*passer.position)
         self._pass_velocity = pass_velocity
         self._time_since_pass = 0
 
     def _complete_pass(self) -> None:
-        ball = self._players_involved.passer.ball
-        ball.give_to(self._players_involved.receiver)
+        self._ball.give_to(self._players_involved.receiver)
 
     def _step(self, time_step: float) -> _PassingServer:
         self._time_since_pass += time_step

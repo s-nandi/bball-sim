@@ -1,8 +1,9 @@
 import math
 from dataclasses import dataclass
-from bball_server import Player, Space, Ball
+from bball_server import Player, Space
 from ..utils import (
     create_space,
+    create_ball,
     DEFAULT_PLAYER_ATTRIBUTES,
     create_initialized_player,
 )
@@ -29,7 +30,7 @@ class PassingTest:
 def setup_passing_test(pass_distance, pass_velocity) -> PassingTest:
     passer = create_initialized_player(DEFAULT_PLAYER_ATTRIBUTES, (0, 0), 0)
     receiver = create_initialized_player(position=(pass_distance, 0))
-    ball = Ball()
+    ball = create_ball()
     space = create_space().add(passer, receiver, ball)
     ball.give_to(passer)
     assert passer.has_ball

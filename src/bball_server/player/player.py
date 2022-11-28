@@ -44,8 +44,7 @@ class Player:
     def has_ball(self) -> bool:
         return self._ball is not None
 
-    @property
-    def ball(self) -> Ball:
+    def _unsafe_ball(self) -> Ball:
         assert self._ball is not None
         return self._ball
 
@@ -70,8 +69,11 @@ class Player:
         return self
 
     def pass_to(self, receiver: Player, pass_velocity: float) -> Player:
-        assert self.has_ball
-        self.ball.pass_to(receiver, pass_velocity)
+        self._unsafe_ball().pass_to(receiver, pass_velocity)
+        return self
+
+    def shoot_at(self, target: Tuple[float, float]) -> Player:
+        self._unsafe_ball().shoot_at(target)
         return self
 
     def _step(self, time_step: float) -> Player:
