@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 class BallMode(Enum):
     MIDPASS = auto()
     HELD = auto()
-    LOOSE = auto()
+    DEAD = auto()
     MIDSHOT = auto()
 
 
@@ -27,7 +27,7 @@ class Ball:
         self._position = (0, 0)
         self._belongs_to = None
         self._passing_server = None
-        self._mode = BallMode.LOOSE
+        self._mode = BallMode.DEAD
 
     def __repr__(self):
         return f"Ball(position = {vector_to_string(self._position)})"
@@ -56,8 +56,8 @@ class Ball:
         self._unsafe_belongs_to()._ball = None
         self._belongs_to = None
 
-    def loose(self, position: Optional[Tuple[float, float]] = None) -> Ball:
-        if self._mode == BallMode.LOOSE:
+    def _reset(self) -> None:
+        if self._mode == BallMode.DEAD:
             pass
         elif self._mode == BallMode.HELD:
             self._remove_posession()
@@ -67,13 +67,15 @@ class Ball:
             self._shooting_server = None
         else:
             assert False
-        self._mode = BallMode.LOOSE
-        if position is not None:
-            self._position = position
+
+    def dead_ball(self) -> Ball:
+        assert self._mode != BallMode.DEAD, "Ball is already dead"
+        self._reset()
+        self._mode = BallMode.DEAD
         return self
 
     def give_to(self, player: Player) -> Ball:
-        self.loose()
+        self._reset()
         self._mode = BallMode.HELD
         self._give_posession(player)
         return self
@@ -94,7 +96,7 @@ class Ball:
         )
 
     def _step(self, time_frame: float):
-        if self._mode == BallMode.LOOSE:
+        if self._mode == BallMode.DEAD:
             return
         if self._mode == BallMode.HELD:
             self._position = self._unsafe_belongs_to().position

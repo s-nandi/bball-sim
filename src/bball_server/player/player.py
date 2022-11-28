@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import Tuple, Optional, TYPE_CHECKING
-import pymunk
 from bball_server.utils import convert_to_tuple, vector_to_string
 from bball_server.validator import valid_multiplier
 from bball_server.player.player_attributes import PlayerAttributes
