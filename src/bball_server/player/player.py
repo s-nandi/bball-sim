@@ -72,8 +72,8 @@ class Player:
         self._unsafe_ball().pass_to(receiver, pass_velocity)
         return self
 
-    def shoot_at(self, target: Tuple[float, float]) -> Player:
-        self._unsafe_ball().shoot_at(target)
+    def shoot_at(self, target: Tuple[float, float], shot_velocity: float) -> Player:
+        self._unsafe_ball().shoot_at(target, shot_velocity)
         return self
 
     def _step(self, time_step: float) -> Player:
