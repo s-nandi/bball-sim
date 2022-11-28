@@ -110,12 +110,19 @@ def create_initialized_player(
     return player.place_at(position, orientation_degrees)
 
 
+DEFAULT_EPS = 10**-6
+
+
+def approx(value_1: float, value_2: float, eps: float = DEFAULT_EPS):
+    return abs(value_1 - value_2) < eps
+
+
 def close_to(
-    vec_1: Tuple[float, float], vec_2: Tuple[float, float], eps: float = 10**-6
+    vec_1: Tuple[float, float], vec_2: Tuple[float, float], eps: float = DEFAULT_EPS
 ) -> bool:
     delta_x = vec_1[0] - vec_2[0]
     delta_y = vec_1[1] - vec_2[1]
-    return abs(delta_x) < eps and abs(delta_y) < eps
+    return approx(delta_x, 0, eps) and approx(delta_y, 0, eps)
 
 
 def require_exception(callback: Callable[[], T], exception_type: Any):
