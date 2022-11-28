@@ -24,17 +24,19 @@ _TERMINAL_MODES = [BallMode.POSTPASS, BallMode.POSTSHOT, BallMode.DEAD]
 class Ball:
     _position: Point
     _belongs_to: Optional[Player]
+    _last_belonged_to: Optional[Player]
     _passing_server: Optional[_PassingServer]
     _shooting_server: Optional[_ShootingServer]
-    _flip_posession: bool
+    _should_flip_posession: bool
     _mode: BallMode
 
     def __init__(self):
         self._position = (0, 0)
         self._belongs_to = None
+        self._last_belonged_to = None
         self._passing_server = None
         self._mode = BallMode.DEAD
-        self._flip_posession = False
+        self._should_flip_posession = False
 
     def __repr__(self):
         return (
@@ -48,6 +50,15 @@ class Ball:
     @property
     def mode(self) -> BallMode:
         return self._mode
+
+    @property
+    def last_belonged_to(self) -> Optional[Player]:
+        return self._last_belonged_to
+
+    @property
+    def should_flip_posession(self) -> bool:
+        assert self._mode == BallMode.DEAD
+        return self._should_flip_posession
 
     def _unsafe_belongs_to(self) -> Player:
         assert self._belongs_to is not None
@@ -64,6 +75,7 @@ class Ball:
     def _give_posession(self, player: Player) -> None:
         self._belongs_to = player
         self._unsafe_belongs_to()._ball = self
+        self._last_belonged_to = player
 
     def _remove_posession(self) -> None:
         self._unsafe_belongs_to()._ball = None
@@ -85,7 +97,7 @@ class Ball:
 
     def _reset(self) -> None:
         if self.mode == BallMode.DEAD:
-            self._flip_posession = False
+            self._should_flip_posession = False
         elif self._mode in _TERMINAL_MODES:
             pass
         elif self._mode == BallMode.HELD:
@@ -102,14 +114,13 @@ class Ball:
         return self
 
     def _give_to(self, player: Player) -> Ball:
-        self._mode = BallMode.HELD
+        self._position = player.position
         self._give_posession(player)
-        return self
+        return self._with_mode(BallMode.HELD)
 
     def _dead_ball(self, flip_possesion: bool) -> Ball:
-        self._mode = BallMode.DEAD
-        self._flip_posession = flip_possesion
-        return self
+        self._should_flip_posession = flip_possesion
+        return self._with_mode(BallMode.DEAD)
 
     def held_out_of_bounds(self):
         assert self._mode == BallMode.HELD
