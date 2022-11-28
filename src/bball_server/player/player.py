@@ -24,7 +24,7 @@ class Player:
         self._ball = None
 
     def __repr__(self) -> str:
-        if not self._physics.is_initialized:
+        if not self.is_initialized:
             return "UninitializedPlayer"
         position_str = "position = " + vector_to_string(self.position)
         velocity_str = "velocity = " + vector_to_string(self.velocity)
@@ -34,52 +34,65 @@ class Player:
 
     @property
     def position(self) -> Tuple[float, float]:
+        assert self.is_initialized
         return convert_to_tuple(self._physics.position)
 
     @property
     def velocity(self) -> Tuple[float, float]:
+        assert self.is_initialized
         return convert_to_tuple(self._physics.velocity)
 
     @property
     def has_ball(self) -> bool:
+        assert self.is_initialized
         return self._ball is not None
 
+    @property
+    def is_initialized(self):
+        return self._physics.is_initialized
+
     def _unsafe_ball(self) -> Ball:
+        assert self.is_initialized
         assert self._ball is not None
         return self._ball
 
-    def initial_orientation(self, orientation_degrees: float) -> Player:
-        self._physics.init_orientation(orientation_degrees)
-        return self
-
-    def initial_position(self, pos_x: float, pos_y: float) -> Player:
-        self._physics.init_position(pymunk.Vec2d(pos_x, pos_y))
+    def place_at(
+        self, position: Tuple[float, float], orientation_degrees: float
+    ) -> Player:
+        self._physics.position = position
+        self._physics.orientation = orientation_degrees
         return self
 
     def turn(self, turn_degrees_multiplier: float) -> Player:
+        assert self.is_initialized
         assert valid_multiplier(turn_degrees_multiplier)
         turn_degrees = turn_degrees_multiplier * self._attributes.max_turn_degrees
         self._move.turn(turn_degrees)
         return self
 
     def accelerate(self, strength_multiplier: float) -> Player:
+        assert self.is_initialized
         assert valid_multiplier(strength_multiplier)
         acceleration = strength_multiplier * self._attributes.max_acceleration
         self._move.accelerate(acceleration)
         return self
 
     def pass_to(self, receiver: Player, pass_velocity: float) -> Player:
+        assert self.is_initialized
         self._unsafe_ball().pass_to(receiver, pass_velocity)
         return self
 
     def shoot_at(self, target: Tuple[float, float], shot_velocity: float) -> Player:
+        assert self.is_initialized
         self._unsafe_ball().shoot_at(target, shot_velocity)
         return self
 
     def _step(self, time_step: float) -> Player:
+        assert self.is_initialized
         self._physics.step(self._move, time_step)
         return self
 
     def _reset(self) -> Player:
+        assert self.is_initialized
         self._move.reset()
         return self

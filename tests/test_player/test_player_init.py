@@ -15,13 +15,13 @@ def test_invalid_moves():
         player = create_initialized_player()
         player.accelerate(value)
 
-    require_exception(lambda: test_turn(2), AssertionError)
+    require_exception(lambda: test_turn(1.01), AssertionError)
     require_exception(lambda: test_turn(-1.01), AssertionError)
     require_exception(lambda: test_acceleration(1.01), AssertionError)
-    require_exception(lambda: test_acceleration(-2), AssertionError)
+    require_exception(lambda: test_acceleration(-1.01), AssertionError)
 
 
-def test_turn_after_accelerate():
+def test_player_action_order():
     def turn_after_accelerate():
         player = create_initialized_player()
         player.accelerate(1).turn(1)
@@ -34,29 +34,29 @@ def test_turn_after_accelerate():
     accelerate_after_turn()
 
 
-def test_double_initialization():
-    def initialize_position_twice():
-        player = create_uninitialized_player()
-        player.initial_position(0, 3).initial_position(3, 0)
-
-    def initialize_orientation_twice():
-        player = create_uninitialized_player()
-        player.initial_orientation(0).initial_orientation(90)
-
-    require_exception(initialize_orientation_twice, AssertionError)
-    require_exception(initialize_position_twice, AssertionError)
+def test_place_at():
+    player = create_uninitialized_player()
+    player.place_at((-100.0, 23), 81)
+    assert close_to(player.position, (-100.0, 23))
 
 
-def test_place():
-    def orientation_before_position():
-        player = create_uninitialized_player()
-        player.initial_orientation(0).initial_position(-100.0, 23)
-        assert close_to(player.position, (-100.0, 23))
+def test_player_usage_before_init():
+    player = create_uninitialized_player()
 
-    def position_before_orientation():
-        player = create_uninitialized_player()
-        player.initial_position(-100.0, 23).initial_orientation(0)
-        assert close_to(player.position, (-100.0, 23))
+    def accelerate():
+        player.accelerate(1)
 
-    orientation_before_position()
-    position_before_orientation()
+    def turn():
+        player.turn(1)
+
+    def pass_to():
+        receiver = create_initialized_player(position=(1, 1))
+        player.pass_to(receiver, pass_velocity=1)
+
+    def shoot_at():
+        player.shoot_at((1, 1), shot_velocity=1)
+
+    require_exception(accelerate, AssertionError)
+    require_exception(turn, AssertionError)
+    require_exception(pass_to, AssertionError)
+    require_exception(shoot_at, AssertionError)

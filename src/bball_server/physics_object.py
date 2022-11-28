@@ -1,3 +1,4 @@
+from typing import Tuple
 import pymunk
 from bball_server.utils import to_degrees, to_radians, BASE_DIRECTION
 
@@ -27,25 +28,25 @@ class PhysicsObject:
     def is_initialized(self):
         return self._has_orientation and self._has_position
 
-    def init_position(self, position: pymunk.Vec2d):
-        assert not self._has_position
-        self._body.position = position
-        self._has_position = True
-
-    def init_orientation(self, orientation_degrees: float):
-        assert not self._has_orientation
-        self._body.angle = to_radians(orientation_degrees)
-        self._has_orientation = True
-
     @property
     def position(self):
         assert self.is_initialized
         return self._body.position
 
+    @position.setter
+    def position(self, position: Tuple[float, float]):
+        self._body.position = pymunk.Vec2d(*position)
+        self._has_position = True
+
     @property
     def orientation(self):
         assert self.is_initialized
         return to_degrees(self._body.angle)
+
+    @orientation.setter
+    def orientation(self, orientation_degrees: float):
+        self._body.angle = to_radians(orientation_degrees)
+        self._has_orientation = True
 
     @property
     def velocity(self):

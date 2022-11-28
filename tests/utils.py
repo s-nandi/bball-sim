@@ -41,7 +41,7 @@ def create_initialized_player(
     orientation_degrees: float = 0.0,
 ) -> Player:
     player = Player(attributes)
-    return player.initial_position(*position).initial_orientation(orientation_degrees)
+    return player.place_at(position, orientation_degrees)
 
 
 def close_to(
