@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Tuple
 import pymunk
+from bball_server.validator import valid_shot_velocity
 
 if TYPE_CHECKING:
     from bball_server.player import Player
@@ -18,7 +19,7 @@ class _ShootingServer:
     def __init__(
         self, shooter: Player, target: Tuple[float, float], shot_velocity: float
     ):
-        assert shot_velocity > 0
+        assert valid_shot_velocity(shot_velocity)
         assert shooter.has_ball
         self._shooter = shooter
         self._ball = shooter._unsafe_ball()

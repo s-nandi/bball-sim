@@ -58,16 +58,18 @@ def test_left_three_point_line():
     height = 5
     distance_from_left = 2
     distance_from_bottom = 1
-    """
-    5 | . . . . . . . . .
-    4 | 3 3 3 . . . 3 3 3
-    3 | 3 3 3 . . . 3 3 3
-    2 | 3 3 3 . . . 3 3 3
-    1 | 3 3 3 . . . 3 3 3
-    0 | . . . . . . . . .
-        - - - - - - - - - 
-        0 1 2 3 4 5 6 7 8
-    """
+
+    #########################
+    # 5 | . . . . . . . . . #
+    # 4 | 3 3 3 . . . 3 3 3 #
+    # 3 | 3 3 3 . . . 3 3 3 #
+    # 2 | 3 3 3 . . . 3 3 3 #
+    # 1 | 3 3 3 . . . 3 3 3 #
+    # 0 | . . . . . . . . . #
+    #   / - - - - - - - - - #
+    #     0 1 2 3 4 5 6 7 8 #
+    #########################
+
     left_hoop = create_hoop(
         width,
         height,
@@ -101,7 +103,9 @@ def test_left_three_point_line():
     for position in within_line_positions:
         assert not is_position_beyond_line(left_hoop, position)
 
-    reflect = lambda position: (width - position[0], position[1])
+    def reflect(position: Tuple[float, float]) -> Tuple[float, float]:
+        return (width - position[0], position[1])
+
     right_hoop = left_hoop.other_hoop(width)
     for position in beyond_line_positions:
         assert is_position_beyond_line(right_hoop, reflect(position))

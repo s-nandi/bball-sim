@@ -2,8 +2,8 @@ from __future__ import annotations
 from enum import Enum, auto
 from typing import Tuple, Optional, TYPE_CHECKING
 from bball_server.utils import vector_to_string
-from bball_server.passing_server import _PassingServer
-from bball_server.shooting_server import _ShootingServer
+from bball_server.ball.passing_server import _PassingServer
+from bball_server.ball.shooting_server import _ShootingServer
 
 if TYPE_CHECKING:
     from bball_server.player import Player

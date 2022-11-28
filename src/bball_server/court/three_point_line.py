@@ -29,16 +29,9 @@ class RectangleThreePointLine(ThreePointLine):
         assert self.y_lo <= self.y_hi
 
     def other_line(self, width):
-        x_coord = width / 2
-        assert (self.x_lo <= x_coord and self.x_hi <= x_coord) or (
-            self.x_lo >= x_coord and self.x_hi >= x_coord
-        )
-        print(width - self.x_lo, width - self.x_hi)
+        assert 0 <= self.x_lo and self.x_hi <= width
         return RectangleThreePointLine(
-            width - self.x_hi,
-            width - self.x_lo,
-            self.y_lo,
-            self.y_hi,
+            width - self.x_hi, width - self.x_lo, self.y_lo, self.y_hi
         )
 
     def contains(self, point: Tuple[float, float]):

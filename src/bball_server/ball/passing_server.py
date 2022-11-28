@@ -2,6 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 import pymunk
+from bball_server.validator import valid_pass_velocity
 
 if TYPE_CHECKING:
     from bball_server.player import Player
@@ -22,7 +23,7 @@ class _PassingServer:
     _time_since_pass: float
 
     def __init__(self, passer: Player, receiver: Player, pass_velocity: float):
-        assert pass_velocity > 0
+        assert valid_pass_velocity(pass_velocity)
         assert passer.has_ball
         assert not receiver.has_ball
         self._players_involved = PassPlayers(passer, receiver)
