@@ -22,16 +22,17 @@ class _PassingServer:
     _original_position: pymunk.Vec2d
     _time_since_pass: float
 
-    def __init__(self, passer: Player, receiver: Player, pass_velocity: float):
+    def __init__(
+        self, passer: Player, receiver: Player, ball: Ball, pass_velocity: float
+    ):
         assert valid_pass_velocity(pass_velocity)
-        assert passer.has_ball
+        assert not passer.has_ball
         assert not receiver.has_ball
         self._players_involved = PassPlayers(passer, receiver)
-        self._ball = passer._unsafe_ball()
+        self._ball = ball
         self._original_position = pymunk.Vec2d(*passer.position)
         self._pass_velocity = pass_velocity
         self._time_since_pass = 0
-        self._ball._remove_posession()
 
     def _complete_pass(self) -> None:
         self._ball.post_pass()

@@ -93,26 +93,31 @@ class Ball:
 
     def pass_to(self, receiver: Player, pass_velocity: float) -> Ball:
         assert self._mode == BallMode.HELD
+        passer = self._unsafe_belongs_to()
+        self._reset()
         self._mode = BallMode.MIDPASS
-        self._passing_server = _PassingServer(
-            self._unsafe_belongs_to(), receiver, pass_velocity
-        )
+        self._passing_server = _PassingServer(passer, receiver, self, pass_velocity)
         return self
 
-    def post_pass(self):
+    def post_pass(self) -> Ball:
         assert self._mode == BallMode.MIDPASS
+        self._reset()
         self._mode = BallMode.POSTPASS
+        return self
 
-    def shoot_at(self, target: Point, shot_velocity: float):
+    def shoot_at(self, target: Point, shot_velocity: float) -> Ball:
         assert self._mode == BallMode.HELD
+        shooter = self._unsafe_belongs_to()
+        self._reset()
         self._mode = BallMode.MIDSHOT
-        self._shooting_server = _ShootingServer(
-            self._unsafe_belongs_to(), target, shot_velocity
-        )
+        self._shooting_server = _ShootingServer(shooter, target, self, shot_velocity)
+        return self
 
-    def post_shot(self):
+    def post_shot(self) -> Ball:
         assert self._mode == BallMode.MIDSHOT
+        self._reset()
         self._mode = BallMode.POSTSHOT
+        return self
 
     def _step(self, time_frame: float):
         if self._mode in _TERMINAL_MODES:

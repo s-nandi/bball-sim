@@ -17,16 +17,17 @@ class _ShootingServer:
     _original_position: pymunk.Vec2d
     _time_since_shot: float
 
-    def __init__(self, shooter: Player, target: Point, shot_velocity: float):
+    def __init__(
+        self, shooter: Player, target: Point, ball: Ball, shot_velocity: float
+    ):
         assert valid_shot_velocity(shot_velocity)
-        assert shooter.has_ball
+        assert not shooter.has_ball
         self._shooter = shooter
-        self._ball = shooter._unsafe_ball()
+        self._ball = ball
         self._target = target
         self._shot_velocity = shot_velocity
         self._original_position = pymunk.Vec2d(*shooter.position)
         self._time_since_shot = 0.0
-        self._ball._remove_posession()
 
     def _complete_shot(self) -> None:
         self._ball._position = self._target
