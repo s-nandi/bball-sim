@@ -26,7 +26,7 @@ def setup_passing_test(pass_distance, pass_velocity) -> PassingTest:
     receiver = create_initialized_player(position=(pass_distance, 0))
     ball = create_ball()
     space = create_space().add(passer, receiver, ball)
-    ball.give_to(passer)
+    ball.jump_ball_won_by(passer)
     assert passer.has_ball
     assert not receiver.has_ball
     passer.pass_to(receiver, pass_velocity=pass_velocity)

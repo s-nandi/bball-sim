@@ -21,7 +21,7 @@ def setup_shooting_test(shot_distance, shot_velocity) -> ShootingTest:
     shooter = create_initialized_player(position=(0, 0))
     ball = create_ball()
     space = create_space().add(shooter, ball)
-    ball.give_to(shooter)
+    ball.jump_ball_won_by(shooter)
     assert shooter.has_ball
     shooter.shoot_at((shot_distance, 0), shot_velocity=shot_velocity)
     return ShootingTest(space, ball, shooter)
