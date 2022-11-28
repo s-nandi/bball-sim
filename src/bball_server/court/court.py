@@ -1,16 +1,7 @@
+from __future__ import annotations
 from typing import Tuple
-from dataclasses import dataclass
 from bball_server.player import Player
-
-
-@dataclass
-class Hoop:
-    x_position: float
-    y_position: float
-
-    @property
-    def position(self) -> Tuple[float, float]:
-        return (self.x_position, self.y_position)
+from bball_server.court.hoop import Hoop
 
 
 class Court:
@@ -29,5 +20,5 @@ class Court:
     def _contains_position(self, position: Tuple[float, float]):
         inbounds = True
         for dimension in range(2):
-            inbounds &= 1 <= position[dimension] <= self._dimensions[dimension]
+            inbounds &= 0 <= position[dimension] <= self._dimensions[dimension]
         return inbounds
