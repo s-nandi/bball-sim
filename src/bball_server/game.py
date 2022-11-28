@@ -24,13 +24,15 @@ class Game:
         return {
             BallMode.HELD: [self.check_out_of_bounds],
             BallMode.DEAD: [self.arbitrary_inbound],
+            BallMode.POSTPASS: [self.transfer_posession],
         }
 
-    def _step(self, _time_frame: float):
+    def _step(self, _time_frame: float) -> bool:
         checks = self._checks_per_mode.get(self.ball.mode, [])
         for check in checks:
             if check():
-                return
+                return True
+        return False
 
     def team_index_of(self, player: Player):
         for team_index, team in enumerate(self.teams):
@@ -66,4 +68,8 @@ class Game:
         if not self.court.is_inbounds(player):
             return False
         self.ball.jump_ball_won_by(player)
+        return True
+
+    def transfer_posession(self) -> bool:
+        self.ball.successful_pass(self.ball.passed_to)
         return True

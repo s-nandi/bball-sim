@@ -9,6 +9,7 @@ from bball_server import (
     ThreePointLine,
     RectangleThreePointLine,
     LinearShotProbability,
+    Game,
 )
 
 T = TypeVar("T")
@@ -108,6 +109,10 @@ def create_initialized_player(
 ) -> Player:
     player = Player(attributes)
     return player.place_at(position, orientation_degrees)
+
+
+def create_game(teams):
+    return Game(teams, create_ball(), create_court())
 
 
 DEFAULT_EPS = 10**-6

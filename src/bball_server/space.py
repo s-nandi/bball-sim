@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, Union, Iterable, Set
+from typing import List, Union, Sequence, Set
 import pymunk
 from bball_server.ball import Ball
 from bball_server.player import Player
@@ -75,9 +75,17 @@ class Space:
     def _substep(self, time_frame: float):
         self._step_each(self._players, time_frame)
         self._space.step(time_frame)
-        self._step_each(self._balls, time_frame)
-        self._step_each(self._games, time_frame)
+        if self._step_one(self._balls, time_frame):
+            return
+        if self._step_one(self._games, time_frame):
+            return
 
-    def _step_each(self, objs: Iterable[AddableObject], time_frame: float):
+    def _step_each(self, objs: Sequence[AddableObject], time_frame: float):
         for obj in objs:
             obj._step(time_frame)
+
+    def _step_one(self, objs: Sequence[AddableObject], time_frame: float) -> bool:
+        if len(objs) == 0:
+            return False
+        assert len(objs) == 1
+        return objs[0]._step(time_frame)

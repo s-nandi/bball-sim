@@ -85,10 +85,9 @@ class Player:
         self._unsafe_ball().shoot_at(target, shot_velocity)
         return self
 
-    def _step(self, time_step: float) -> Player:
+    def _step(self, time_step: float) -> bool:
         assert self.is_initialized
-        self._physics.step(self._move, time_step)
-        return self
+        return self._physics._step(self._move, time_step)
 
     def _reset(self) -> Player:
         assert self.is_initialized

@@ -29,21 +29,21 @@ class _ShootingServer:
         self._original_position = pymunk.Vec2d(*shooter.position)
         self._time_since_shot = 0.0
 
-    def _complete_shot(self) -> None:
+    def _complete_shot(self) -> bool:
         self._ball._position = self._target
         self._ball.post_shot()
+        return True
 
-    def _step(self, time_step: float) -> _ShootingServer:
+    def _step(self, time_step: float) -> bool:
         self._time_since_shot += time_step
         covered = self._time_since_shot * self._shot_velocity
         distance = self._original_position.get_distance(self._target)
         if covered >= distance:
-            self._complete_shot()
-        else:
-            fraction_completed = covered / distance
-            assert 0.0 <= fraction_completed <= 1.0
-            position = self._original_position.interpolate_to(
-                self._target, fraction_completed
-            )
-            self._ball._position = position
-        return self
+            return self._complete_shot()
+        fraction_completed = covered / distance
+        assert 0.0 <= fraction_completed <= 1.0
+        position = self._original_position.interpolate_to(
+            self._target, fraction_completed
+        )
+        self._ball._position = position
+        return False

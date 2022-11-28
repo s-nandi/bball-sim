@@ -8,7 +8,8 @@ class PlayerPhysics(PhysicsObject):
     def __init__(self, attributes: PlayerAttributes):
         super().__init__(attributes.mass, attributes.velocity_decay)
 
-    def step(self, action: PlayerMove, time_step: float) -> None:
+    def _step(self, action: PlayerMove, time_step: float) -> bool:
         assert self.is_initialized
         super().turn(to_radians(action.turn_degrees), time_step)
         super().accelerate(action.acceleration, time_step)
+        return False

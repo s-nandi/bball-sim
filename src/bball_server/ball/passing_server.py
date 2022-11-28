@@ -34,20 +34,20 @@ class _PassingServer:
         self._pass_velocity = pass_velocity
         self._time_since_pass = 0
 
-    def _complete_pass(self) -> None:
-        self._ball.post_pass()
+    def _complete_pass(self) -> bool:
+        self._ball.post_pass(self._players_involved.receiver)
+        return True
 
-    def _step(self, time_step: float) -> _PassingServer:
+    def _step(self, time_step: float) -> bool:
         self._time_since_pass += time_step
         receiver_position = self._players_involved.receiver.position
         distance = self._original_position.get_distance(receiver_position)
         covered = self._pass_velocity * self._time_since_pass
         if covered >= distance:
-            self._complete_pass()
-        else:
-            fraction_completed = covered / distance
-            assert 0.0 <= fraction_completed <= 1.0
-            self._ball._position = self._original_position.interpolate_to(
-                receiver_position, fraction_completed
-            )
-        return self
+            return self._complete_pass()
+        fraction_completed = covered / distance
+        assert 0.0 <= fraction_completed <= 1.0
+        self._ball._position = self._original_position.interpolate_to(
+            receiver_position, fraction_completed
+        )
+        return False
