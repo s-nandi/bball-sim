@@ -1,11 +1,12 @@
 from typing import Tuple
-from bball_server import Court, Hoop
+from bball_server import Court, Hoop, Player, Space
 from .utils import (
     create_initialized_player,
     create_court,
     create_three_point_line,
     require_exception,
     create_hoop,
+    create_space,
 )
 
 
@@ -17,6 +18,15 @@ def is_position_inbounds(court: Court, position: Tuple[float, float]) -> bool:
 def is_position_beyond_line(hoop: Hoop, position: Tuple[float, float]) -> bool:
     player = create_initialized_player(position=position)
     return hoop.is_beyond_three_point_line(player)
+
+
+def check_is_off_court_after(
+    court: Court, player: Player, space: Space, expected_time: int
+):
+    for _ in range(expected_time):
+        assert court.is_inbounds(player)
+        space.step(1)
+    assert not court.is_inbounds(player)
 
 
 def test_court_bounds():
@@ -31,6 +41,36 @@ def test_court_bounds():
     assert not is_position_inbounds(court, (0, height + 0.01))
     assert not is_position_inbounds(court, (-0.01, 0))
     assert not is_position_inbounds(court, (0, -0.01))
+
+
+def test_move_off_court_horizontal():
+    width = 5
+    height = 1
+
+    def test_with_starting_position(position, expected_time):
+        court = create_court(width, height)
+        player = create_initialized_player(position=position)
+        space = create_space().add(player)
+        player.accelerate(1)
+        check_is_off_court_after(court, player, space, expected_time)
+
+    test_with_starting_position((0.5, 0.5), width)
+    test_with_starting_position((0, 0.5), width + 1)
+
+
+def test_move_off_court_vertical():
+    width = 5
+    height = 1
+
+    def test_with_starting_position(position, expected_time):
+        court = create_court(width, height)
+        player = create_initialized_player(position=position)
+        space = create_space().add(player)
+        player.turn(1).accelerate(1)
+        check_is_off_court_after(court, player, space, expected_time)
+
+    test_with_starting_position((0.5, 0.5), height)
+    test_with_starting_position((0.5, 0), height + 1)
 
 
 def test_invalid_hoop_position():
