@@ -21,4 +21,4 @@ Run `python -m pylint src tests && python -m mypy src tests`
 Run `python -m black src tests`
 
 ## Testing
-Run `python -m pytest src tests`
+Run `python -m pytest`
