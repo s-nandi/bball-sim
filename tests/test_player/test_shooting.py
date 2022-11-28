@@ -1,6 +1,12 @@
 from dataclasses import dataclass
 from bball_server import Player, Space, Ball, BallMode
-from ..utils import create_initialized_player, create_space, create_ball, close_to
+from ..utils import (
+    create_initialized_player,
+    create_space,
+    create_ball,
+    close_to,
+    create_shot_probability,
+)
 
 
 @dataclass
@@ -33,3 +39,11 @@ def test_ball_position_mid_shot():
         assert close_to(test.ball.position, (time_since_shot, 0))
         test.space.step(1)
     assert test.ball.mode == BallMode.POSTSHOT
+
+
+def test_shot_probability():
+    max_shot_distance = 50
+    shot_probability = create_shot_probability(max_shot_distance=max_shot_distance)
+    assert shot_probability.probability(0) == 1.0
+    assert shot_probability.probability(max_shot_distance) == 0.0
+    assert shot_probability.probability(max_shot_distance / 2) == 0.5

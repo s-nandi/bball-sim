@@ -8,6 +8,7 @@ from bball_server import (
     Hoop,
     ThreePointLine,
     RectangleThreePointLine,
+    LinearShotProbability,
 )
 
 T = TypeVar("T")
@@ -64,6 +65,17 @@ def create_court(
     if hoop is None:
         hoop = create_hoop(width, height)
     return Court(dimensions=(width, height), hoops=(hoop, hoop.other_hoop(width)))
+
+
+def create_shot_probability(
+    max_percentage: float = 1.0,
+    min_shot_distance: float = 0.0,
+    min_percentage: float = 0.0,
+    max_shot_distance: float = 100.0,
+) -> LinearShotProbability:
+    return LinearShotProbability(
+        max_percentage, min_shot_distance, min_percentage, max_shot_distance
+    )
 
 
 def create_player_attributes(
