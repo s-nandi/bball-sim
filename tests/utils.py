@@ -1,5 +1,5 @@
 from typing import Tuple, TypeVar, Callable, Any
-from bball_server import Player, PlayerAttributes, Space, Ball
+from bball_server import Player, PlayerAttributes, Space, Ball, Court, Hoop
 
 T = TypeVar("T")
 
@@ -10,6 +10,12 @@ def create_space() -> Space:
 
 def create_ball() -> Ball:
     return Ball()
+
+
+def create_court(width: float, height: float) -> Court:
+    hoop_1 = Hoop(1, height / 2)
+    hoop_2 = Hoop(width, height / 2)
+    return Court(dimensions=(width, height), hoops=(hoop_1, hoop_2))
 
 
 def create_player_attributes(
