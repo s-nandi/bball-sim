@@ -30,7 +30,7 @@ class _ShootingServer:
 
     def _complete_shot(self) -> None:
         self._ball._position = self._target
-        self._ball.dead_ball()
+        self._ball.post_shot()
 
     def _step(self, time_step: float) -> _ShootingServer:
         self._time_since_shot += time_step

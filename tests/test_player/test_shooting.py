@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from bball_server import Player, Space, Ball
+from bball_server import Player, Space, Ball, BallMode
 from ..utils import create_initialized_player, create_space, create_ball, close_to
 
 
@@ -32,3 +32,4 @@ def test_ball_position_mid_shot():
     for time_since_shot in range(shot_distance + 1):
         assert close_to(test.ball.position, (time_since_shot, 0))
         test.space.step(1)
+    assert test.ball.mode == BallMode.POSTSHOT

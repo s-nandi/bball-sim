@@ -11,9 +11,14 @@ if TYPE_CHECKING:
 
 class BallMode(Enum):
     MIDPASS = auto()
+    POSTPASS = auto()
     HELD = auto()
     DEAD = auto()
     MIDSHOT = auto()
+    POSTSHOT = auto()
+
+
+_TERMINAL_MODES = [BallMode.POSTPASS, BallMode.POSTSHOT, BallMode.DEAD]
 
 
 class Ball:
@@ -30,11 +35,17 @@ class Ball:
         self._mode = BallMode.DEAD
 
     def __repr__(self):
-        return f"Ball(position = {vector_to_string(self._position)})"
+        return (
+            f"Ball(position = {vector_to_string(self._position)}, mode = {self._mode})"
+        )
 
     @property
     def position(self) -> Tuple[float, float]:
         return self._position
+
+    @property
+    def mode(self) -> BallMode:
+        return self._mode
 
     def _unsafe_belongs_to(self) -> Player:
         assert self._belongs_to is not None
@@ -57,7 +68,7 @@ class Ball:
         self._belongs_to = None
 
     def _reset(self) -> None:
-        if self._mode == BallMode.DEAD:
+        if self._mode in _TERMINAL_MODES:
             pass
         elif self._mode == BallMode.HELD:
             self._remove_posession()
@@ -88,6 +99,10 @@ class Ball:
         )
         return self
 
+    def post_pass(self):
+        assert self._mode == BallMode.MIDPASS
+        self._mode = BallMode.POSTPASS
+
     def shoot_at(self, target: Tuple[float, float], shot_velocity: float):
         assert self._mode == BallMode.HELD
         self._mode = BallMode.MIDSHOT
@@ -95,8 +110,12 @@ class Ball:
             self._unsafe_belongs_to(), target, shot_velocity
         )
 
+    def post_shot(self):
+        assert self._mode == BallMode.MIDSHOT
+        self._mode = BallMode.POSTSHOT
+
     def _step(self, time_frame: float):
-        if self._mode == BallMode.DEAD:
+        if self._mode in _TERMINAL_MODES:
             return
         if self._mode == BallMode.HELD:
             self._position = self._unsafe_belongs_to().position

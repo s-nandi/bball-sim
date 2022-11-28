@@ -1,18 +1,7 @@
 import math
 from dataclasses import dataclass
-from bball_server import Player, Space, Ball
+from bball_server import Player, Space, Ball, BallMode
 from ..utils import create_space, create_ball, create_initialized_player, close_to
-
-
-def check_pass_completes_after(
-    space: Space, passer: Player, receiver: Player, expected_time: int
-):
-    for _ in range(expected_time):
-        assert not passer.has_ball
-        assert not receiver.has_ball
-        space.step(1)
-    assert not passer.has_ball
-    assert receiver.has_ball
 
 
 @dataclass
@@ -21,6 +10,15 @@ class PassingTest:
     ball: Ball
     passer: Player
     receiver: Player
+
+
+def check_pass_completes_after(test: PassingTest, expected_time: int):
+    space = test.space
+    ball = test.ball
+    for _ in range(expected_time):
+        assert ball.mode == BallMode.MIDPASS
+        space.step(1)
+    assert ball.mode == BallMode.POSTPASS
 
 
 def setup_passing_test(pass_distance, pass_velocity) -> PassingTest:
@@ -48,16 +46,16 @@ def test_standstill_pass():
     pass_velocity = 1
     test = setup_passing_test(pass_distance, pass_velocity)
     time_to_complete = pass_distance
-    check_pass_completes_after(test.space, test.passer, test.receiver, time_to_complete)
+    check_pass_completes_after(test, time_to_complete)
 
 
 def test_handoff():
     pass_distance = 0
     pass_velocity = 0.01
     test = setup_passing_test(pass_distance, pass_velocity)
+    assert test.ball.mode == BallMode.MIDPASS
     test.space.step(10**-6)
-    assert not test.passer.has_ball
-    assert test.receiver.has_ball
+    assert test.ball.mode == BallMode.POSTPASS
 
 
 def test_step_passing_server_after_completion():
@@ -65,7 +63,7 @@ def test_step_passing_server_after_completion():
     pass_velocity = 1
     test = setup_passing_test(pass_distance, pass_velocity)
     time_to_complete = pass_distance
-    check_pass_completes_after(test.space, test.passer, test.receiver, time_to_complete)
+    check_pass_completes_after(test, time_to_complete)
     extra_steps = 3
     for _ in range(extra_steps):
         test.space.step(1)
@@ -77,7 +75,7 @@ def test_pass_from_moving_passer():
     test = setup_passing_test(pass_distance, pass_velocity)
     time_to_complete = pass_distance
     test.passer.accelerate(1)
-    check_pass_completes_after(test.space, test.passer, test.receiver, time_to_complete)
+    check_pass_completes_after(test, time_to_complete)
 
 
 def test_pass_to_moving_receiver():
@@ -89,7 +87,7 @@ def test_pass_to_moving_receiver():
     time_to_complete = calculate_time_to_complete(
         pass_distance, pass_velocity, receiver_speed
     )
-    check_pass_completes_after(test.space, test.passer, test.receiver, time_to_complete)
+    check_pass_completes_after(test, time_to_complete)
 
 
 def test_ball_position_mid_pass_with_both_players_moving():

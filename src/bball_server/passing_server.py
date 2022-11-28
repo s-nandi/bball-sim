@@ -33,7 +33,7 @@ class _PassingServer:
         self._ball._remove_posession()
 
     def _complete_pass(self) -> None:
-        self._ball.give_to(self._players_involved.receiver)
+        self._ball.post_pass()
 
     def _step(self, time_step: float) -> _PassingServer:
         self._time_since_pass += time_step
