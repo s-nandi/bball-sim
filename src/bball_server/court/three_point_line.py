@@ -1,11 +1,11 @@
 from __future__ import annotations
-from typing import Tuple
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
+from bball_server.utils import Point
 
 
 class ThreePointLine(ABC):
-    def is_beyond(self, point: Tuple[float, float]):
+    def is_beyond(self, point: Point):
         return not self.contains(point)
 
     @abstractmethod
@@ -13,7 +13,7 @@ class ThreePointLine(ABC):
         pass
 
     @abstractmethod
-    def contains(self, _point: Tuple[float, float]):
+    def contains(self, _point: Point):
         pass
 
 
@@ -34,5 +34,5 @@ class RectangleThreePointLine(ThreePointLine):
             width - self.x_hi, width - self.x_lo, self.y_lo, self.y_hi
         )
 
-    def contains(self, point: Tuple[float, float]):
+    def contains(self, point: Point):
         return self.x_lo <= point[0] <= self.x_hi and self.y_lo <= point[1] <= self.y_hi

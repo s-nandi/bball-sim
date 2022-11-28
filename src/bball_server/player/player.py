@@ -1,6 +1,6 @@
 from __future__ import annotations
-from typing import Tuple, Optional, TYPE_CHECKING
-from bball_server.utils import convert_to_tuple, vector_to_string
+from typing import Optional, TYPE_CHECKING
+from bball_server.utils import coords_to_string
 from bball_server.validator import valid_multiplier
 from bball_server.player.player_attributes import PlayerAttributes
 from bball_server.player.player_physics import PlayerPhysics
@@ -8,6 +8,7 @@ from bball_server.player.player_move import PlayerMove
 
 if TYPE_CHECKING:
     from bball_server.ball import Ball
+    from bball_server.utils import Point, Vector
 
 
 class Player:
@@ -25,21 +26,21 @@ class Player:
     def __repr__(self) -> str:
         if not self.is_initialized:
             return "UninitializedPlayer"
-        position_str = "position = " + vector_to_string(self.position)
-        velocity_str = "velocity = " + vector_to_string(self.velocity)
+        position_str = "position = " + coords_to_string(self.position)
+        velocity_str = "velocity = " + coords_to_string(self.velocity)
         has_ball_str = "HasBall" if self.has_ball else ""
         concat_str = ", ".join(filter(None, [position_str, velocity_str, has_ball_str]))
         return f"Player({concat_str})"
 
     @property
-    def position(self) -> Tuple[float, float]:
+    def position(self) -> Point:
         assert self.is_initialized
-        return convert_to_tuple(self._physics.position)
+        return self._physics.position
 
     @property
-    def velocity(self) -> Tuple[float, float]:
+    def velocity(self) -> Vector:
         assert self.is_initialized
-        return convert_to_tuple(self._physics.velocity)
+        return self._physics.velocity
 
     @property
     def has_ball(self) -> bool:
@@ -55,9 +56,7 @@ class Player:
         assert self._ball is not None
         return self._ball
 
-    def place_at(
-        self, position: Tuple[float, float], orientation_degrees: float
-    ) -> Player:
+    def place_at(self, position: Point, orientation_degrees: float) -> Player:
         self._physics.position = position
         self._physics.orientation = orientation_degrees
         return self
@@ -81,7 +80,7 @@ class Player:
         self._unsafe_ball().pass_to(receiver, pass_velocity)
         return self
 
-    def shoot_at(self, target: Tuple[float, float], shot_velocity: float) -> Player:
+    def shoot_at(self, target: Point, shot_velocity: float) -> Player:
         assert self.is_initialized
         self._unsafe_ball().shoot_at(target, shot_velocity)
         return self

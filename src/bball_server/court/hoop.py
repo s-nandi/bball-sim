@@ -1,10 +1,11 @@
 from __future__ import annotations
-from typing import Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from dataclasses import dataclass
 from bball_server.court.three_point_line import ThreePointLine
 
 if TYPE_CHECKING:
     from bball_server.player import Player
+    from bball_server.utils import Point
 
 
 @dataclass
@@ -21,7 +22,7 @@ class Hoop:
         )
 
     @property
-    def position(self) -> Tuple[float, float]:
+    def position(self) -> Point:
         return (self.x_position, self.y_position)
 
     def is_beyond_three_point_line(self, player: Player) -> bool:

@@ -1,6 +1,12 @@
-from typing import Tuple
 import pymunk
-from bball_server.utils import to_degrees, to_radians, BASE_DIRECTION
+from bball_server.utils import (
+    to_degrees,
+    to_radians,
+    BASE_DIRECTION,
+    convert_to_tuple,
+    Point,
+    Vector,
+)
 
 
 def velocity_func_with_decay(velocity_decay: float):
@@ -29,12 +35,12 @@ class PhysicsObject:
         return self._has_orientation and self._has_position
 
     @property
-    def position(self):
+    def position(self) -> Point:
         assert self.is_initialized
-        return self._body.position
+        return convert_to_tuple(self._body.position)
 
     @position.setter
-    def position(self, position: Tuple[float, float]):
+    def position(self, position: Point):
         self._body.position = pymunk.Vec2d(*position)
         self._has_position = True
 
@@ -49,9 +55,9 @@ class PhysicsObject:
         self._has_orientation = True
 
     @property
-    def velocity(self):
+    def velocity(self) -> Vector:
         assert self.is_initialized
-        return self._body.velocity
+        return convert_to_tuple(self._body.velocity)
 
     def turn(self, angle: float, time_step: float) -> None:
         assert self.is_initialized

@@ -1,24 +1,23 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING
 import pymunk
 from bball_server.validator import valid_shot_velocity
 
 if TYPE_CHECKING:
     from bball_server.player import Player
     from bball_server.ball import Ball
+    from bball_server.utils import Point
 
 
 class _ShootingServer:
     _shooter: Player
     _ball: Ball
-    _target: Tuple[float, float]
+    _target: Point
     _shot_velocity: float
     _original_position: pymunk.Vec2d
     _time_since_shot: float
 
-    def __init__(
-        self, shooter: Player, target: Tuple[float, float], shot_velocity: float
-    ):
+    def __init__(self, shooter: Player, target: Point, shot_velocity: float):
         assert valid_shot_velocity(shot_velocity)
         assert shooter.has_ball
         self._shooter = shooter

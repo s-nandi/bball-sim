@@ -1,7 +1,7 @@
 from __future__ import annotations
 from enum import Enum, auto
-from typing import Tuple, Optional, TYPE_CHECKING
-from bball_server.utils import vector_to_string
+from typing import Optional, TYPE_CHECKING
+from bball_server.utils import coords_to_string, Point
 from bball_server.ball.passing_server import _PassingServer
 from bball_server.ball.shooting_server import _ShootingServer
 
@@ -22,7 +22,7 @@ _TERMINAL_MODES = [BallMode.POSTPASS, BallMode.POSTSHOT, BallMode.DEAD]
 
 
 class Ball:
-    _position: Tuple[float, float]
+    _position: Point
     _belongs_to: Optional[Player]
     _passing_server: Optional[_PassingServer]
     _shooting_server: Optional[_ShootingServer]
@@ -36,11 +36,11 @@ class Ball:
 
     def __repr__(self):
         return (
-            f"Ball(position = {vector_to_string(self._position)}, mode = {self._mode})"
+            f"Ball(position = {coords_to_string(self._position)}, mode = {self._mode})"
         )
 
     @property
-    def position(self) -> Tuple[float, float]:
+    def position(self) -> Point:
         return self._position
 
     @property
@@ -103,7 +103,7 @@ class Ball:
         assert self._mode == BallMode.MIDPASS
         self._mode = BallMode.POSTPASS
 
-    def shoot_at(self, target: Tuple[float, float], shot_velocity: float):
+    def shoot_at(self, target: Point, shot_velocity: float):
         assert self._mode == BallMode.HELD
         self._mode = BallMode.MIDSHOT
         self._shooting_server = _ShootingServer(

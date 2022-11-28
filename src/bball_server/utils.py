@@ -2,13 +2,16 @@ import math
 from typing import Tuple
 import pymunk
 
+Point = Tuple[float, float]
+Vector = Tuple[float, float]
+
 BASE_DIRECTION = pymunk.Vec2d(1, 0)
 ZERO_VECTOR = pymunk.Vec2d(0, 0)
 
 
-def vector_to_string(vec: Tuple[float, float]) -> str:
-    x_coord = round(vec[0], 4)
-    y_coord = round(vec[1], 4)
+def coords_to_string(tup: Tuple[float, float]) -> str:
+    x_coord = round(tup[0], 4)
+    y_coord = round(tup[1], 4)
     return f"({x_coord}, {y_coord})"
 
 
