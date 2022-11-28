@@ -96,7 +96,6 @@ class Ball:
             self._shooting_server = None
         else:
             assert False
-        return self
 
     def _with_mode(self, mode: BallMode) -> Ball:
         self._mode = mode
