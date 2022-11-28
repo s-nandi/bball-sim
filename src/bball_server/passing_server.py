@@ -30,6 +30,7 @@ class _PassingServer:
         self._original_position = pymunk.Vec2d(*passer.position)
         self._pass_velocity = pass_velocity
         self._time_since_pass = 0
+        self._ball._remove_posession()
 
     def _complete_pass(self) -> None:
         self._ball.give_to(self._players_involved.receiver)

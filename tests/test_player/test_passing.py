@@ -13,7 +13,7 @@ def check_pass_completes_after(
     space: Space, passer: Player, receiver: Player, expected_time: int
 ):
     for _ in range(expected_time):
-        assert passer.has_ball
+        assert not passer.has_ball
         assert not receiver.has_ball
         space.step(1)
     assert not passer.has_ball

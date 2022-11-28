@@ -62,7 +62,6 @@ class Ball:
         elif self._mode == BallMode.HELD:
             self._remove_posession()
         elif self._mode == BallMode.MIDPASS:
-            self._remove_posession()
             self._passing_server = None
         elif self._mode == BallMode.MIDSHOT:
             self._shooting_server = None
