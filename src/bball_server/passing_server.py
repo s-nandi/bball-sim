@@ -42,4 +42,10 @@ class _PassingServer:
         covered = self._pass_velocity * self._time_since_pass
         if covered >= distance:
             self._complete_pass()
+        else:
+            fraction_completed = covered / distance
+            assert 0.0 <= fraction_completed <= 1.0
+            self._ball._position = self._original_position.interpolate_to(
+                receiver_position, fraction_completed
+            )
         return self
