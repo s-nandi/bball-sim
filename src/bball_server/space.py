@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, Union, Iterable
+from typing import List, Union, Iterable, Set
 import pymunk
 from bball_server.ball import Ball
 from bball_server.player import Player
@@ -12,11 +12,13 @@ class Space:
     _space: pymunk.Space
     _players: List[Player]
     _balls: List[Ball]
+    _ids: Set[int]
 
     def __init__(self):
         self._space = pymunk.Space()
         self._players = []
         self._balls = []
+        self._ids = set()
 
     def add(self, *objs: AddableObject) -> Space:
         for obj in objs:
@@ -24,6 +26,9 @@ class Space:
         return self
 
     def _add_single_object(self, obj: AddableObject) -> Space:
+        if id(obj) in self._ids:
+            return self
+        self._ids.add(id(obj))
         if isinstance(obj, Player):
             return self._add_player(obj)
         if isinstance(obj, Ball):
