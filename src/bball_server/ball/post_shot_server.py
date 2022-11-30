@@ -4,7 +4,7 @@ from bball_server.utils import Point
 
 
 @dataclass
-class _ScoringServer:
+class _PostShotServer:
     shooter: Player
     target: Point
     location: Point

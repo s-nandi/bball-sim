@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from bball_server.utils import Point
 
 
-class _ShootingServer:
+class _MidShotServer:
     _shooter: Player
     _ball: Ball
     _target: Point

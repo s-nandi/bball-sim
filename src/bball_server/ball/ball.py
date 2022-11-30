@@ -2,12 +2,12 @@ from __future__ import annotations
 from enum import Enum, auto
 from typing import Optional, TYPE_CHECKING, Union
 from bball_server.utils import coords_to_string, Point
-from bball_server.ball.passing_server import _PassingServer
-from bball_server.ball.shooting_server import _ShootingServer
-from bball_server.ball.scoring_server import _ScoringServer
-from bball_server.ball.dead_ball_server import _DeadBallServer
-from bball_server.ball.post_pass_server import _PostPassServer
 from bball_server.ball.held_ball_server import _HeldBallServer
+from bball_server.ball.mid_pass_server import _MidPassServer
+from bball_server.ball.post_pass_server import _PostPassServer
+from bball_server.ball.mid_shot_server import _MidShotServer
+from bball_server.ball.post_shot_server import _PostShotServer
+from bball_server.ball.dead_ball_server import _DeadBallServer
 
 
 if TYPE_CHECKING:
@@ -15,21 +15,21 @@ if TYPE_CHECKING:
 
 
 class BallMode(Enum):
+    HELD = auto()
     MIDPASS = auto()
     POSTPASS = auto()
-    HELD = auto()
-    DEAD = auto()
     MIDSHOT = auto()
     POSTSHOT = auto()
+    DEAD = auto()
 
 
 _Server = Union[
-    _PassingServer,
-    _ShootingServer,
-    _ScoringServer,
-    _DeadBallServer,
-    _PostPassServer,
     _HeldBallServer,
+    _MidPassServer,
+    _PostPassServer,
+    _MidShotServer,
+    _PostShotServer,
+    _DeadBallServer,
 ]
 
 
@@ -71,10 +71,10 @@ class Ball:
         return server._should_flip_posession
 
     @property
-    def shot_parameters(self) -> _ScoringServer:
+    def shot_parameters(self) -> _PostShotServer:
         assert self._mode == BallMode.POSTSHOT
         server = self._unsafe_server()
-        assert isinstance(server, _ScoringServer)
+        assert isinstance(server, _PostShotServer)
         return server
 
     @property
@@ -99,9 +99,7 @@ class Ball:
             return False
         if self._mode in [BallMode.HELD, BallMode.MIDPASS, BallMode.MIDSHOT]:
             server = self._unsafe_server()
-            assert isinstance(
-                server, (_ShootingServer, _PassingServer, _HeldBallServer)
-            )
+            assert isinstance(server, (_MidShotServer, _MidPassServer, _HeldBallServer))
             return server._step(time_frame)
         assert False, f"Invalid ball mode {self._mode}"
 
@@ -134,13 +132,13 @@ class Ball:
     def pass_to(self, receiver: Player, pass_velocity: float) -> Ball:
         assert self._mode == BallMode.HELD
         self._reset()
-        self._server = _PassingServer(self.belongs_to, receiver, self, pass_velocity)
+        self._server = _MidPassServer(self.belongs_to, receiver, self, pass_velocity)
         return self._with_mode(BallMode.MIDPASS)
 
     def shoot_at(self, target: Point, shot_velocity: float) -> Ball:
         assert self._mode == BallMode.HELD
         self._reset()
-        self._server = _ShootingServer(self.belongs_to, target, self, shot_velocity)
+        self._server = _MidShotServer(self.belongs_to, target, self, shot_velocity)
         return self._with_mode(BallMode.MIDSHOT)
 
     def post_pass(self, receiver: Player) -> Ball:
@@ -158,7 +156,7 @@ class Ball:
     def post_shot(self, shooter: Player, target: Point, shot_from: Point) -> Ball:
         assert self._mode == BallMode.MIDSHOT
         self._reset()
-        self._server = _ScoringServer(shooter, target, shot_from)
+        self._server = _PostShotServer(shooter, target, shot_from)
         return self._with_mode(BallMode.POSTSHOT)
 
     def successful_shot(self) -> Ball:

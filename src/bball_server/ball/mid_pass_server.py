@@ -16,7 +16,7 @@ class PassPlayers:
     receiver: Player
 
 
-class _PassingServer:
+class _MidPassServer:
     _players_involved: PassPlayers
     _ball: Ball
     _pass_velocity: float
