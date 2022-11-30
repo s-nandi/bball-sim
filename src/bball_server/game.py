@@ -4,6 +4,7 @@ from bball_server.ball import BallMode, Ball
 from bball_server.court import Court, Hoop
 from bball_server.player import Player
 from bball_server.utils import Point, close_to
+from bball_server.ball.scoring_server import _ScoringServer
 
 Team = List[Player]
 Teams = Tuple[Team, Team]
@@ -46,7 +47,7 @@ class Game:
 
     @property
     def score(self) -> Score:
-        return tuple(self._score)
+        return (self._score[0], self._score[1])
 
     @property
     def team_with_last_posession(self) -> Optional[int]:
@@ -100,11 +101,12 @@ class Game:
 
     def _apply_score_change(self) -> None:
         assert self.ball.mode == BallMode.POSTSHOT
-        player = self.ball._shot_by
+        server = self.ball._unsafe_server()
+        assert isinstance(server, _ScoringServer)
+        player = server._shot_by
         target_hoop = self.target_hoop(player)
-        print(self.ball._shot_at, target_hoop.position)
-        assert close_to(self.ball._shot_at, target_hoop.position)
-        value = self.value_of_shot(self.ball._shot_from, target_hoop)
+        assert close_to(server._shot_at, target_hoop.position)
+        value = self.value_of_shot(server._shot_from, target_hoop)
         self._score[self.team_index_of(player)] += value
 
     def make_basket(self) -> bool:

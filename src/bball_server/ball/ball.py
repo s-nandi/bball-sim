@@ -4,6 +4,7 @@ from typing import Optional, TYPE_CHECKING, Union
 from bball_server.utils import coords_to_string, Point
 from bball_server.ball.passing_server import _PassingServer
 from bball_server.ball.shooting_server import _ShootingServer
+from bball_server.ball.scoring_server import _ScoringServer
 
 if TYPE_CHECKING:
     from bball_server.player import Player
@@ -18,8 +19,7 @@ class BallMode(Enum):
     POSTSHOT = auto()
 
 
-_TERMINAL_MODES = [BallMode.POSTPASS, BallMode.POSTSHOT, BallMode.DEAD]
-_Server = Union[_PassingServer, _ShootingServer]
+_Server = Union[_PassingServer, _ShootingServer, _ScoringServer]
 
 
 class Ball:
@@ -87,13 +87,15 @@ class Ball:
         self._belongs_to = None
 
     def _step(self, time_frame: float) -> bool:
-        if self._mode in _TERMINAL_MODES:
+        if self._mode in [BallMode.POSTPASS, BallMode.POSTSHOT, BallMode.DEAD]:
             return False
         if self._mode == BallMode.HELD:
             self._position = self._unsafe_belongs_to().position
             return False
         if self._mode in [BallMode.MIDPASS, BallMode.MIDSHOT]:
-            return self._unsafe_server()._step(time_frame)
+            server = self._unsafe_server()
+            assert isinstance(server, (_ShootingServer, _PassingServer))
+            return server._step(time_frame)
         assert False, f"Invalid ball mode {self._mode}"
 
     def _reset(self) -> None:
@@ -101,11 +103,9 @@ class Ball:
             self._should_flip_posession = None
         elif self.mode == BallMode.POSTPASS:
             self._passed_to = None
-        elif self._mode in _TERMINAL_MODES:
-            pass
         elif self._mode == BallMode.HELD:
             self._remove_posession()
-        elif self._mode in [BallMode.MIDPASS, BallMode.MIDSHOT]:
+        elif self._mode in [BallMode.MIDPASS, BallMode.MIDSHOT, BallMode.POSTSHOT]:
             self._server = None
         else:
             assert False
@@ -156,9 +156,7 @@ class Ball:
     def post_shot(self, shooter: Player, target: Point, shot_from: Point) -> Ball:
         assert self._mode == BallMode.MIDSHOT
         self._reset()
-        self._shot_by = shooter
-        self._shot_at = target
-        self._shot_from = shot_from
+        self._server = _ScoringServer(shooter, target, shot_from)
         return self._with_mode(BallMode.POSTSHOT)
 
     def successful_shot(self) -> Ball:
