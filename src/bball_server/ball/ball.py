@@ -1,7 +1,8 @@
 from __future__ import annotations
-from typing import Optional, TYPE_CHECKING, Union
+from typing import Optional, TYPE_CHECKING, Type, TypeVar, Any
 from bball_server.utils import coords_to_string, Point
 from bball_server.ball.ball_mode import BallMode
+from bball_server.ball.server import _Server
 from bball_server.ball.held_ball_server import _HeldBallServer
 from bball_server.ball.mid_pass_server import _MidPassServer
 from bball_server.ball.post_pass_server import _PostPassServer
@@ -13,15 +14,12 @@ from bball_server.ball.dead_ball_server import _DeadBallServer
 if TYPE_CHECKING:
     from bball_server.player import Player
 
+T = TypeVar("T")
 
-_Server = Union[
-    _HeldBallServer,
-    _MidPassServer,
-    _PostPassServer,
-    _MidShotServer,
-    _PostShotServer,
-    _DeadBallServer,
-]
+
+def _checked(server: Any, variable_type: Type[T]) -> T:
+    assert isinstance(server, variable_type)
+    return server
 
 
 class Ball:
@@ -53,100 +51,56 @@ class Ball:
 
     @property
     def should_flip_posession(self) -> bool:
-        assert self.mode == BallMode.DEAD
-        server = self._server
-        assert isinstance(server, _DeadBallServer)
-        return server._should_flip_posession
+        return _checked(self._server, _DeadBallServer)._should_flip_posession
 
     @property
     def shot_parameters(self) -> _PostShotServer:
-        assert self.mode == BallMode.POSTSHOT
-        server = self._server
-        assert isinstance(server, _PostShotServer)
-        return server
+        return _checked(self._server, _PostShotServer)
 
     @property
     def passed_to(self) -> Player:
-        assert self.mode == BallMode.POSTPASS
-        server = self._server
-        assert isinstance(server, _PostPassServer)
-        return server._receiver
+        return _checked(self._server, _PostPassServer)._receiver
 
     @property
     def belongs_to(self) -> Player:
-        server = self._server
-        assert isinstance(server, _HeldBallServer)
-        return server._ball_handler
+        return _checked(self._server, _HeldBallServer)._ball_handler
 
     def _step(self, time_frame: float) -> bool:
-        if self.mode in [BallMode.POSTPASS, BallMode.POSTSHOT, BallMode.DEAD]:
-            return False
-        if self.mode in [BallMode.HELD, BallMode.MIDPASS, BallMode.MIDSHOT]:
-            server = self._server
-            assert isinstance(server, (_MidShotServer, _MidPassServer, _HeldBallServer))
-            return server._step(time_frame)
-        assert False, f"Invalid ball mode {self.mode}"
+        return self._server._step(time_frame)
 
-    def _reset(self) -> None:
-        if self.mode == BallMode.HELD:
-            server = self._server
-            assert isinstance(server, _HeldBallServer)
-            server._reset()
-        elif self.mode in [
-            BallMode.MIDPASS,
-            BallMode.MIDSHOT,
-            BallMode.POSTSHOT,
-            BallMode.DEAD,
-            BallMode.POSTPASS,
-        ]:
-            pass
-        else:
-            assert False
+    def _transition(self, previous_server_type: Type[_Server], server: _Server) -> Ball:
+        _checked(self._server, previous_server_type)._reset()
+        self._server = server
+        return self
 
     def held_out_of_bounds(self):
-        assert self.mode == BallMode.HELD
-        self._reset()
-        self._server = _DeadBallServer(True)
-        return self
+        return self._transition(_HeldBallServer, _DeadBallServer(True))
 
     def pass_to(self, receiver: Player, pass_velocity: float) -> Ball:
-        assert self.mode == BallMode.HELD
-        self._reset()
-        self._server = _MidPassServer(self.belongs_to, receiver, self, pass_velocity)
-        return self
+        return self._transition(
+            _HeldBallServer,
+            _MidPassServer(self.belongs_to, receiver, self, pass_velocity),
+        )
 
     def shoot_at(self, target: Point, shot_velocity: float) -> Ball:
-        assert self.mode == BallMode.HELD
-        self._reset()
-        self._server = _MidShotServer(self.belongs_to, target, self, shot_velocity)
-        return self
+        return self._transition(
+            _HeldBallServer,
+            _MidShotServer(self.belongs_to, target, self, shot_velocity),
+        )
 
     def post_pass(self, receiver: Player) -> Ball:
-        assert self.mode == BallMode.MIDPASS
-        self._reset()
-        self._server = _PostPassServer(receiver)
-        return self
+        return self._transition(_MidPassServer, _PostPassServer(receiver))
 
     def successful_pass(self, receiver: Player) -> Ball:
-        assert self.mode == BallMode.POSTPASS
-        self._reset()
-        self._server = _HeldBallServer(receiver, self)
-        return self
+        return self._transition(_PostPassServer, _HeldBallServer(receiver, self))
 
     def post_shot(self, shooter: Player, target: Point, shot_from: Point) -> Ball:
-        assert self.mode == BallMode.MIDSHOT
-        self._reset()
-        self._server = _PostShotServer(shooter, target, shot_from)
-        return self
+        return self._transition(
+            _MidShotServer, _PostShotServer(shooter, target, shot_from)
+        )
 
     def successful_shot(self) -> Ball:
-        assert self.mode == BallMode.POSTSHOT
-        self._reset()
-        self._server = _DeadBallServer(True)
-        return self
+        return self._transition(_PostShotServer, _DeadBallServer(True))
 
     def jump_ball_won_by(self, receiver: Player) -> Ball:
-        assert self.mode == BallMode.DEAD
-        self._reset()
-        self._server = _HeldBallServer(receiver, self)
-        return self
+        return self._transition(_DeadBallServer, _HeldBallServer(receiver, self))

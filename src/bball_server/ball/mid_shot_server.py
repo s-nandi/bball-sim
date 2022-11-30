@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 import pymunk
 from bball_server.validator import valid_shot_velocity
 from bball_server.utils import convert_to_tuple
+from bball_server.ball.server import _Server
 from bball_server.ball.ball_mode import BallMode
 
 if TYPE_CHECKING:
@@ -11,7 +12,7 @@ if TYPE_CHECKING:
     from bball_server.utils import Point
 
 
-class _MidShotServer:
+class _MidShotServer(_Server):
     _shooter: Player
     _ball: Ball
     _target: Point
@@ -23,7 +24,6 @@ class _MidShotServer:
         self, shooter: Player, target: Point, ball: Ball, shot_velocity: float
     ):
         assert valid_shot_velocity(shot_velocity)
-        assert not shooter.has_ball
         self._shooter = shooter
         self._ball = ball
         self._target = target
