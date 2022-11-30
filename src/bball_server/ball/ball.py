@@ -6,6 +6,7 @@ from bball_server.ball.passing_server import _PassingServer
 from bball_server.ball.shooting_server import _ShootingServer
 from bball_server.ball.scoring_server import _ScoringServer
 from bball_server.ball.dead_ball_server import _DeadBallServer
+from bball_server.ball.post_pass_server import _PostPassServer
 
 if TYPE_CHECKING:
     from bball_server.player import Player
@@ -20,7 +21,9 @@ class BallMode(Enum):
     POSTSHOT = auto()
 
 
-_Server = Union[_PassingServer, _ShootingServer, _ScoringServer, _DeadBallServer]
+_Server = Union[
+    _PassingServer, _ShootingServer, _ScoringServer, _DeadBallServer, _PostPassServer
+]
 
 
 class Ball:
@@ -28,15 +31,13 @@ class Ball:
     _belongs_to: Optional[Player]
     _last_belonged_to: Optional[Player]
     _server: Optional[_Server]
-    _passed_to: Optional[Player]
     _mode: BallMode
 
     def __init__(self):
         self._position = (0, 0)
         self._belongs_to = None
         self._last_belonged_to = None
-        self._server = None
-        self._passed_to = None
+        self._server = _DeadBallServer(False)
         self._mode = BallMode.DEAD
 
     def __repr__(self):
@@ -73,8 +74,9 @@ class Ball:
     @property
     def passed_to(self) -> Player:
         assert self._mode == BallMode.POSTPASS
-        assert self._passed_to is not None
-        return self._passed_to
+        server = self._unsafe_server()
+        assert isinstance(server, _PostPassServer)
+        return server._receiver
 
     def _unsafe_belongs_to(self) -> Player:
         assert self._belongs_to is not None
@@ -106,15 +108,14 @@ class Ball:
         assert False, f"Invalid ball mode {self._mode}"
 
     def _reset(self) -> None:
-        if self.mode == BallMode.POSTPASS:
-            self._passed_to = None
-        elif self._mode == BallMode.HELD:
+        if self._mode == BallMode.HELD:
             self._remove_posession()
         elif self._mode in [
             BallMode.MIDPASS,
             BallMode.MIDSHOT,
             BallMode.POSTSHOT,
             BallMode.DEAD,
+            BallMode.POSTPASS,
         ]:
             self._server = None
         else:
@@ -145,7 +146,7 @@ class Ball:
     def post_pass(self, receiver: Player) -> Ball:
         assert self._mode == BallMode.MIDPASS
         self._reset()
-        self._passed_to = receiver
+        self._server = _PostPassServer(receiver)
         return self._with_mode(BallMode.POSTPASS)
 
     def successful_pass(self, receiver: Player) -> Ball:
