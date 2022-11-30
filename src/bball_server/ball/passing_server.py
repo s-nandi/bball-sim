@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 import pymunk
 from bball_server.validator import valid_pass_velocity
+from bball_server.utils import convert_to_tuple
 
 if TYPE_CHECKING:
     from bball_server.player import Player
@@ -47,7 +48,9 @@ class _PassingServer:
             return self._complete_pass()
         fraction_completed = covered / distance
         assert 0.0 <= fraction_completed <= 1.0
-        self._ball._position = self._original_position.interpolate_to(
-            receiver_position, fraction_completed
+        self._ball._position = convert_to_tuple(
+            self._original_position.interpolate_to(
+                receiver_position, fraction_completed
+            )
         )
         return False

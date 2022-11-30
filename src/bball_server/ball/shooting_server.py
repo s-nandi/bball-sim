@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import pymunk
 from bball_server.validator import valid_shot_velocity
+from bball_server.utils import convert_to_tuple
 
 if TYPE_CHECKING:
     from bball_server.player import Player
@@ -42,8 +43,8 @@ class _ShootingServer:
             return self._complete_shot()
         fraction_completed = covered / distance
         assert 0.0 <= fraction_completed <= 1.0
-        position = self._original_position.interpolate_to(
-            self._target, fraction_completed
+        position = convert_to_tuple(
+            self._original_position.interpolate_to(self._target, fraction_completed)
         )
         self._ball._position = position
         return False
