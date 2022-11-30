@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 import pymunk
 from bball_server.validator import valid_shot_velocity
 from bball_server.utils import convert_to_tuple
+from bball_server.ball.ball_mode import BallMode
 
 if TYPE_CHECKING:
     from bball_server.player import Player
@@ -48,3 +49,7 @@ class _MidShotServer:
         )
         self._ball._position = position
         return False
+
+    @staticmethod
+    def mode() -> BallMode:
+        return BallMode.MIDSHOT

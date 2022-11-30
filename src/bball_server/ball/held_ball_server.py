@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+from bball_server.ball.ball_mode import BallMode
 
 if TYPE_CHECKING:
     from bball_server.player import Player
@@ -23,3 +24,7 @@ class _HeldBallServer:
 
     def _reset(self):
         self._ball_handler._ball = None
+
+    @staticmethod
+    def mode() -> BallMode:
+        return BallMode.HELD
