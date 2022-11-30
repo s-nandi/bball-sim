@@ -1,7 +1,7 @@
+from bball_server.utils import close_to
 from ..utils import (
     create_initialized_player,
     create_uninitialized_player,
-    close_to,
     require_exception,
 )
 

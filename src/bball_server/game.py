@@ -1,4 +1,4 @@
-from typing import List, Tuple, Callable, Optional, List
+from typing import List, Tuple, Callable, Optional
 from dataclasses import dataclass, field
 from bball_server.ball import BallMode, Ball
 from bball_server.court import Court, Hoop
@@ -59,8 +59,7 @@ class Game:
     def value_of_shot(shot_position: Point, target_hoop: Hoop):
         if target_hoop.is_beyond_three_point_line(shot_position):
             return 3
-        else:
-            return 2
+        return 2
 
     def target_hoop(self, player: Player) -> Hoop:
         team_index = self.team_index_of(player)

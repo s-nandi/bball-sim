@@ -1,11 +1,11 @@
 from bball_server import BallMode
+from bball_server.utils import close_to
 from .utils import (
     create_initialized_player,
     create_space,
     create_game,
     create_court,
     create_hoop,
-    close_to,
     create_uninitialized_player,
 )
 

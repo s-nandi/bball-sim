@@ -1,12 +1,11 @@
 from dataclasses import dataclass
 from bball_server import Player, Space, Ball, BallMode
+from bball_server.utils import close_to, approx
 from ..utils import (
     create_initialized_player,
     create_space,
     create_ball,
-    close_to,
     create_shot_probability,
-    approx,
 )
 
 

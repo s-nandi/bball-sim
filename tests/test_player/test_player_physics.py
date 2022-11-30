@@ -1,9 +1,5 @@
-from ..utils import (
-    create_space,
-    create_player_attributes,
-    create_initialized_player,
-    close_to,
-)
+from bball_server.utils import close_to
+from ..utils import create_space, create_player_attributes, create_initialized_player
 
 
 def test_if_displaced():
