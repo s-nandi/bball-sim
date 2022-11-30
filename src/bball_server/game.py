@@ -20,16 +20,15 @@ class Game:
     court: Court
 
     @property
-    def _checks_per_mode(self) -> Dict[BallMode, List[MonitoringFunction]]:
-        return {
-            BallMode.HELD: [self.check_out_of_bounds],
-            BallMode.DEAD: [self.arbitrary_inbound],
-            BallMode.POSTPASS: [self.transfer_posession],
-        }
+    def _checks(self) -> List[MonitoringFunction]:
+        return [
+            self.check_out_of_bounds,
+            self.arbitrary_inbound,
+            self.transfer_posession,
+        ]
 
     def _step(self, _time_frame: float) -> bool:
-        checks = self._checks_per_mode.get(self.ball.mode, [])
-        for check in checks:
+        for check in self._checks:
             if check():
                 return True
         return False
@@ -48,12 +47,16 @@ class Game:
         return self.team_index_of(last_ball_handler)
 
     def check_out_of_bounds(self) -> bool:
+        if self.ball.mode != BallMode.HELD:
+            return False
         if self.court.is_inbounds(self.ball):
             return False
         self.ball.held_out_of_bounds()
         return True
 
     def arbitrary_inbound(self) -> bool:
+        if self.ball.mode != BallMode.DEAD:
+            return False
         team_with_posession = (
             self.team_with_last_posession
             if self.team_with_last_posession is not None
@@ -71,5 +74,7 @@ class Game:
         return True
 
     def transfer_posession(self) -> bool:
+        if self.ball.mode != BallMode.POSTPASS:
+            return False
         self.ball.successful_pass(self.ball.passed_to)
         return True

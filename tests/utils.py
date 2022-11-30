@@ -1,4 +1,4 @@
-from typing import Tuple, TypeVar, Callable, Any, Optional
+from typing import Tuple, TypeVar, Callable, Any, Optional, Union
 from bball_server import (
     Player,
     PlayerAttributes,
@@ -111,8 +111,14 @@ def create_initialized_player(
     return player.place_at(position, orientation_degrees)
 
 
-def create_game(teams):
-    return Game(teams, create_ball(), create_court())
+def create_game(
+    teams, ball: Union[Ball, None] = None, court: Union[Court, None] = None
+):
+    if ball is None:
+        ball = create_ball()
+    if court is None:
+        court = create_court()
+    return Game(teams, ball, court)
 
 
 DEFAULT_EPS = 10**-6
