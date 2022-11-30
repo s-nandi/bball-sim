@@ -3,6 +3,9 @@ from .utils import (
     create_initialized_player,
     create_space,
     create_game,
+    create_court,
+    create_hoop,
+    close_to,
 )
 
 
@@ -48,3 +51,28 @@ def test_pass_completion():
     space.step(0)
     assert ball.mode == BallMode.HELD
     assert player_2.has_ball
+
+
+def test_shot_completion():
+    width = 10
+    height = 6
+    hoop = create_hoop(width, height)
+    assert close_to(hoop.position, (0, height / 2))
+    court = create_court(width, height, hoop)
+    player = create_initialized_player(position=(0, height / 2))
+    game = create_game(teams=([player], []), court=court)
+    ball = game.ball
+    ball.jump_ball_won_by(player)
+    target_position = game.target_hoop(player).position
+    player.shoot_at(target_position, 0.5)
+    assert close_to(player.position, (0, height / 2))
+    assert close_to(target_position, (width, height / 2))
+    player.accelerate(1)
+    space = create_space().add(game)
+    for time_since_shot in range(width * 2):
+        assert ball.mode == BallMode.MIDSHOT
+        assert close_to(ball.position, (time_since_shot / 2, height / 2))
+        space.step(1)
+    assert ball.mode == BallMode.POSTSHOT
+    space.step(0)
+    assert ball.mode == BallMode.DEAD

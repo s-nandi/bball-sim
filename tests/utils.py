@@ -51,11 +51,12 @@ def create_three_point_line(
 def create_hoop(
     width: float,
     height: float,
+    offset_from_left: float = 0.0,
     three_point_line: Optional[ThreePointLine] = None,
 ):
     if three_point_line is None:
         three_point_line = create_three_point_line(width, height)
-    return Hoop(1, height / 2, three_point_line)
+    return Hoop(offset_from_left, height / 2, three_point_line)
 
 
 def create_court(

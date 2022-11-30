@@ -114,7 +114,7 @@ def test_left_three_point_line():
     left_hoop = create_hoop(
         width,
         height,
-        create_three_point_line(
+        three_point_line=create_three_point_line(
             width, height, distance_from_left / width, distance_from_bottom / height
         ),
     )

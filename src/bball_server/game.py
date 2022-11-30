@@ -1,7 +1,7 @@
-from typing import List, Tuple, Dict, Callable, Optional
+from typing import List, Tuple, Callable, Optional
 from dataclasses import dataclass
 from bball_server.ball import BallMode, Ball
-from bball_server.court import Court
+from bball_server.court import Court, Hoop
 from bball_server.player import Player
 
 Team = List[Player]
@@ -25,6 +25,7 @@ class Game:
             self.check_out_of_bounds,
             self.arbitrary_inbound,
             self.transfer_posession,
+            self.score_basket,
         ]
 
     def _step(self, _time_frame: float) -> bool:
@@ -45,6 +46,10 @@ class Game:
         if last_ball_handler is None:
             return None
         return self.team_index_of(last_ball_handler)
+
+    def target_hoop(self, player: Player) -> Hoop:
+        team_index = self.team_index_of(player)
+        return self.court._hoops[other_team(team_index)]
 
     def check_out_of_bounds(self) -> bool:
         if self.ball.mode != BallMode.HELD:
@@ -77,4 +82,10 @@ class Game:
         if self.ball.mode != BallMode.POSTPASS:
             return False
         self.ball.successful_pass(self.ball.passed_to)
+        return True
+
+    def score_basket(self) -> bool:
+        if self.ball.mode != BallMode.POSTSHOT:
+            return False
+        self.ball.successful_shot()
         return True
