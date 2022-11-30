@@ -5,9 +5,7 @@ if TYPE_CHECKING:
     from bball_server.player import Player
     from bball_server.ball import Ball
     from bball_server.court.hoop import Hoop
-    from bball_server.utils import Point
-
-    ObjectWithPosition = Union[Player, Ball]
+    from bball_server.utils import Point, ObjectWithPosition
 
 
 class Court:
@@ -19,6 +17,17 @@ class Court:
         self._hoops = hoops
         for hoop in self._hoops:
             assert self._contains_position(hoop.position)
+
+    @property
+    def width(self) -> float:
+        return self._dimensions[0]
+
+    @property
+    def height(self) -> float:
+        return self._dimensions[1]
+
+    def hoop(self, index: int) -> Hoop:
+        return self._hoops[index]
 
     def is_inbounds(self, obj: ObjectWithPosition) -> bool:
         return self._contains_position(obj.position)

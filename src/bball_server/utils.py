@@ -1,9 +1,14 @@
 import math
-from typing import Tuple
+from typing import Tuple, Union, TYPE_CHECKING
 import pymunk
 
 Point = Tuple[float, float]
 Vector = Tuple[float, float]
+if TYPE_CHECKING:
+    from bball_server.player import Player
+    from bball_server.ball import Ball
+
+    ObjectWithPosition = Union[Player, Ball]
 
 BASE_DIRECTION = pymunk.Vec2d(1, 0)
 ZERO_VECTOR = pymunk.Vec2d(0, 0)
