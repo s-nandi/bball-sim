@@ -153,9 +153,12 @@ class Ball:
         self._server = _ShootingServer(shooter, target, self, shot_velocity)
         return self._with_mode(BallMode.MIDSHOT)
 
-    def post_shot(self) -> Ball:
+    def post_shot(self, shooter: Player, target: Point, shot_from: Point) -> Ball:
         assert self._mode == BallMode.MIDSHOT
         self._reset()
+        self._shot_by = shooter
+        self._shot_at = target
+        self._shot_from = shot_from
         return self._with_mode(BallMode.POSTSHOT)
 
     def successful_shot(self) -> Ball:

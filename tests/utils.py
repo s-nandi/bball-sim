@@ -11,6 +11,7 @@ from bball_server import (
     LinearShotProbability,
     Game,
 )
+from bball_server.utils import close_to, approx
 
 T = TypeVar("T")
 
@@ -120,21 +121,6 @@ def create_game(
     if court is None:
         court = create_court()
     return Game(teams, ball, court)
-
-
-DEFAULT_EPS = 10**-6
-
-
-def approx(value_1: float, value_2: float, eps: float = DEFAULT_EPS):
-    return abs(value_1 - value_2) < eps
-
-
-def close_to(
-    vec_1: Tuple[float, float], vec_2: Tuple[float, float], eps: float = DEFAULT_EPS
-) -> bool:
-    delta_x = vec_1[0] - vec_2[0]
-    delta_y = vec_1[1] - vec_2[1]
-    return approx(delta_x, 0, eps) and approx(delta_y, 0, eps)
 
 
 def require_exception(callback: Callable[[], T], exception_type: Any):

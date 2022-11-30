@@ -6,6 +6,7 @@ from .utils import (
     create_court,
     create_hoop,
     close_to,
+    create_uninitialized_player,
 )
 
 
@@ -53,7 +54,7 @@ def test_pass_completion():
     assert player_2.has_ball
 
 
-def test_shot_completion():
+def test_shot_completion_with_movement_after_shot():
     width = 10
     height = 6
     hoop = create_hoop(width, height)
@@ -76,3 +77,39 @@ def test_shot_completion():
     assert ball.mode == BallMode.POSTSHOT
     space.step(0)
     assert ball.mode == BallMode.DEAD
+
+
+def test_scoring():
+    player_1 = create_uninitialized_player()
+    player_2 = create_uninitialized_player()
+    game = create_game(teams=([player_1], [player_2]))
+    ball = game.ball
+    court = game.court
+    player_1.place_at((0, court.height / 2), 0)
+    player_2.place_at((court.width, court.height / 2), 0)
+    space = create_space().add(game)
+    ball.jump_ball_won_by(player_1)
+    assert player_1.has_ball
+    assert not player_2.has_ball
+    player_1.shoot_at(game.target_hoop(player_1).position, 1)
+    assert ball.mode == BallMode.MIDSHOT
+    for _ in range(court.width):
+        space.step(1)
+    assert ball.mode == BallMode.POSTSHOT
+    space.step(0)
+    assert ball.mode == BallMode.DEAD
+    space.step(0)
+    assert ball.mode == BallMode.HELD
+    assert not player_1.has_ball
+    assert player_2.has_ball
+    assert game.score == (3, 0)
+    player_2.accelerate(-1)
+    for _ in range(court.width):
+        space.step(1)
+    player_2.shoot_at(game.target_hoop(player_2).position, 0.0001)
+    assert ball.mode == BallMode.MIDSHOT
+    space.step(0)
+    assert ball.mode == BallMode.POSTSHOT
+    space.step(0)
+    assert ball.mode == BallMode.DEAD
+    assert game.score == (3, 2)

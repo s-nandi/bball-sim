@@ -32,7 +32,7 @@ class _ShootingServer:
 
     def _complete_shot(self) -> bool:
         self._ball._position = self._target
-        self._ball.post_shot()
+        self._ball.post_shot(self._shooter, self._target, self._original_position)
         return True
 
     def _step(self, time_step: float) -> bool:

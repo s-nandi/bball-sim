@@ -17,7 +17,7 @@ def is_position_inbounds(court: Court, position: Tuple[float, float]) -> bool:
 
 def is_position_beyond_line(hoop: Hoop, position: Tuple[float, float]) -> bool:
     player = create_initialized_player(position=position)
-    return hoop.is_beyond_three_point_line(player)
+    return hoop.is_beyond_three_point_line(player.position)
 
 
 def check_is_off_court_after(

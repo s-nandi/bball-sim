@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from bball_server.court.three_point_line import ThreePointLine
 
 if TYPE_CHECKING:
-    from bball_server.player import Player
     from bball_server.utils import Point
 
 
@@ -25,5 +24,5 @@ class Hoop:
     def position(self) -> Point:
         return (self.x_position, self.y_position)
 
-    def is_beyond_three_point_line(self, player: Player) -> bool:
-        return self.three_point_line.is_beyond(player.position)
+    def is_beyond_three_point_line(self, position: Point) -> bool:
+        return self.three_point_line.is_beyond(position)
