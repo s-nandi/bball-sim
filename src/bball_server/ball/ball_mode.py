@@ -4,7 +4,7 @@ from enum import Enum, auto
 class BallMode(Enum):
     HELD = auto()
     MIDPASS = auto()
-    POSTPASS = auto()
+    RECEIVEDPASS = auto()
     MIDSHOT = auto()
-    POSTSHOT = auto()
+    REACHEDSHOT = auto()
     DEAD = auto()

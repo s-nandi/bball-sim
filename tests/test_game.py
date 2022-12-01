@@ -48,7 +48,7 @@ def test_pass_completion():
     assert not player_2.has_ball
     assert ball.mode == BallMode.MIDPASS
     space.step(1)
-    assert ball.mode == BallMode.POSTPASS
+    assert ball.mode == BallMode.RECEIVEDPASS
     space.step(0)
     assert ball.mode == BallMode.HELD
     assert player_2.has_ball
@@ -74,7 +74,7 @@ def test_shot_completion_with_movement_after_shot():
         assert ball.mode == BallMode.MIDSHOT
         assert close_to(ball.position, (time_since_shot / 2, height / 2))
         space.step(1)
-    assert ball.mode == BallMode.POSTSHOT
+    assert ball.mode == BallMode.REACHEDSHOT
     space.step(0)
     assert ball.mode == BallMode.DEAD
 
@@ -95,7 +95,7 @@ def test_scoring():
     assert ball.mode == BallMode.MIDSHOT
     for _ in range(court.width):
         space.step(1)
-    assert ball.mode == BallMode.POSTSHOT
+    assert ball.mode == BallMode.REACHEDSHOT
     space.step(0)
     assert ball.mode == BallMode.DEAD
     space.step(0)
@@ -109,7 +109,7 @@ def test_scoring():
     player_2.shoot_at(game.target_hoop(player_2).position, 0.0001)
     assert ball.mode == BallMode.MIDSHOT
     space.step(0)
-    assert ball.mode == BallMode.POSTSHOT
+    assert ball.mode == BallMode.REACHEDSHOT
     space.step(0)
     assert ball.mode == BallMode.DEAD
     assert game.score == (3, 2)

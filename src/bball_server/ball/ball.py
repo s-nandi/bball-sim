@@ -5,9 +5,9 @@ from bball_server.ball.ball_mode import BallMode
 from bball_server.ball.state import BallState
 from bball_server.ball.held_ball import HeldBall
 from bball_server.ball.mid_pass import MidPass
-from bball_server.ball.post_pass import PostPass
+from bball_server.ball.received_pass import ReceivedPass
 from bball_server.ball.mid_shot import MidShot
-from bball_server.ball.post_shot import PostShot
+from bball_server.ball.reached_shot import ReachedShot
 from bball_server.ball.dead_ball import DeadBall
 
 
@@ -52,12 +52,12 @@ class Ball:
         return checked_type(self._state, DeadBall)._should_flip_posession
 
     @property
-    def shot_parameters(self) -> PostShot:
-        return checked_type(self._state, PostShot)
+    def shot_parameters(self) -> ReachedShot:
+        return checked_type(self._state, ReachedShot)
 
     @property
     def passed_to(self) -> Player:
-        return checked_type(self._state, PostPass)._receiver
+        return checked_type(self._state, ReceivedPass)._receiver
 
     @property
     def belongs_to(self) -> Player:
@@ -81,16 +81,16 @@ class Ball:
         return self._transition(HeldBall, MidShot(self, target, shot_velocity))
 
     def post_pass(self, receiver: Player) -> Ball:
-        return self._transition(MidPass, PostPass(receiver))
+        return self._transition(MidPass, ReceivedPass(receiver))
 
     def successful_pass(self, receiver: Player) -> Ball:
-        return self._transition(PostPass, HeldBall(receiver, self))
+        return self._transition(ReceivedPass, HeldBall(receiver, self))
 
     def post_shot(self, shooter: Player, target: Point, shot_from: Point) -> Ball:
-        return self._transition(MidShot, PostShot(shooter, target, shot_from))
+        return self._transition(MidShot, ReachedShot(shooter, target, shot_from))
 
     def successful_shot(self) -> Ball:
-        return self._transition(PostShot, DeadBall(True))
+        return self._transition(ReachedShot, DeadBall(True))
 
     def jump_ball_won_by(self, receiver: Player) -> Ball:
         return self._transition(DeadBall, HeldBall(receiver, self))

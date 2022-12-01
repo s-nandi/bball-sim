@@ -19,7 +19,7 @@ def check_pass_completes_after(test: PassingTest, expected_time: int):
     for _ in range(expected_time):
         assert ball.mode == BallMode.MIDPASS
         space.step(1)
-    assert ball.mode == BallMode.POSTPASS
+    assert ball.mode == BallMode.RECEIVEDPASS
 
 
 def setup_passing_test(pass_distance, pass_velocity) -> PassingTest:
@@ -56,7 +56,7 @@ def test_handoff():
     test = setup_passing_test(pass_distance, pass_velocity)
     assert test.ball.mode == BallMode.MIDPASS
     test.space.step(10**-6)
-    assert test.ball.mode == BallMode.POSTPASS
+    assert test.ball.mode == BallMode.RECEIVEDPASS
 
 
 def test_step_passing_server_after_completion():

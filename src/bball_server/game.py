@@ -93,13 +93,13 @@ class Game:
         return True
 
     def transfer_posession(self) -> bool:
-        if self.ball.mode != BallMode.POSTPASS:
+        if self.ball.mode != BallMode.RECEIVEDPASS:
             return False
         self.ball.successful_pass(self.ball.passed_to)
         return True
 
     def _apply_score_change(self) -> None:
-        assert self.ball.mode == BallMode.POSTSHOT
+        assert self.ball.mode == BallMode.REACHEDSHOT
         shot = self.ball.shot_parameters
         player = shot.shooter
         target_hoop = self.target_hoop(player)
@@ -108,7 +108,7 @@ class Game:
         self._score[self.team_index_of(player)] += value
 
     def make_basket(self) -> bool:
-        if self.ball.mode != BallMode.POSTSHOT:
+        if self.ball.mode != BallMode.REACHEDSHOT:
             return False
         self._apply_score_change()
         self.ball.successful_shot()
