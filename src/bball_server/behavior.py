@@ -82,17 +82,18 @@ class ReachVelocityBehavior:
         player.accelerate(multiplier)
         return True
 
-    def drive(self, player: Player):
-        if not self._correct_orientation(player):
-            self._fix_orientation(player)
-        else:
-            self._fix_velocity_magnitude(player)
+    def drive(self, player: Player) -> bool:
+        if self._fix_orientation(player):
+            return True
+        if self._fix_velocity_magnitude(player):
+            return True
+        return False
 
 
 class StopBehavior:
-    def drive(self, player: Player):
+    def drive(self, player: Player) -> bool:
         if close_to(player.velocity, (0, 0)):
-            return
+            return False
         accelerate_forward = should_accelerate_forward_assuming_alignment(
             player.velocity, player.orientation_degrees
         )
@@ -102,3 +103,4 @@ class StopBehavior:
             delta = vector_length(player.velocity)
         multiplier = acceleration_multiplier(player.physical_attributes, delta)
         player.accelerate(multiplier)
+        return True

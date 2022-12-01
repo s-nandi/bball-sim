@@ -12,7 +12,8 @@ def test_steady_velocity_behavior():
     target_velocity = (-2, 2)
     behavior = ReachVelocityBehavior(target_velocity)
     for _ in range(steps):
-        behavior.drive(player)
+        if not behavior.drive(player):
+            break
         space.step(1)
     assert close_to(player.velocity, target_velocity)
 
@@ -31,7 +32,8 @@ def test_steady_velocity_behavior_with_initial_movement(_trial_index):
     target_velocity = (target_velocity_x, 0)
     behavior = ReachVelocityBehavior(target_velocity)
     for _ in range(initial_steps + extra_steps_for_rotation + extra_steps_for_velocity):
-        behavior.drive(team[0])
+        if not behavior.drive(team[0]):
+            break
         space.step(1)
     assert close_to(team[0].velocity, target_velocity)
 
@@ -57,8 +59,10 @@ def test_stopping_behavior(_trial_index):
     assert player_2.velocity[0] > 0
     behavior = StopBehavior()
     for _ in range(initial_steps):
-        behavior.drive(player_1)
-        behavior.drive(player_2)
+        moved_1 = behavior.drive(player_1)
+        moved_2 = behavior.drive(player_2)
+        if not moved_1 and not moved_2:
+            break
         space.step(1)
     target_velocity = (0, 0)
     assert close_to(player_1.velocity, target_velocity)
