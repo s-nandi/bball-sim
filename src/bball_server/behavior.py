@@ -10,20 +10,23 @@ from bball_server.utils import (
     vector_length,
     approx,
     difference_between,
-    angle_degrees_to_vector,
 )
 from bball_server.player import Player, PlayerAttributes
 
 Attributes = PlayerAttributes.Physical
 
 
-def turn_multiplier(attributes: Attributes, turn_degrees: float) -> float:
-    multiplier = turn_degrees / attributes.max_turn_degrees
+def turn_multiplier(
+    attributes: Attributes, turn_degrees: float, time_frame: float
+) -> float:
+    multiplier = turn_degrees / time_frame / attributes.max_turn_degrees
     return clamp(multiplier, -1.0, 1.0)
 
 
-def acceleration_multiplier(attributes: Attributes, acceleration: float) -> float:
-    multiplier = acceleration / attributes.max_acceleration
+def acceleration_multiplier(
+    attributes: Attributes, acceleration: float, time_frame: float
+) -> float:
+    multiplier = acceleration / time_frame / attributes.max_acceleration
     return clamp(multiplier, -1.0, 1.0)
 
 
@@ -62,8 +65,7 @@ class ReachOrientationBehavior:
         delta = turn_degrees_required(
             player.orientation_degrees, self.target_angle_degrees
         )
-        delta /= self.time_frame
-        multiplier = turn_multiplier(player.physical_attributes, delta)
+        multiplier = turn_multiplier(player.physical_attributes, delta, self.time_frame)
         player.turn(multiplier)
         return True
 
@@ -89,16 +91,16 @@ class ReachVelocityBehavior:
             delta = vector_length(self.target_velocity) - vector_length(player.velocity)
         else:
             delta = vector_length(self.target_velocity) + vector_length(player.velocity)
-        delta /= self.time_frame
-        multiplier = acceleration_multiplier(player.physical_attributes, delta)
+        multiplier = acceleration_multiplier(
+            player.physical_attributes, delta, self.time_frame
+        )
         player.accelerate(multiplier)
         return True
 
     def drive(self, player: Player) -> bool:
-        orientation_behavior = ReachOrientationBehavior(
-            self.target_angle_degrees, self.time_frame
-        )
-        if orientation_behavior.drive(player):
+        if ReachOrientationBehavior(self.target_angle_degrees, self.time_frame).drive(
+            player
+        ):
             return True
         if self._fix_velocity_magnitude_assuming_alignment(player):
             return True
@@ -119,13 +121,11 @@ class StopBehavior:
             delta = -vector_length(player.velocity)
         else:
             delta = vector_length(player.velocity)
-        delta /= self.time_frame
-        multiplier = acceleration_multiplier(player.physical_attributes, delta)
+        multiplier = acceleration_multiplier(
+            player.physical_attributes, delta, self.time_frame
+        )
         player.accelerate(multiplier)
         return True
-
-
-from .kinematics import determine_acceleration
 
 
 @dataclass
@@ -135,32 +135,33 @@ class ReachPositionBehavior:
 
     def drive(self, player: Player) -> bool:
         if close_to(player.position, self.target_position):
-            stop_behavior = StopBehavior(self.time_frame)
-            return stop_behavior.drive(player)
+            return StopBehavior(self.time_frame).drive(player)
+
         target_orientation_degrees = vector_angle_degrees(self.target_position)
-        orientation_behavior = ReachOrientationBehavior(
-            target_orientation_degrees, self.time_frame
-        )
-        if orientation_behavior.drive(player):
+        if ReachOrientationBehavior(target_orientation_degrees, self.time_frame).drive(
+            player
+        ):
             return True
 
         position_delta = difference_between(self.target_position, player.position)
+        assert is_moving_in_orientation_direction(
+            position_delta, player.orientation_degrees
+        )
 
         distance = vector_length(position_delta)
-        velocity = vector_length(player.velocity)
+        velocity_magnitude = vector_length(player.velocity)
         max_acceleration = player.physical_attributes.max_acceleration
-
-        time = float("inf") if approx(velocity, 0) else distance / velocity
+        time = (
+            float("inf")
+            if approx(velocity_magnitude, 0)
+            else distance / velocity_magnitude
+        )
         if time > self.time_frame:
-            target_acceleration = max_acceleration * self.time_frame - velocity
+            delta = max_acceleration * self.time_frame - velocity_magnitude
         else:
-            target_acceleration = time - self.time_frame
-        target_acceleration /= self.time_frame
-
-        if not is_moving_in_orientation_direction(
-            position_delta, player.orientation_degrees
-        ):
-            stop_behavior = StopBehavior(self.time_frame)
-            return stop_behavior.drive(player)
-        player.accelerate(target_acceleration / max_acceleration)
+            delta = time - self.time_frame
+        multiplier = acceleration_multiplier(
+            player.physical_attributes, delta, self.time_frame
+        )
+        player.accelerate(multiplier)
         return True

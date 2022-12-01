@@ -1,5 +1,5 @@
 import math
-from random import uniform, choice
+from random import uniform
 import pytest
 from bball_server import (
     Team,
@@ -26,16 +26,18 @@ def test_steady_velocity_behavior():
     assert close_to(player.velocity, target_velocity)
 
 
-@pytest.mark.parametrize("_trial_index", range(60))
-def test_steady_velocity_behavior_with_initial_movement(_trial_index):
-    initial_steps = choice([1, 10, 50])
+@pytest.mark.parametrize("_trial_index", range(10))
+@pytest.mark.parametrize("initial_steps", (1, 10, 50))
+@pytest.mark.parametrize("target_velocity_x", (-2, 2))
+def test_steady_velocity_behavior_with_initial_movement(
+    _trial_index, initial_steps, target_velocity_x
+):
     team = Team(create_initialized_player())
     space = create_space().add(team)
     time_frame = 0.2
     for _ in range(initial_steps):
         team[0].turn(uniform(0, 1)).accelerate(1)
         space.step(time_frame)
-    target_velocity_x = choice([-2, 2])
     rotation_steps = 2 if target_velocity_x < 0 else 0
     acceleration_steps = abs(target_velocity_x)
     target_velocity = (target_velocity_x, 0)
@@ -48,9 +50,9 @@ def test_steady_velocity_behavior_with_initial_movement(_trial_index):
     assert close_to(team[0].velocity, target_velocity)
 
 
-@pytest.mark.parametrize("_trial_index", range(60))
-def test_stopping_behavior(_trial_index):
-    initial_steps = choice([2, 10, 50])
+@pytest.mark.parametrize("_trial_index", range(20))
+@pytest.mark.parametrize("initial_steps", (2, 10, 50))
+def test_stopping_behavior(_trial_index, initial_steps):
     teams = Teams(
         Team(create_initialized_player(position=(0, 0))),
         Team(create_initialized_player(position=(0, 5))),
@@ -80,13 +82,15 @@ def test_stopping_behavior(_trial_index):
     assert close_to(player_2.velocity, target_velocity)
 
 
-def test_position_reaching():
+@pytest.mark.parametrize(
+    "target_position", [(4.5, 3), (3, 4.5), (-5, 0), (-5, 1), (-5, -5), (0, 5), (0, -5)]
+)
+def test_position_reaching(target_position):
     player = create_initialized_player()
     space = create_space().add(player)
-    target_position = (4.5, 3)
     time_frame = 0.2
     behavior = ReachPositionBehavior(target_position, time_frame)
-    turn_steps = 2
+    turn_steps = 360 / player.physical_attributes.max_turn_degrees / time_frame
     acceleration_steps = (
         math.hypot(target_position[0], target_position[1]) / time_frame / time_frame
     )
