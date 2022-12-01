@@ -77,12 +77,15 @@ class PlayerMove:
         assert self._action is None
         self._action = PlayerShot(ball, target, velocity)
 
-    def reset(self):
+    def do_action(self) -> None:
         if self._action is not None:
             self._action.execute()
+            self._action = None
+
+    def reset(self):
+        assert self._action is None, "Action was not done"
         self._acceleration = None
         self._turn_degrees = None
-        self._action = None
 
     @property
     def acceleration(self) -> float:

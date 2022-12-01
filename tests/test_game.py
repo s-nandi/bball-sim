@@ -118,9 +118,9 @@ def test_scoring():
     player_2.accelerate(-1)
     for _ in range(court.width):
         space.step(1)
-    player_2.shoot_at(game.target_hoop(player_2).position, 0.0001)
-    space.step(0)
-    assert ball.mode == BallMode.MIDSHOT
+    player_2_target = game.target_hoop(player_2)
+    assert close_to(player_2.position, player_2_target.position)
+    player_2.shoot_at(player_2_target.position, 0.0001)
     space.step(0)
     assert ball.mode == BallMode.REACHEDSHOT
     space.step(0)

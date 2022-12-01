@@ -55,8 +55,6 @@ def test_handoff():
     pass_distance = 0
     pass_velocity = 0.01
     test = setup_passing_test(pass_distance, pass_velocity)
-    assert test.ball.mode == BallMode.MIDPASS
-    test.space.step(10**-6)
     assert test.ball.mode == BallMode.RECEIVEDPASS
 
 

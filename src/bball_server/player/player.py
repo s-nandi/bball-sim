@@ -88,6 +88,7 @@ class Player:
 
     def _step(self, time_step: float) -> bool:
         assert self.is_initialized
+        self._move.do_action()
         return self._physics._step(self._move, time_step)
 
     def _reset(self) -> Player:
