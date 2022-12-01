@@ -51,7 +51,8 @@ class Player:
     def is_initialized(self):
         return self._physics.is_initialized
 
-    def _unsafe_ball(self) -> Ball:
+    @property
+    def ball(self) -> Ball:
         assert self.is_initialized
         assert self._ball is not None
         return self._ball
@@ -77,12 +78,12 @@ class Player:
 
     def pass_to(self, receiver: Player, pass_velocity: float) -> Player:
         assert self.is_initialized
-        self._unsafe_ball().pass_to(receiver, pass_velocity)
+        self._move.pass_to(self.ball, receiver, pass_velocity)
         return self
 
     def shoot_at(self, target: Point, shot_velocity: float) -> Player:
         assert self.is_initialized
-        self._unsafe_ball().shoot_at(target, shot_velocity)
+        self._move.shoot_at(self.ball, target, shot_velocity)
         return self
 
     def _step(self, time_step: float) -> bool:

@@ -129,7 +129,6 @@ class Game:
         if self.settings.use_expected_value_for_points:
             self._scoreboard.increment(team, shot.probability * value)
             return True
-        print(shot.probability)
         made_shot = random() < shot.probability
         if made_shot:
             self._scoreboard.increment(team, value)

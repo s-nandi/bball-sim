@@ -49,6 +49,7 @@ def test_pass_completion():
     ball = game.ball
     ball.jump_ball_won_by(player_1)
     player_1.pass_to(player_2, 10)
+    space.step(0)
     assert not player_1.has_ball
     assert not player_2.has_ball
     assert ball.mode == BallMode.MIDPASS
@@ -67,18 +68,20 @@ def test_shot_completion_with_movement_after_shot():
     court = create_court(width, height, hoop)
     player = create_initialized_player(position=(0, height / 2))
     game = create_game(teams=([player], []), court=court)
+    space = create_space().add(game)
     ball = game.ball
     ball.jump_ball_won_by(player)
     target_position = game.target_hoop(player).position
     player.shoot_at(target_position, 0.5)
+    space.step(0)
     assert close_to(player.position, (0, height / 2))
     assert close_to(target_position, (width, height / 2))
     player.accelerate(1)
-    space = create_space().add(game)
     for time_since_shot in range(width * 2):
         assert ball.mode == BallMode.MIDSHOT
         assert close_to(ball.position, (time_since_shot / 2, height / 2))
         space.step(1)
+        assert not close_to(ball.position, player.position)
     assert ball.mode == BallMode.REACHEDSHOT
     space.step(0)
     assert ball.mode == BallMode.DEAD
@@ -91,15 +94,16 @@ def test_scoring():
     player_1 = create_uninitialized_player(attributes=guaranteed_scorer_attributes)
     player_2 = create_uninitialized_player(attributes=guaranteed_scorer_attributes)
     game = create_game(teams=([player_1], [player_2]))
+    space = create_space().add(game)
     ball = game.ball
     court = game.court
     player_1.place_at((0, court.height / 2), 0)
     player_2.place_at((court.width, court.height / 2), 0)
-    space = create_space().add(game)
     ball.jump_ball_won_by(player_1)
     assert player_1.has_ball
     assert not player_2.has_ball
     player_1.shoot_at(game.target_hoop(player_1).position, 1)
+    space.step(0)
     assert ball.mode == BallMode.MIDSHOT
     for _ in range(court.width):
         space.step(1)
@@ -115,6 +119,7 @@ def test_scoring():
     for _ in range(court.width):
         space.step(1)
     player_2.shoot_at(game.target_hoop(player_2).position, 0.0001)
+    space.step(0)
     assert ball.mode == BallMode.MIDSHOT
     space.step(0)
     assert ball.mode == BallMode.REACHEDSHOT
@@ -160,6 +165,7 @@ def setup_scoring_test(use_ev: bool) -> ScoringTest:
     _check_probability_in_threshold(probability, 0.45, 0.55)
     expected_value = concrete_value * probability
     player.shoot_at(target_hoop.position, 1)
+    space.step(0)
     for _ in range(math.ceil(distance_to_target)):
         assert ball.mode == BallMode.MIDSHOT
         space.step(1)

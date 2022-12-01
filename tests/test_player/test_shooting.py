@@ -23,6 +23,7 @@ def setup_shooting_test(shot_distance, shot_velocity) -> ShootingTest:
     ball.jump_ball_won_by(shooter)
     assert shooter.has_ball
     shooter.shoot_at((shot_distance, 0), shot_velocity=shot_velocity)
+    space.step(0)
     return ShootingTest(space, ball, shooter)
 
 

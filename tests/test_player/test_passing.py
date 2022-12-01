@@ -31,6 +31,7 @@ def setup_passing_test(pass_distance, pass_velocity) -> PassingTest:
     assert passer.has_ball
     assert not receiver.has_ball
     passer.pass_to(receiver, pass_velocity=pass_velocity)
+    space.step(0)
     return PassingTest(space, ball, passer, receiver)
 
 
