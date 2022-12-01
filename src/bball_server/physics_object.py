@@ -3,10 +3,13 @@ from bball_server.utils import (
     to_degrees,
     to_radians,
     BASE_DIRECTION,
+    convert_to_vec2d,
     convert_to_tuple,
     Point,
     Vector,
+    normalized_angle_degrees,
 )
+from bball_server.validator import valid_angle_degrees
 
 
 def velocity_func_with_decay(velocity_decay: float):
@@ -45,12 +48,13 @@ class PhysicsObject:
         self._has_position = True
 
     @property
-    def orientation(self):
+    def orientation_degrees(self):
         assert self.is_initialized
         return to_degrees(self._body.angle)
 
-    @orientation.setter
-    def orientation(self, orientation_degrees: float):
+    @orientation_degrees.setter
+    def orientation_degrees(self, orientation_degrees: float):
+        assert valid_angle_degrees(orientation_degrees)
         self._body.angle = to_radians(orientation_degrees)
         self._has_orientation = True
 
@@ -61,11 +65,13 @@ class PhysicsObject:
 
     def turn(self, angle: float, time_step: float) -> None:
         assert self.is_initialized
-        self._body.angle += angle
+        self.orientation_degrees = normalized_angle_degrees(
+            self.orientation_degrees + to_degrees(angle)
+        )
         self._body.velocity = self._body.velocity.rotated(angle * time_step)
 
     def accelerate(self, acceleration: float, time_step: float) -> None:
         assert self.is_initialized
-        force = acceleration * self._body.mass * BASE_DIRECTION
+        force = acceleration * self._body.mass * convert_to_vec2d(BASE_DIRECTION)
         impulse = force * time_step
         self._body.apply_impulse_at_local_point(impulse)

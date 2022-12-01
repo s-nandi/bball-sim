@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
-from bball_server.utils import coords_to_string
-from bball_server.validator import valid_multiplier
+from bball_server.utils import coords_to_string, ROUND_DIGITS
+from bball_server.validator import valid_multiplier, valid_angle_degrees
 from bball_server.player.player_attributes import PlayerAttributes
 from bball_server.player.player_physics import PlayerPhysics
 from bball_server.player.player_move import PlayerMove
@@ -26,10 +26,13 @@ class Player:
     def __repr__(self) -> str:
         if not self.is_initialized:
             return "UninitializedPlayer"
-        position_str = "position = " + coords_to_string(self.position)
-        velocity_str = "velocity = " + coords_to_string(self.velocity)
+        position_str = f"position={coords_to_string(self.position)}"
+        velocity_str = f"velocity={coords_to_string(self.velocity)}"
+        orientation_str = f"orientation={round(self.orientation_degrees, ROUND_DIGITS)}"
         has_ball_str = "HasBall" if self.has_ball else ""
-        concat_str = ", ".join(filter(None, [position_str, velocity_str, has_ball_str]))
+        concat_str = ",".join(
+            filter(None, [position_str, velocity_str, orientation_str, has_ball_str])
+        )
         return f"Player({concat_str})"
 
     @property
@@ -41,6 +44,17 @@ class Player:
     def velocity(self) -> Vector:
         assert self.is_initialized
         return self._physics.velocity
+
+    @property
+    def physical_attributes(self) -> PlayerAttributes.Physical:
+        return self._attributes.physical
+
+    @property
+    def orientation_degrees(self) -> float:
+        assert self.is_initialized
+        orientation_degrees = self._physics.orientation_degrees
+        assert valid_angle_degrees(orientation_degrees)
+        return orientation_degrees
 
     @property
     def has_ball(self) -> bool:
@@ -59,7 +73,7 @@ class Player:
 
     def place_at(self, position: Point, orientation_degrees: float) -> Player:
         self._physics.position = position
-        self._physics.orientation = orientation_degrees
+        self._physics.orientation_degrees = orientation_degrees
         return self
 
     def turn(self, multiplier: float) -> Player:
@@ -71,6 +85,7 @@ class Player:
 
     def accelerate(self, multiplier: float) -> Player:
         assert self.is_initialized
+        # TODO: Require multiplier in [-0.5, 1] range to prevent rapid backpedaling
         assert valid_multiplier(multiplier)
         acceleration = multiplier * self._attributes.physical.max_acceleration
         self._move.accelerate(acceleration)

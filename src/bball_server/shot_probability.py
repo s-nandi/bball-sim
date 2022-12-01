@@ -1,10 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from bball_server.validator import valid_probability
-
-
-def clamp(value: float, min_value: float, max_value: float) -> float:
-    return max(min_value, min(value, max_value))
+from bball_server.utils import clamp
 
 
 def interpolate(small: float, big: float, fraction: float) -> float:

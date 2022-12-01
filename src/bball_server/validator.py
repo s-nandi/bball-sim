@@ -11,7 +11,7 @@ def valid_multiplier(strength: float) -> bool:
 
 
 def valid_angle_degrees(angle_degrees: float) -> bool:
-    return -180 <= angle_degrees <= 180
+    return -180 <= angle_degrees < 180
 
 
 def valid_pass_velocity(pass_velocity: float) -> bool:

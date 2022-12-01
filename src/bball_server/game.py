@@ -42,7 +42,7 @@ class Game:
     def team_index_of(self, player: Player) -> int:
         for team_index, team in enumerate(self.teams):
             assert isinstance(team, Team)
-            if team.contains(player) > 0:
+            if player in team:
                 return team_index
         assert False, f"Player {player} does not exist in game"
 

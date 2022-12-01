@@ -12,6 +12,7 @@ from bball_server import (
     LinearShotProbability,
     GuaranteedShotProbability,
     Team,
+    Teams,
     Game,
     GameSettings,
 )
@@ -131,11 +132,11 @@ def create_court(
 create_game_settings = GameSettings  # pylint: disable=invalid-name
 
 
-def _normalized_teams(teams: List[Team]) -> Tuple[Team, Team]:
+def _normalized_teams(teams: List[Team]) -> Teams:
     assert len(teams) <= 2
     while len(teams) <= 2:
         teams.append(Team())
-    return (teams[0], teams[1])
+    return Teams(teams[0], teams[1])
 
 
 def create_game(

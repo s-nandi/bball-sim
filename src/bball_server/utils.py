@@ -10,13 +10,15 @@ if TYPE_CHECKING:
 
     ObjectWithPosition = Union[Player, Ball]
 
-BASE_DIRECTION = pymunk.Vec2d(1, 0)
-ZERO_VECTOR = pymunk.Vec2d(0, 0)
+ZERO_VECTOR = (0, 0)
+BASE_DIRECTION = (1, 0)
+
+ROUND_DIGITS = 2
 
 
 def coords_to_string(tup: Tuple[float, float]) -> str:
-    x_coord = round(tup[0], 4)
-    y_coord = round(tup[1], 4)
+    x_coord = round(tup[0], ROUND_DIGITS)
+    y_coord = round(tup[1], ROUND_DIGITS)
     return f"({x_coord}, {y_coord})"
 
 
@@ -24,7 +26,7 @@ def convert_to_tuple(vec: pymunk.Vec2d) -> Tuple[float, float]:
     return (vec.x, vec.y)
 
 
-def convert_to_vec2d(point: Point):
+def convert_to_vec2d(point: Tuple[float, float]):
     return pymunk.Vec2d(*point)
 
 
@@ -34,6 +36,33 @@ def to_radians(degrees: float) -> float:
 
 def to_degrees(radians: float) -> float:
     return radians * 180 / math.pi
+
+
+def normalized_angle(radians: float) -> float:
+    while radians < -math.pi:
+        radians += 2 * math.pi
+    while radians >= math.pi:
+        radians -= 2 * math.pi
+    assert -math.pi <= radians < math.pi
+    return radians
+
+
+def normalized_angle_degrees(degrees: float) -> float:
+    while degrees < -180:
+        degrees += 360
+    while degrees >= 180:
+        degrees -= 360
+    assert -180 <= degrees <= 180
+    return degrees
+
+
+def turn_degrees_required(degrees: float, target_degrees: float) -> float:
+    return min(
+        target_degrees - degrees,
+        target_degrees - degrees + 360,
+        target_degrees - degrees - 360,
+        key=abs,
+    )
 
 
 DEFAULT_EPS = 10**-6
@@ -51,3 +80,15 @@ def close_to(point_1: Point, point_2: Point, eps: float = DEFAULT_EPS) -> bool:
 
 def distance_between(point_1: Point, point_2: Point) -> float:
     return convert_to_vec2d(point_1).get_distance(convert_to_vec2d(point_2))
+
+
+def vector_angle_degrees(vector: Vector) -> float:
+    return normalized_angle_degrees(convert_to_vec2d(vector).angle_degrees)
+
+
+def vector_length(vector: Vector) -> float:
+    return convert_to_vec2d(vector).length
+
+
+def clamp(value: float, min_value: float, max_value: float) -> float:
+    return max(min_value, min(value, max_value))

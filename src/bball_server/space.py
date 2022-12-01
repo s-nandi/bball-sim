@@ -4,9 +4,11 @@ import pymunk
 from bball_server.ball import Ball
 from bball_server.player import Player
 from bball_server.game import Game
+from bball_server.team import Team, Teams
 from bball_server.physics_object import PhysicsObject
 
-AddableObject = Union[Player, Ball, Game]
+AddableObject = Union[Player, Ball, Game, Team, Teams]
+StoredObject = Union[Player, Ball, Game]
 
 
 class Space:
@@ -34,6 +36,10 @@ class Space:
         self._ids.add(id(obj))
         if isinstance(obj, Player):
             return self._add_player(obj)
+        if isinstance(obj, Team):
+            return self._add_team(obj)
+        if isinstance(obj, Teams):
+            return self._add_teams(obj)
         if isinstance(obj, Ball):
             return self._add_ball(obj)
         if isinstance(obj, Game):
@@ -43,6 +49,16 @@ class Space:
     def _add_player(self, player: Player) -> Space:
         self._add_physics_object(player._physics)
         self._players.append(player)
+        return self
+
+    def _add_team(self, team: Team) -> Space:
+        for player in team:
+            self._add_player(player)
+        return self
+
+    def _add_teams(self, teams: Teams) -> Space:
+        for team in teams:
+            self._add_team(team)
         return self
 
     def _add_physics_object(self, physics_object: PhysicsObject) -> Space:
@@ -80,11 +96,11 @@ class Space:
         if self._step_one(self._games, time_frame):
             return
 
-    def _step_each(self, objs: Sequence[AddableObject], time_frame: float):
+    def _step_each(self, objs: Sequence[StoredObject], time_frame: float):
         for obj in objs:
             obj._step(time_frame)
 
-    def _step_one(self, objs: Sequence[AddableObject], time_frame: float) -> bool:
+    def _step_one(self, objs: Sequence[StoredObject], time_frame: float) -> bool:
         if len(objs) == 0:
             return False
         assert len(objs) == 1

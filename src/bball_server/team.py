@@ -3,23 +3,37 @@ from bball_server.player import Player
 
 
 class Team:
-    players: List[Player]
+    _players: List[Player]
 
     def __init__(self, *players: Player):
-        self.players = list(players)
+        self._players = list(players)
 
     def __iter__(self):
-        return iter(self.players)
+        return iter(self._players)
 
-    def contains(self, player: Player):
-        return self.players.count(player) > 0
+    def __contains__(self, player: Player):
+        return player in self._players
+
+    def __getitem__(self, index):
+        return self._players.__getitem__(index)
 
     def random_player(self):
-        assert len(self.players) > 0
-        return self.players[0]
+        assert len(self._players) > 0
+        return self._players[0]
 
 
-Teams = Tuple[Team, Team]
+class Teams:
+    _teams: Tuple[Team, Team]
+
+    def __init__(self, *teams: Team):
+        assert len(teams) == 2
+        self._teams = (teams[0], teams[1])
+
+    def __getitem__(self, index):
+        return self._teams.__getitem__(index)
+
+    def __iter__(self):
+        return iter(self._teams)
 
 
 def other_team_index(team_index: int) -> int:
