@@ -19,7 +19,7 @@ class Player:
 
     def __init__(self, attributes: PlayerAttributes):
         self._attributes = attributes
-        self._physics = PlayerPhysics(attributes)
+        self._physics = PlayerPhysics(attributes.physical)
         self._move = PlayerMove()
         self._ball = None
 
@@ -61,17 +61,17 @@ class Player:
         self._physics.orientation = orientation_degrees
         return self
 
-    def turn(self, turn_degrees_multiplier: float) -> Player:
+    def turn(self, multiplier: float) -> Player:
         assert self.is_initialized
-        assert valid_multiplier(turn_degrees_multiplier)
-        turn_degrees = turn_degrees_multiplier * self._attributes.max_turn_degrees
+        assert valid_multiplier(multiplier)
+        turn_degrees = multiplier * self._attributes.physical.max_turn_degrees
         self._move.turn(turn_degrees)
         return self
 
-    def accelerate(self, strength_multiplier: float) -> Player:
+    def accelerate(self, multiplier: float) -> Player:
         assert self.is_initialized
-        assert valid_multiplier(strength_multiplier)
-        acceleration = strength_multiplier * self._attributes.max_acceleration
+        assert valid_multiplier(multiplier)
+        acceleration = multiplier * self._attributes.physical.max_acceleration
         self._move.accelerate(acceleration)
         return self
 

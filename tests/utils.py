@@ -8,8 +8,11 @@ from bball_server import (
     Hoop,
     ThreePointLine,
     RectangleThreePointLine,
+    ShotProbability,
     LinearShotProbability,
+    GuaranteedShotProbability,
     Game,
+    GameSettings,
 )
 
 T = TypeVar("T")
@@ -17,6 +20,60 @@ T = TypeVar("T")
 
 def create_space() -> Space:
     return Space()
+
+
+def create_linear_shot_probability(
+    max_percentage: float = 1.0,
+    min_shot_distance: float = 0.0,
+    min_percentage: float = 0.0,
+    max_shot_distance: float = 100.0,
+) -> ShotProbability:
+    return LinearShotProbability(
+        max_percentage, min_shot_distance, min_percentage, max_shot_distance
+    )
+
+
+def create_guaranteed_shot_probability():
+    return GuaranteedShotProbability()
+
+
+DEFAULT_SHOT_PROBABILITY = create_linear_shot_probability()
+
+
+def create_player_attributes(
+    mass: float = 1.0,
+    max_acceleration: float = 1.0,
+    max_turn_degrees: float = 90.0,
+    velocity_decay: float = 0.0,
+    shot_probability: ShotProbability = DEFAULT_SHOT_PROBABILITY,
+) -> PlayerAttributes:
+    return PlayerAttributes(
+        PlayerAttributes.Physical(
+            mass=mass,
+            max_acceleration=max_acceleration,
+            max_turn_degrees=max_turn_degrees,
+            velocity_decay=velocity_decay,
+        ),
+        PlayerAttributes.Skill(shot_probability),
+    )
+
+
+DEFAULT_PLAYER_ATTRIBUTES = create_player_attributes()
+
+
+def create_uninitialized_player(
+    attributes: PlayerAttributes = DEFAULT_PLAYER_ATTRIBUTES,
+) -> Player:
+    return Player(attributes)
+
+
+def create_initialized_player(
+    attributes: PlayerAttributes = DEFAULT_PLAYER_ATTRIBUTES,
+    position: Tuple[float, float] = (0.0, 0.0),
+    orientation_degrees: float = 0.0,
+) -> Player:
+    player = Player(attributes)
+    return player.place_at(position, orientation_degrees)
 
 
 def create_ball() -> Ball:
@@ -69,57 +126,23 @@ def create_court(
     return Court(dimensions=(width, height), hoops=(hoop, hoop.other_hoop(width)))
 
 
-def create_shot_probability(
-    max_percentage: float = 1.0,
-    min_shot_distance: float = 0.0,
-    min_percentage: float = 0.0,
-    max_shot_distance: float = 100.0,
-) -> LinearShotProbability:
-    return LinearShotProbability(
-        max_percentage, min_shot_distance, min_percentage, max_shot_distance
-    )
-
-
-def create_player_attributes(
-    mass: float = 1.0,
-    max_acceleration: float = 1.0,
-    max_turn_degrees: float = 90.0,
-    velocity_decay: float = 0.0,
-) -> PlayerAttributes:
-    return PlayerAttributes(
-        mass=mass,
-        max_acceleration=max_acceleration,
-        max_turn_degrees=max_turn_degrees,
-        velocity_decay=velocity_decay,
-    )
-
-
-DEFAULT_PLAYER_ATTRIBUTES = create_player_attributes()
-
-
-def create_uninitialized_player(
-    attributes: PlayerAttributes = DEFAULT_PLAYER_ATTRIBUTES,
-) -> Player:
-    return Player(attributes)
-
-
-def create_initialized_player(
-    attributes: PlayerAttributes = DEFAULT_PLAYER_ATTRIBUTES,
-    position: Tuple[float, float] = (0.0, 0.0),
-    orientation_degrees: float = 0.0,
-) -> Player:
-    player = Player(attributes)
-    return player.place_at(position, orientation_degrees)
+# Alias for consistency while still enabling type hinting
+create_game_settings = GameSettings  # pylint: disable=invalid-name
 
 
 def create_game(
-    teams, ball: Union[Ball, None] = None, court: Union[Court, None] = None
+    teams,
+    ball: Union[Ball, None] = None,
+    court: Union[Court, None] = None,
+    settings: Union[GameSettings, None] = None,
 ):
     if ball is None:
         ball = create_ball()
     if court is None:
         court = create_court()
-    return Game(teams, ball, court)
+    if settings is None:
+        settings = create_game_settings()
+    return Game(teams, ball, court, settings)
 
 
 def require_exception(callback: Callable[[], T], exception_type: Any):

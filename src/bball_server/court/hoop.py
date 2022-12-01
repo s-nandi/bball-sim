@@ -26,3 +26,6 @@ class Hoop:
 
     def is_beyond_three_point_line(self, position: Point) -> bool:
         return self.three_point_line.is_beyond(position)
+
+    def value_of_shot_from(self, position: Point) -> int:
+        return 3 if self.is_beyond_three_point_line(position) else 2

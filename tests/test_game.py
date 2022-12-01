@@ -1,12 +1,17 @@
-from bball_server import BallMode
-from bball_server.utils import close_to
+import math
+from dataclasses import dataclass
+from bball_server import BallMode, ScoreBoard
+from bball_server.utils import close_to, distance_between, approx
 from .utils import (
     create_initialized_player,
     create_space,
+    create_game_settings,
     create_game,
     create_court,
     create_hoop,
     create_uninitialized_player,
+    create_guaranteed_shot_probability,
+    create_player_attributes,
 )
 
 
@@ -80,8 +85,11 @@ def test_shot_completion_with_movement_after_shot():
 
 
 def test_scoring():
-    player_1 = create_uninitialized_player()
-    player_2 = create_uninitialized_player()
+    guaranteed_scorer_attributes = create_player_attributes(
+        shot_probability=create_guaranteed_shot_probability()
+    )
+    player_1 = create_uninitialized_player(attributes=guaranteed_scorer_attributes)
+    player_2 = create_uninitialized_player(attributes=guaranteed_scorer_attributes)
     game = create_game(teams=([player_1], [player_2]))
     ball = game.ball
     court = game.court
@@ -113,3 +121,67 @@ def test_scoring():
     space.step(0)
     assert ball.mode == BallMode.DEAD
     assert game.score == (3, 2)
+
+
+@dataclass
+class ScoringTest:
+    score: ScoreBoard
+    concrete_value: int
+    expected_value: float
+
+
+def _check_probability_in_threshold(
+    probability: float, lower_bound: float, upper_bound: float
+):
+    rounded_probability = round(probability, 2)
+    unsafe_probability_msg = (
+        f"Want shot probability between {lower_bound} and {upper_bound}"
+        f" but have p={rounded_probability}, change court dimensions to fix"
+    )
+    assert lower_bound <= rounded_probability <= upper_bound, unsafe_probability_msg
+
+
+def setup_scoring_test(use_ev: bool) -> ScoringTest:
+    width = 50
+    court = create_court(width=width)
+    player = create_initialized_player()
+    game = create_game(
+        teams=([player], []), settings=create_game_settings(use_ev), court=court
+    )
+    ball = game.ball
+    space = create_space().add(game)
+    ball.jump_ball_won_by(player)
+    target_hoop = game.target_hoop(player)
+    distance_to_target = distance_between(player.position, target_hoop.position)
+    concrete_value = target_hoop.value_of_shot_from(player.position)
+    probability = player._attributes.skill.shot_probability.probability(
+        distance_to_target
+    )
+    _check_probability_in_threshold(probability, 0.45, 0.55)
+    expected_value = concrete_value * probability
+    player.shoot_at(target_hoop.position, 1)
+    for _ in range(math.ceil(distance_to_target)):
+        assert ball.mode == BallMode.MIDSHOT
+        space.step(1)
+    assert ball.mode == BallMode.REACHEDSHOT
+    space.step(0)
+    return ScoringTest(game.score, concrete_value, expected_value)
+
+
+def test_expected_value_scoring():
+    test = setup_scoring_test(use_ev=True)
+    assert approx(test.score[0], test.expected_value)
+    assert test.score[1] == 0
+
+
+def test_non_guaranteed_scoring():
+    trials = 100
+    times_scored = 0
+    for _ in range(trials):
+        test = setup_scoring_test(use_ev=False)
+        assert test.score[0] in (0, 2, 3)
+        assert test.score[1] == 0
+        did_score = test.score[0] > 0
+        if did_score:
+            times_scored += 1
+    assert 0 < times_scored < trials

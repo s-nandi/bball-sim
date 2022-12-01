@@ -84,7 +84,7 @@ def test_pass_to_moving_receiver():
     pass_velocity = 2
     test = setup_passing_test(pass_distance, pass_velocity)
     test.receiver.accelerate(1)
-    receiver_speed = test.receiver._attributes.max_acceleration
+    receiver_speed = test.receiver._attributes.physical.max_acceleration
     time_to_complete = calculate_time_to_complete(
         pass_distance, pass_velocity, receiver_speed
     )
@@ -97,7 +97,7 @@ def test_ball_position_mid_pass_with_both_players_moving():
     test = setup_passing_test(pass_distance, pass_velocity)
     test.passer.turn(1).accelerate(1)
     test.receiver.accelerate(1)
-    receiver_speed = test.receiver._attributes.max_acceleration
+    receiver_speed = test.receiver._attributes.physical.max_acceleration
     time_to_complete = calculate_time_to_complete(
         pass_distance, pass_velocity, receiver_speed
     )

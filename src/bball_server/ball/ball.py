@@ -7,7 +7,7 @@ from bball_server.ball.held_ball import HeldBall
 from bball_server.ball.mid_pass import MidPass
 from bball_server.ball.received_pass import ReceivedPass
 from bball_server.ball.mid_shot import MidShot
-from bball_server.ball.reached_shot import ReachedShot
+from bball_server.ball.reached_shot import ReachedShot, ShotParameters
 from bball_server.ball.dead_ball import DeadBall
 
 
@@ -52,8 +52,8 @@ class Ball:
         return checked_type(self._state, DeadBall)._should_flip_posession
 
     @property
-    def shot_parameters(self) -> ReachedShot:
-        return checked_type(self._state, ReachedShot)
+    def shot_parameters(self) -> ShotParameters:
+        return checked_type(self._state, ReachedShot).parameters()
 
     @property
     def passed_to(self) -> Player:
@@ -90,6 +90,10 @@ class Ball:
         return self._transition(MidShot, ReachedShot(shooter, target, shot_from))
 
     def successful_shot(self) -> Ball:
+        return self._transition(ReachedShot, DeadBall(True))
+
+    def missed_shot(self) -> Ball:
+        # TODO: Implement rebounding logic, add LooseBall state
         return self._transition(ReachedShot, DeadBall(True))
 
     def jump_ball_won_by(self, receiver: Player) -> Ball:

@@ -5,7 +5,7 @@ from ..utils import (
     create_initialized_player,
     create_space,
     create_ball,
-    create_shot_probability,
+    create_linear_shot_probability,
 )
 
 
@@ -43,7 +43,9 @@ def test_ball_position_mid_shot():
 
 def test_shot_probability():
     max_shot_distance = 10
-    shot_probability = create_shot_probability(max_shot_distance=max_shot_distance)
+    shot_probability = create_linear_shot_probability(
+        max_shot_distance=max_shot_distance
+    )
     assert approx(shot_probability.probability(0), 1.0)
     assert approx(shot_probability.probability(max_shot_distance), 0.0)
     assert approx(shot_probability.probability(max_shot_distance / 2), 0.5)

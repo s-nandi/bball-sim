@@ -20,3 +20,11 @@ def valid_pass_velocity(pass_velocity: float) -> bool:
 
 def valid_shot_velocity(shot_velocity: float) -> bool:
     return shot_velocity > 0
+
+
+def valid_probability(probability: float) -> bool:
+    return 0.0 <= probability <= 1.0
+
+
+def valid_shot_value(value: float) -> bool:
+    return value >= 0.0
