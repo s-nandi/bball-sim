@@ -39,9 +39,7 @@ def approx(value_1: float, value_2: float, eps: float = DEFAULT_EPS):
     return abs(value_1 - value_2) < eps
 
 
-def close_to(
-    vec_1: Tuple[float, float], vec_2: Tuple[float, float], eps: float = DEFAULT_EPS
-) -> bool:
-    delta_x = vec_1[0] - vec_2[0]
-    delta_y = vec_1[1] - vec_2[1]
+def close_to(point_1: Point, point_2: Point, eps: float = DEFAULT_EPS) -> bool:
+    delta_x = point_1[0] - point_2[0]
+    delta_y = point_1[1] - point_2[1]
     return approx(delta_x, 0, eps) and approx(delta_y, 0, eps)
