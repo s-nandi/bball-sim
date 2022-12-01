@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from bball_server.ball.ball_mode import BallMode
 
 
-class _Server(ABC):
+class BallState(ABC):
     def _step(self, _time_frame: float) -> bool:
         return False
 

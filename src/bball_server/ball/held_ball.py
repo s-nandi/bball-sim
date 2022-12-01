@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from bball_server.ball.server import _Server
+from bball_server.ball.state import BallState
 from bball_server.ball.ball_mode import BallMode
 
 if TYPE_CHECKING:
@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from bball_server.ball import Ball
 
 
-class _HeldBallServer(_Server):
+class HeldBall(BallState):
     _ball_handler: Player
     _ball: Ball
 

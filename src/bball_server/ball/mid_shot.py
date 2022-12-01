@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 import pymunk
 from bball_server.validator import valid_shot_velocity
 from bball_server.utils import convert_to_tuple
-from bball_server.ball.server import _Server
+from bball_server.ball.state import BallState
 from bball_server.ball.ball_mode import BallMode
 
 if TYPE_CHECKING:
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from bball_server.utils import Point
 
 
-class _MidShotServer(_Server):
+class MidShot(BallState):
     _shooter: Player
     _ball: Ball
     _target: Point
@@ -20,10 +20,9 @@ class _MidShotServer(_Server):
     _original_position: pymunk.Vec2d
     _time_since_shot: float
 
-    def __init__(
-        self, shooter: Player, target: Point, ball: Ball, shot_velocity: float
-    ):
+    def __init__(self, ball: Ball, target: Point, shot_velocity: float):
         assert valid_shot_velocity(shot_velocity)
+        shooter = ball.belongs_to
         self._shooter = shooter
         self._ball = ball
         self._target = target

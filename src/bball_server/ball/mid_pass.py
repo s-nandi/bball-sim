@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 import pymunk
 from bball_server.validator import valid_pass_velocity
 from bball_server.utils import convert_to_tuple
-from bball_server.ball.server import _Server
+from bball_server.ball.state import BallState
 from bball_server.ball.ball_mode import BallMode
 
 if TYPE_CHECKING:
@@ -18,17 +18,16 @@ class PassPlayers:
     receiver: Player
 
 
-class _MidPassServer(_Server):
+class MidPass(BallState):
     _players_involved: PassPlayers
     _ball: Ball
     _pass_velocity: float
     _original_position: pymunk.Vec2d
     _time_since_pass: float
 
-    def __init__(
-        self, passer: Player, receiver: Player, ball: Ball, pass_velocity: float
-    ):
+    def __init__(self, ball: Ball, receiver: Player, pass_velocity: float):
         assert valid_pass_velocity(pass_velocity)
+        passer = ball.belongs_to
         self._players_involved = PassPlayers(passer, receiver)
         self._ball = ball
         self._original_position = pymunk.Vec2d(*passer.position)

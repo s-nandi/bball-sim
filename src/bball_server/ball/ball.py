@@ -1,14 +1,14 @@
 from __future__ import annotations
-from typing import Optional, TYPE_CHECKING, Type, TypeVar, Any
+from typing import Optional, TYPE_CHECKING, Type, TypeVar
 from bball_server.utils import coords_to_string, Point
 from bball_server.ball.ball_mode import BallMode
-from bball_server.ball.server import _Server
-from bball_server.ball.held_ball_server import _HeldBallServer
-from bball_server.ball.mid_pass_server import _MidPassServer
-from bball_server.ball.post_pass_server import _PostPassServer
-from bball_server.ball.mid_shot_server import _MidShotServer
-from bball_server.ball.post_shot_server import _PostShotServer
-from bball_server.ball.dead_ball_server import _DeadBallServer
+from bball_server.ball.state import BallState
+from bball_server.ball.held_ball import HeldBall
+from bball_server.ball.mid_pass import MidPass
+from bball_server.ball.post_pass import PostPass
+from bball_server.ball.mid_shot import MidShot
+from bball_server.ball.post_shot import PostShot
+from bball_server.ball.dead_ball import DeadBall
 
 
 if TYPE_CHECKING:
@@ -17,25 +17,23 @@ if TYPE_CHECKING:
 T = TypeVar("T")
 
 
-def _checked(server: Any, variable_type: Type[T]) -> T:
-    assert isinstance(server, variable_type)
-    return server
+def checked_type(state: BallState, state_type: Type[T]) -> T:
+    assert isinstance(state, state_type)
+    return state
 
 
 class Ball:
     _position: Point
     _last_belonged_to: Optional[Player]
-    _server: _Server
+    _state: BallState
 
     def __init__(self):
         self._position = (0, 0)
         self._last_belonged_to = None
-        self._server = _DeadBallServer(False)
+        self._state = DeadBall(False)
 
     def __repr__(self):
-        return (
-            f"Ball(position = {coords_to_string(self._position)}, mode = {self.mode})"
-        )
+        return f"Ball(position = {coords_to_string(self.position)}, mode = {self.mode})"
 
     @property
     def position(self) -> Point:
@@ -43,7 +41,7 @@ class Ball:
 
     @property
     def mode(self) -> BallMode:
-        return self._server.mode()
+        return self._state.mode()
 
     @property
     def last_belonged_to(self) -> Optional[Player]:
@@ -51,56 +49,48 @@ class Ball:
 
     @property
     def should_flip_posession(self) -> bool:
-        return _checked(self._server, _DeadBallServer)._should_flip_posession
+        return checked_type(self._state, DeadBall)._should_flip_posession
 
     @property
-    def shot_parameters(self) -> _PostShotServer:
-        return _checked(self._server, _PostShotServer)
+    def shot_parameters(self) -> PostShot:
+        return checked_type(self._state, PostShot)
 
     @property
     def passed_to(self) -> Player:
-        return _checked(self._server, _PostPassServer)._receiver
+        return checked_type(self._state, PostPass)._receiver
 
     @property
     def belongs_to(self) -> Player:
-        return _checked(self._server, _HeldBallServer)._ball_handler
+        return checked_type(self._state, HeldBall)._ball_handler
 
     def _step(self, time_frame: float) -> bool:
-        return self._server._step(time_frame)
+        return self._state._step(time_frame)
 
-    def _transition(self, previous_server_type: Type[_Server], server: _Server) -> Ball:
-        _checked(self._server, previous_server_type)._reset()
-        self._server = server
+    def _transition(self, prior_state_type: Type[BallState], state: BallState) -> Ball:
+        checked_type(self._state, prior_state_type)._reset()
+        self._state = state
         return self
 
     def held_out_of_bounds(self):
-        return self._transition(_HeldBallServer, _DeadBallServer(True))
+        return self._transition(HeldBall, DeadBall(True))
 
     def pass_to(self, receiver: Player, pass_velocity: float) -> Ball:
-        return self._transition(
-            _HeldBallServer,
-            _MidPassServer(self.belongs_to, receiver, self, pass_velocity),
-        )
+        return self._transition(HeldBall, MidPass(self, receiver, pass_velocity))
 
     def shoot_at(self, target: Point, shot_velocity: float) -> Ball:
-        return self._transition(
-            _HeldBallServer,
-            _MidShotServer(self.belongs_to, target, self, shot_velocity),
-        )
+        return self._transition(HeldBall, MidShot(self, target, shot_velocity))
 
     def post_pass(self, receiver: Player) -> Ball:
-        return self._transition(_MidPassServer, _PostPassServer(receiver))
+        return self._transition(MidPass, PostPass(receiver))
 
     def successful_pass(self, receiver: Player) -> Ball:
-        return self._transition(_PostPassServer, _HeldBallServer(receiver, self))
+        return self._transition(PostPass, HeldBall(receiver, self))
 
     def post_shot(self, shooter: Player, target: Point, shot_from: Point) -> Ball:
-        return self._transition(
-            _MidShotServer, _PostShotServer(shooter, target, shot_from)
-        )
+        return self._transition(MidShot, PostShot(shooter, target, shot_from))
 
     def successful_shot(self) -> Ball:
-        return self._transition(_PostShotServer, _DeadBallServer(True))
+        return self._transition(PostShot, DeadBall(True))
 
     def jump_ball_won_by(self, receiver: Player) -> Ball:
-        return self._transition(_DeadBallServer, _HeldBallServer(receiver, self))
+        return self._transition(DeadBall, HeldBall(receiver, self))
