@@ -82,22 +82,55 @@ def test_stopping_behavior(_trial_index, initial_steps):
     assert close_to(player_2.velocity, target_velocity)
 
 
-@pytest.mark.parametrize(
-    "target_position", [(4.5, 3), (3, 4.5), (-5, 0), (-5, 1), (-5, -5), (0, 5), (0, -5)]
-)
+TARGET_POSITIONS = [
+    (1.2, 0),
+    (1.21, 0),
+    (4.5, 0.001),
+    (4.5, 3),
+    (3, 4.5),
+    (-5, 0),
+    (-5, 1),
+    (-5, -5),
+    (0, 5),
+    (0, -5),
+    (1.1, -4.2),
+]
+
+
+@pytest.mark.parametrize("target_position", TARGET_POSITIONS)
 def test_position_reaching(target_position):
     player = create_initialized_player()
     space = create_space().add(player)
     time_frame = 0.2
     behavior = ReachPositionBehavior(target_position, time_frame)
     turn_steps = 360 / player.physical_attributes.max_turn_degrees / time_frame
-    acceleration_steps = (
-        math.hypot(target_position[0], target_position[1]) / time_frame / time_frame
-    )
+    acceleration_steps = math.hypot(target_position[0], target_position[1]) / time_frame
     allowed_steps = turn_steps + acceleration_steps
+    # player.turn(uniform(-1, 1)).accelerate(uniform(-1, 1))
+    # space.step(time_frame)
     for _ in range(math.ceil(allowed_steps)):
         if not behavior.drive(player):
             break
         space.step(time_frame)
+    print("final vel", player.velocity)
+    assert close_to(player.position, target_position)
 
+
+@pytest.mark.parametrize("initial_steps", (1, 10, 50))
+@pytest.mark.parametrize("target_position", TARGET_POSITIONS)
+def test_position_reaching_with_initial_movement(initial_steps, target_position):
+    player = create_initialized_player()
+    space = create_space().add(player)
+    time_frame = 0.2
+    behavior = ReachPositionBehavior(target_position, time_frame)
+    turn_steps = 360 / player.physical_attributes.max_turn_degrees / time_frame
+    acceleration_steps = math.hypot(target_position[0], target_position[1]) / time_frame
+    allowed_steps = turn_steps + acceleration_steps + initial_steps
+    for _ in range(initial_steps):
+        player.turn(uniform(0, 1)).accelerate(uniform(-1, 1))
+        space.step(time_frame)
+    for _ in range(math.ceil(allowed_steps)):
+        if not behavior.drive(player):
+            break
+        space.step(time_frame)
     assert close_to(player.position, target_position)
