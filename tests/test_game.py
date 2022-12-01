@@ -1,6 +1,6 @@
 import math
 from dataclasses import dataclass
-from bball_server import BallMode, ScoreBoard
+from bball_server import BallMode, Scoreboard
 from bball_server.utils import close_to, distance_between, approx
 from .utils import (
     create_initialized_player,
@@ -130,7 +130,7 @@ def test_scoring():
 
 @dataclass
 class ScoringTest:
-    score: ScoreBoard
+    score: Scoreboard
     concrete_value: int
     expected_value: float
 

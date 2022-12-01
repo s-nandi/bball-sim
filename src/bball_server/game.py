@@ -5,35 +5,15 @@ from bball_server.ball import BallMode, Ball
 from bball_server.court import Court, Hoop
 from bball_server.player import Player
 from bball_server.utils import close_to
-from bball_server.validator import valid_shot_value
+from bball_server.scoreboard import Score, Scoreboard
 
 Team = List[Player]
 Teams = Tuple[Team, Team]
 MonitoringFunction = Callable[[], bool]
-Score = Tuple[float, float]
 
 
 def other_team(team_index: int) -> int:
     return 1 - team_index
-
-
-@dataclass
-class ScoreBoard:
-    _score_1: float = 0
-    _score_2: float = 0
-
-    @property
-    def score(self) -> Score:
-        return (self._score_1, self._score_2)
-
-    def increment(self, team_index: int, value: float):
-        assert valid_shot_value(value)
-        if team_index == 0:
-            self._score_1 += value
-        elif team_index == 1:
-            self._score_2 += value
-        else:
-            assert False, f"Invalid team index {team_index}, must be 0 or 1"
 
 
 @dataclass
@@ -47,7 +27,7 @@ class Game:
     ball: Ball
     court: Court
     settings: GameSettings = field(default_factory=GameSettings)
-    _scoreboard: ScoreBoard = field(init=False, default_factory=ScoreBoard)
+    _scoreboard: Scoreboard = field(init=False, default_factory=Scoreboard)
 
     @property
     def _checks(self) -> List[MonitoringFunction]:

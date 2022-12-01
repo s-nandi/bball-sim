@@ -7,4 +7,5 @@ from .shot_probability import (
     LinearShotProbability,
     GuaranteedShotProbability,
 )
-from .game import Game, GameSettings, ScoreBoard
+from .game import Game, GameSettings
+from .scoreboard import Scoreboard
