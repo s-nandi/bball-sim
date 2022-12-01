@@ -1,4 +1,4 @@
-from typing import List, Tuple, Callable, Optional
+from typing import List, Callable, Optional
 from dataclasses import dataclass, field
 from random import random
 from bball_server.ball import BallMode, Ball
@@ -6,14 +6,9 @@ from bball_server.court import Court, Hoop
 from bball_server.player import Player
 from bball_server.utils import close_to
 from bball_server.scoreboard import Score, Scoreboard
+from bball_server.team import Team, Teams, other_team_index
 
-Team = List[Player]
-Teams = Tuple[Team, Team]
 MonitoringFunction = Callable[[], bool]
-
-
-def other_team(team_index: int) -> int:
-    return 1 - team_index
 
 
 @dataclass
@@ -46,7 +41,8 @@ class Game:
 
     def team_index_of(self, player: Player) -> int:
         for team_index, team in enumerate(self.teams):
-            if team.count(player) > 0:
+            assert isinstance(team, Team)
+            if team.contains(player) > 0:
                 return team_index
         assert False, f"Player {player} does not exist in game"
 
@@ -63,7 +59,7 @@ class Game:
 
     def target_hoop(self, player: Player) -> Hoop:
         team_index = self.team_index_of(player)
-        return self.court._hoops[other_team(team_index)]
+        return self.court._hoops[other_team_index(team_index)]
 
     def check_out_of_bounds(self) -> bool:
         if self.ball.mode != BallMode.HELD:
@@ -84,9 +80,9 @@ class Game:
         new_team_with_posession = (
             team_with_posession
             if not self.ball.should_flip_posession
-            else other_team(team_with_posession)
+            else other_team_index(team_with_posession)
         )
-        player = self.teams[new_team_with_posession][0]
+        player = self.teams[new_team_with_posession].random_player()
         if not self.court.is_inbounds(player):
             return False
         self.ball.jump_ball_won_by(player)

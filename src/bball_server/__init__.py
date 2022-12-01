@@ -9,3 +9,4 @@ from .shot_probability import (
 )
 from .game import Game, GameSettings
 from .scoreboard import Scoreboard
+from .team import Team, Teams

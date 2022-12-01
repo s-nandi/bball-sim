@@ -1,4 +1,4 @@
-from typing import Tuple, TypeVar, Callable, Any, Optional, Union
+from typing import Tuple, TypeVar, Callable, Any, Optional, Union, List
 from bball_server import (
     Player,
     PlayerAttributes,
@@ -11,6 +11,7 @@ from bball_server import (
     ShotProbability,
     LinearShotProbability,
     GuaranteedShotProbability,
+    Team,
     Game,
     GameSettings,
 )
@@ -130,8 +131,15 @@ def create_court(
 create_game_settings = GameSettings  # pylint: disable=invalid-name
 
 
+def _normalized_teams(teams: List[Team]) -> Tuple[Team, Team]:
+    assert len(teams) <= 2
+    while len(teams) <= 2:
+        teams.append(Team())
+    return (teams[0], teams[1])
+
+
 def create_game(
-    teams,
+    teams: List[Team],
     ball: Union[Ball, None] = None,
     court: Union[Court, None] = None,
     settings: Union[GameSettings, None] = None,
@@ -142,7 +150,7 @@ def create_game(
         court = create_court()
     if settings is None:
         settings = create_game_settings()
-    return Game(teams, ball, court, settings)
+    return Game(_normalized_teams(teams), ball, court, settings)
 
 
 def require_exception(callback: Callable[[], T], exception_type: Any):

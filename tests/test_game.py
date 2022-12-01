@@ -1,6 +1,6 @@
 import math
 from dataclasses import dataclass
-from bball_server import BallMode, Scoreboard
+from bball_server import BallMode, Scoreboard, Team
 from bball_server.utils import close_to, distance_between, approx
 from .utils import (
     create_initialized_player,
@@ -18,7 +18,7 @@ from .utils import (
 def test_game_flow():
     player_1 = create_initialized_player()
     player_2 = create_initialized_player()
-    game = create_game(teams=([player_1], [player_2]))
+    game = create_game(teams=[Team(player_1), Team(player_2)])
     space = create_space().add(game)
     ball = game.ball
 
@@ -44,7 +44,7 @@ def test_game_flow():
 def test_pass_completion():
     player_1 = create_initialized_player()
     player_2 = create_initialized_player(position=(3, 3))
-    game = create_game(teams=([player_1, player_2], []))
+    game = create_game(teams=[Team(player_1, player_2)])
     space = create_space().add(game)
     ball = game.ball
     ball.jump_ball_won_by(player_1)
@@ -67,7 +67,7 @@ def test_shot_completion_with_movement_after_shot():
     assert close_to(hoop.position, (0, height / 2))
     court = create_court(width, height, hoop)
     player = create_initialized_player(position=(0, height / 2))
-    game = create_game(teams=([player], []), court=court)
+    game = create_game(teams=[Team(player)], court=court)
     space = create_space().add(game)
     ball = game.ball
     ball.jump_ball_won_by(player)
@@ -93,7 +93,7 @@ def test_scoring():
     )
     player_1 = create_uninitialized_player(attributes=guaranteed_scorer_attributes)
     player_2 = create_uninitialized_player(attributes=guaranteed_scorer_attributes)
-    game = create_game(teams=([player_1], [player_2]))
+    game = create_game(teams=[Team(player_1), Team(player_2)])
     space = create_space().add(game)
     ball = game.ball
     court = game.court
@@ -151,7 +151,7 @@ def setup_scoring_test(use_ev: bool) -> ScoringTest:
     court = create_court(width=width)
     player = create_initialized_player()
     game = create_game(
-        teams=([player], []), settings=create_game_settings(use_ev), court=court
+        teams=[Team(player)], settings=create_game_settings(use_ev), court=court
     )
     ball = game.ball
     space = create_space().add(game)
