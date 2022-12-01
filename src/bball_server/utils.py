@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 ZERO_VECTOR = (0, 0)
 BASE_DIRECTION = (1, 0)
 
-ROUND_DIGITS = 2
+ROUND_DIGITS = 4
 
 
 def coords_to_string(tup: Tuple[float, float]) -> str:
@@ -82,12 +82,21 @@ def distance_between(point_1: Point, point_2: Point) -> float:
     return convert_to_vec2d(point_1).get_distance(convert_to_vec2d(point_2))
 
 
+def difference_between(point_1: Point, point_2: Point) -> Vector:
+    return convert_to_tuple(convert_to_vec2d(point_1) - convert_to_vec2d(point_2))
+
+
 def vector_angle_degrees(vector: Vector) -> float:
     return normalized_angle_degrees(convert_to_vec2d(vector).angle_degrees)
 
 
 def vector_length(vector: Vector) -> float:
     return convert_to_vec2d(vector).length
+
+
+def angle_degrees_to_vector(angle_degrees: float, length: float) -> Vector:
+    vec = length * convert_to_vec2d(BASE_DIRECTION).rotated_degrees(angle_degrees)
+    return convert_to_tuple(vec)
 
 
 def clamp(value: float, min_value: float, max_value: float) -> float:

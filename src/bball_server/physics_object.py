@@ -66,7 +66,7 @@ class PhysicsObject:
     def turn(self, angle: float, time_step: float) -> None:
         assert self.is_initialized
         self.orientation_degrees = normalized_angle_degrees(
-            self.orientation_degrees + to_degrees(angle)
+            self.orientation_degrees + to_degrees(angle * time_step)
         )
         self._body.velocity = self._body.velocity.rotated(angle * time_step)
 
