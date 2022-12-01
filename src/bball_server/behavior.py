@@ -1,4 +1,3 @@
-import math
 from typing import List, Tuple, Optional
 from dataclasses import dataclass, field
 from bball_server.utils import (
@@ -137,7 +136,6 @@ class ScheduledAccelerationBehavior:
             self.current_index += 1
             return self.drive(player)
         acceleration = current_acceleration_count[0]
-        print("applying ", acceleration_multiplier(player, acceleration))
         player.accelerate(acceleration_multiplier(player, acceleration))
         self.current_count += 1
         return True
@@ -177,51 +175,28 @@ class ReachPositionBehavior:
     )
 
     def drive(self, player: Player) -> bool:
-        print("reach", player)
         if close_to(player.position, self.target_position):
             return StopBehavior(self.time_frame).drive(player)
 
         if self._scheduled_behavior is None and StopBehavior(self.time_frame).drive(
             player
         ):
-            print("stopping")
             return True
         position_delta = difference_between(self.target_position, player.position)
         target_orientation_degrees = vector_angle_degrees(position_delta)
         if ReachOrientationBehavior(target_orientation_degrees, self.time_frame).drive(
             player
         ):
-            print("turning")
             self._scheduled_behavior = None
             return True
 
         if self._scheduled_behavior is None:
             distance = vector_length(position_delta)
-            velocity_magnitude = vector_length(player.velocity)
             max_acceleration = player.physical_attributes.max_acceleration
-            print("v_curr", velocity_magnitude)
 
             num_steps = min_steps_needed(max_acceleration, distance, self.time_frame)
             target_acceleration = acceleration_for(
                 distance, num_steps, max_acceleration, self.time_frame
-            )
-            covered = distance_covered(num_steps, target_acceleration, self.time_frame)
-            error = distance - covered
-            print(
-                "distance",
-                distance,
-                "num steps",
-                num_steps,
-                "accel",
-                max_acceleration,
-                "time frame",
-                self.time_frame,
-                "target accel",
-                target_acceleration,
-                "can cover",
-                covered,
-                "error",
-                error,
             )
             self._scheduled_behavior = ScheduledAccelerationBehavior(
                 [

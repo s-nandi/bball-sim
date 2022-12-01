@@ -112,7 +112,6 @@ def test_position_reaching(target_position):
         if not behavior.drive(player):
             break
         space.step(time_frame)
-    print("final vel", player.velocity)
     assert close_to(player.position, target_position)
 
 
