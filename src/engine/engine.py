@@ -1,6 +1,6 @@
 from typing import Tuple, Callable
 import pygame
-from simulation.render_settings import RenderSettings
+from engine.render_settings import RenderSettings
 
 
 class Engine:

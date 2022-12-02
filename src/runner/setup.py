@@ -1,5 +1,5 @@
 from bball import Game, Space, draw_game
-from simulation.engine import Engine
+from engine import Engine
 from runner.draw import Drawer, max_resolution_for
 
 
