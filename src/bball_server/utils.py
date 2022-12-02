@@ -90,6 +90,26 @@ def sum_of(vector_1: Vector, vector_2: Vector) -> Vector:
     return convert_to_tuple(convert_to_vec2d(vector_1) + convert_to_vec2d(vector_2))
 
 
+def divide_by(vector: Vector, denominator: float):
+    return convert_to_tuple(convert_to_vec2d(vector) / denominator)
+
+
+def multiply_by(vector: Vector, coefficient: float):
+    return convert_to_tuple(convert_to_vec2d(vector) * coefficient)
+
+
+def interpolate(point_1: Point, point_2: Point, interp: float) -> Point:
+    assert 0 <= interp <= 1
+    vec_1 = convert_to_vec2d(point_1)
+    vec_2 = convert_to_vec2d(point_2)
+    vec_res = vec_1.interpolate_to(vec_2, interp)
+    return convert_to_tuple(vec_res)
+
+
+def midpoint_of(point_1: Point, point_2: Point) -> Point:
+    return interpolate(point_1, point_2, 0.5)
+
+
 def vector_angle_degrees(vector: Vector) -> float:
     return normalized_angle_degrees(convert_to_vec2d(vector).angle_degrees)
 
@@ -105,3 +125,13 @@ def angle_degrees_to_vector(angle_degrees: float, length: float) -> Vector:
 
 def clamp(value: float, min_value: float, max_value: float) -> float:
     return max(min_value, min(value, max_value))
+
+
+def same_direction_as(point_1: Point, point_2: Point, point_3: Point) -> bool:
+    pt_1 = convert_to_vec2d(point_1)
+    pt_2 = convert_to_vec2d(point_2)
+    pt_3 = convert_to_vec2d(point_3)
+    vec_1 = pt_2 - pt_1
+    vec_2 = pt_3 - pt_2
+    dot = vec_1.dot(convert_to_tuple(vec_2))
+    return dot >= 0
