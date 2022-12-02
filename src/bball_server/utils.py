@@ -86,6 +86,10 @@ def difference_between(point_1: Point, point_2: Point) -> Vector:
     return convert_to_tuple(convert_to_vec2d(point_1) - convert_to_vec2d(point_2))
 
 
+def sum_of(vector_1: Vector, vector_2: Vector) -> Vector:
+    return convert_to_tuple(convert_to_vec2d(vector_1) + convert_to_vec2d(vector_2))
+
+
 def vector_angle_degrees(vector: Vector) -> float:
     return normalized_angle_degrees(convert_to_vec2d(vector).angle_degrees)
 

@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from typing import Tuple
 from bball_server.utils import Point
 
-Color = Tuple[float, float, float]
-Corners = Tuple[Point, Point, Point, Point]
+Color = Tuple[int, int, int]
+Corners = Tuple[Point, Point]
 
 
 class DrawInterface(ABC):
@@ -17,4 +17,8 @@ class DrawInterface(ABC):
 
     @abstractmethod
     def draw_rectangle(self, corners: Corners, color: Color, fill: bool):
+        pass
+
+    @abstractmethod
+    def write_text(self, position: Point, color: Color, text: str, font_size: int):
         pass

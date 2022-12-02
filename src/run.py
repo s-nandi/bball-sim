@@ -1,106 +1,31 @@
-import itertools
-import functools
-import logging
-from typing import List
-from game import Game, Player, generate_players, Court, behavior
-from game.dimensions import CourtDimensions, RimDimensions, ThreePointLineDimensions
-from visualizer import Visualizer, ScreenParams
-
-# Canonical
-# mass_generator = itertools.cycle([81.19, 98.3]),  # kg
-# size_generator = itertools.repeat(0.94),  # m
-# max_speed_generator = itertools.cycle([2.096618, 1.627226]),  # m / s
-# max_acceleration_generator = itertools.cycle([2.34, 2.5]),  # m / s ^ 2
-# sideline_thickness = 0.05  # m
-# width = 28.65  # m
-# height = 15.24  # m
-# rim_radius = 0.4572  # m
-# rim_distance_from_left_edge = 1.6002  # m
-# three_point_line_distance_from_top_edge = 1.019  # m
-# three_point_line_corner_length = 3.006725  # m
-# three_point_line_outer_radius = 6.75  # m
-# three_point_line_line_thickness = 0.025  # m
+from bball_server import Game, Team
+from bball_server.create import (
+    create_game,
+    create_initialized_player,
+    create_court,
+    create_player_attributes,
+    create_hoop,
+    create_three_point_line,
+)
+from engine import Engine
 
 
-def create_players() -> List[Player]:
-    players = generate_players(
-        mass_generator=itertools.cycle([81.19, 98.3]),  # kg
-        size_generator=itertools.repeat(0.94),  # m
-        max_speed_generator=itertools.cycle([2.096618, 1.627226]),  # m / s
-        max_acceleration_generator=itertools.cycle([2.34, 2.5]),  # m / s ^ 2
-        position_generator=[
-            (28.65 - 4.5, 2.3),
-            (28.65 - 3.5, 7.62),
-            (3.5, 7.62),
-            (4.5, 10.62),
-        ],
-        teams_generator=itertools.cycle([1, 1, 0, 0]),
-    )
-    return list(players)
+def setup_game() -> Game:
+    attributes = create_player_attributes(max_acceleration=2.34)
+    player_1 = create_initialized_player(position=(4, 4), attributes=attributes)
+    player_2 = create_initialized_player(position=(7, 7), attributes=attributes)
+    width = 28.65
+    height = 15.24
+    three_point_line = create_three_point_line(width, height)
+    hoop = create_hoop(width, height, 1.6, three_point_line)
+    court = create_court(width, height, hoop)
+    return create_game(teams=[Team(player_1), Team(player_2)], court=court)
 
 
-def create_court() -> Court:
-    sideline_thickness = 0.05  # m
-    width = 28.65  # m
-    height = 15.24  # m
-    rim_radius = 0.4572  # m
-    rim_distance_from_left_edge = 1.6002  # m
-    three_point_line_distance_from_top_edge = 1.019  # m
-    three_point_line_corner_length = 3.006725  # m
-    three_point_line_outer_radius = 6.75  # m
-    three_point_line_line_thickness = 0.025  # m
-
-    padded_width = width + sideline_thickness * 2
-    padded_height = height + sideline_thickness * 2
-    damping = 0.5
-    return Court(
-        CourtDimensions(
-            width=padded_width,
-            height=padded_height,
-            boundary_thickness=sideline_thickness,
-            rim=RimDimensions(rim_radius, rim_distance_from_left_edge),
-            three_point_line=ThreePointLineDimensions(
-                three_point_line_distance_from_top_edge,
-                three_point_line_corner_length,
-                three_point_line_outer_radius,
-                three_point_line_line_thickness,
-            ),
-        ),
-        damping=damping,
-    )
-
-
-def setup_simulation() -> Visualizer:
-    game = Game(
-        create_players(),
-        create_court(),
-        functools.partial(
-            behavior.get_close_to_basket_or_block,
-            shooting_distance_threshold=3.0,
-            defensive_tightness=0.75,
-        ),
-    )
-    screen_params = ScreenParams(
-        width=game.court.dimensions.width,
-        height=game.court.dimensions.height,
-        fps=90,
-    )
-    simulation = Visualizer(
-        screen_params,
-        game,
-        simulation_speed_scale=20.0,
-    )
-    return simulation
-
-
-def configure_logger() -> None:
-    logging.basicConfig(filename="output/run.log", level=logging.DEBUG)
-
-
-def main() -> None:
-    configure_logger()
-    simulation = setup_simulation()
-    simulation.run()
+def main():
+    game = setup_game()
+    engine = Engine(game, lambda _: game.teams[0][0].accelerate(1))
+    engine.run()
 
 
 if __name__ == "__main__":
