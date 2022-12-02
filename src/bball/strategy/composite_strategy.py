@@ -1,23 +1,23 @@
-from typing import Type
+from typing import Type, Optional, Dict
 from bball.game import Game
 from bball.team import Team
 from bball.strategy.strategy_interface import StrategyInterface
 
 
-class CompositeStrategy:
+class CompositeStrategy(StrategyInterface):
     team: Team
     offensive_strategy: StrategyInterface
     defensive_strategy: StrategyInterface
 
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         team: Team,
-        offensive_strategy_type: Type[StrategyInterface],
-        defensive_strategy_type: Type[StrategyInterface],
         time_frame: float,
-        *,
-        offensive_strategy_params=None,
-        defensive_strategy_params=None,
+        offensive_strategy_type: Type[StrategyInterface],
+        offensive_strategy_params: Optional[Dict],
+        defensive_strategy_type: Type[StrategyInterface],
+        defensive_strategy_params: Optional[Dict],
     ):
         if offensive_strategy_params is None:
             offensive_strategy_params = {}

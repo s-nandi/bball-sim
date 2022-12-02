@@ -7,8 +7,9 @@ def create_strategy(
 ):
     return CompositeStrategy(
         team,
-        RunToBasketAndShoot,
-        StandBetweenBasket,
         time_frame,
-        offensive_strategy_params=dict(distance_threshold=offensive_distance_threshold),
+        RunToBasketAndShoot,
+        dict(distance_threshold=offensive_distance_threshold),
+        StandBetweenBasket,
+        None,
     )
