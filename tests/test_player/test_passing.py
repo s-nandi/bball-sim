@@ -2,7 +2,7 @@ import math
 from dataclasses import dataclass
 from bball_server import Player, Space, Ball, BallMode
 from bball_server.utils import close_to
-from ..utils import create_space, create_ball, create_initialized_player
+from bball_server.create import create_space, create_ball, create_initialized_player
 
 
 @dataclass

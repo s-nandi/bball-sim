@@ -1,13 +1,13 @@
 from typing import Tuple
 from bball_server import Court, Hoop, Player, Space
-from .utils import (
+from bball_server.create import (
     create_initialized_player,
     create_court,
     create_three_point_line,
-    require_exception,
     create_hoop,
     create_space,
 )
+from .utils import require_exception
 
 
 def is_position_inbounds(court: Court, position: Tuple[float, float]) -> bool:

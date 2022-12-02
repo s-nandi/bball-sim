@@ -1,5 +1,5 @@
 from bball_server.utils import close_to
-from .utils import create_initialized_player, create_space, create_ball
+from bball_server.create import create_initialized_player, create_space, create_ball
 
 
 def test_ball_initial_position():

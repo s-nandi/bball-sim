@@ -11,3 +11,5 @@ from .game import Game, GameSettings
 from .scoreboard import Scoreboard
 from .team import Team, Teams
 from .behavior import ReachVelocityBehavior, StopBehavior, ReachPositionBehavior
+from .draw import draw_game
+from .draw_interface import DrawInterface, Color, Point, Corners

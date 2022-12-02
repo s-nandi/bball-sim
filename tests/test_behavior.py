@@ -9,7 +9,7 @@ from bball_server import (
     ReachPositionBehavior,
 )
 from bball_server.utils import close_to, approx
-from .utils import create_initialized_player, create_space
+from bball_server.create import create_initialized_player, create_space
 
 
 def test_steady_velocity_behavior():
