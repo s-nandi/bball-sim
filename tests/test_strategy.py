@@ -1,3 +1,4 @@
+import math
 import pytest
 from bball import Team, BallMode
 from bball.strategy import RunToBasketAndShoot, StandBetweenBasket
@@ -7,6 +8,9 @@ from bball.create import (
     create_space,
     create_game,
     create_court,
+    create_guaranteed_shot_probability,
+    create_player_attributes,
+    create_strategy,
 )
 
 
@@ -59,3 +63,23 @@ def test_stand_between_player_and_basket(attacker_accel):
         assert player_1.position[0] <= player_2.position[0] <= target_hoop.position[0]
         strategy.drive(game)
         space.step(time_frame)
+
+
+def test_scoring_with_composite_strategy():
+    duration = 50
+    time_frame = 0.2
+    attributes = create_player_attributes(
+        shot_probability=create_guaranteed_shot_probability()
+    )
+    player_1 = create_initialized_player(position=(4, 4), attributes=attributes)
+    player_2 = create_initialized_player(position=(7, 7), attributes=attributes)
+    court = create_court()
+    game = create_game(teams=[Team(player_1), Team(player_2)], court=court)
+    space = create_space().add(game)
+    strategies = [create_strategy(team, time_frame) for team in game.teams]
+    num_steps = math.ceil(duration / time_frame)
+    for _ in range(num_steps):
+        for strategy in strategies:
+            strategy.drive(game)
+        space.step(time_frame)
+    assert game.score[0] > 0 and game.score[1] > 0

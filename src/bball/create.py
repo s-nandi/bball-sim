@@ -16,6 +16,7 @@ from bball import (
     Game,
     GameSettings,
 )
+from bball.strategy import CompositeStrategy, RunToBasketAndShoot, StandBetweenBasket
 
 
 def create_space() -> Space:
@@ -150,3 +151,15 @@ def create_game(
     if settings is None:
         settings = create_game_settings()
     return Game(_normalized_teams(teams), ball, court, settings)
+
+
+def create_strategy(
+    team: Team, time_frame: float, offensive_distance_threshold: float = 5.0
+):
+    return CompositeStrategy(
+        team,
+        RunToBasketAndShoot,
+        StandBetweenBasket,
+        time_frame,
+        offensive_strategy_params=dict(distance_threshold=offensive_distance_threshold),
+    )

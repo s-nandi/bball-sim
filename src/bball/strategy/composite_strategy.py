@@ -16,12 +16,17 @@ class CompositeStrategy:
         defensive_strategy_type: Type[StrategyInterface],
         time_frame: float,
         *,
-        offensive_strategy_params,
-        defensive_strategy_params,
+        offensive_strategy_params=None,
+        defensive_strategy_params=None,
     ):
+        if offensive_strategy_params is None:
+            offensive_strategy_params = {}
+        if defensive_strategy_params is None:
+            defensive_strategy_params = {}
+
         self.team = team
         self.offensive_strategy = offensive_strategy_type(
-            team, time_frame, *offensive_strategy_params
+            team, time_frame, **offensive_strategy_params
         )
         self.defensive_strategy = defensive_strategy_type(
             team, time_frame, *defensive_strategy_params
@@ -29,7 +34,8 @@ class CompositeStrategy:
 
     def drive(self, game: Game):
         offensive_team_index = game.team_with_last_posession
-        assert offensive_team_index is not None
+        if offensive_team_index is None:
+            return
         if self.team == game.teams[offensive_team_index]:
             self.offensive_strategy.drive(game)
         else:

@@ -1,2 +1,3 @@
 from .run_to_basket import RunToBasketAndShoot
 from .stand_between_basket import StandBetweenBasket
+from .composite_strategy import CompositeStrategy
