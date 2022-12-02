@@ -1,14 +1,38 @@
 import math
-from dataclasses import dataclass
+from typing import Tuple
 import pygame
-from bball_server import DrawInterface, Color, Point, Corners
-from bball_server.draw import scale_up
+from bball_server import Game, DrawInterface, Color, Point, Corners
 
 
-@dataclass
-class DrawObject(DrawInterface):
+def scale_up(point: Point, scale: float):
+    return (point[0] * scale, point[1] * scale)
+
+
+def scale_while_maintaining_resolution(
+    max_w: float, max_h: float, target_w_to_h: float
+) -> Tuple[float, float]:
+    max_scale = min(max_w / target_w_to_h, max_h / 1)
+    return (max_scale * target_w_to_h, max_scale)
+
+
+def max_resolution_for(game: Game, display_scale=0.5):
+    width, height = game.court.dimensions
+    pygame.init()
+    display_info = pygame.display.Info()
+    return scale_while_maintaining_resolution(
+        display_info.current_w * display_scale,
+        display_info.current_h * display_scale,
+        width / height,
+    )
+
+
+class Drawer(DrawInterface):
     surface: pygame.surface.Surface
     scale: float
+
+    def __init__(self, surface: pygame.surface.Surface, scale: float):
+        self.surface = surface
+        self.scale = scale
 
     def _draw_circle(
         self, center: Point, radius: float, color: Color, thickness_or_fill: float

@@ -19,6 +19,10 @@ class Court:
             assert self._contains_position(hoop.position)
 
     @property
+    def dimensions(self) -> Tuple[float, float]:
+        return self.width, self.height
+
+    @property
     def width(self) -> float:
         return self._dimensions[0]
 

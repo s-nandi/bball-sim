@@ -3,7 +3,6 @@ from bball_server.game import Game, Score
 from bball_server.ball import Ball
 from bball_server.team import Teams
 from bball_server.court import Court, Hoop, ThreePointLine, RectangleThreePointLine
-from bball_server.utils import Point
 from bball_server.draw_interface import DrawInterface
 
 BALL_RADIUS = 0.2
@@ -15,10 +14,6 @@ COURT_LINE_COLOR = (0, 103, 130)
 COURT_LINE_THICKNESS = 7
 HOOP_COLOR = BLACK
 TEXT_COLOR = BLACK
-
-
-def scale_up(point: Point, scale: float):
-    return (point[0] * scale, point[1] * scale)
 
 
 def draw_teams(draw_object: DrawInterface, teams: Teams):

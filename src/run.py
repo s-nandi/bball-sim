@@ -7,10 +7,10 @@ from bball_server.create import (
     create_hoop,
     create_three_point_line,
 )
-from engine import Engine
+from runner import run_game
 
 
-def setup_game() -> Game:
+def initial_game() -> Game:
     attributes = create_player_attributes(max_acceleration=2.34)
     player_1 = create_initialized_player(position=(4, 4), attributes=attributes)
     player_2 = create_initialized_player(position=(7, 7), attributes=attributes)
@@ -23,9 +23,7 @@ def setup_game() -> Game:
 
 
 def main():
-    game = setup_game()
-    engine = Engine(game, lambda _: game.teams[0][0].accelerate(1))
-    engine.run()
+    run_game(initial_game(), fps=30)
 
 
 if __name__ == "__main__":
