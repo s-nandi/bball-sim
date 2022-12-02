@@ -82,7 +82,7 @@ class Game:
             if not self.ball.should_flip_posession
             else other_team_index(team_with_posession)
         )
-        player = self.teams[new_team_with_posession].random_player()
+        player = self.teams[new_team_with_posession][0]
         if not self.court.is_inbounds(player):
             return False
         self.ball.jump_ball_won_by(player)

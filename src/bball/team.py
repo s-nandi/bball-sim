@@ -17,10 +17,6 @@ class Team:
     def __getitem__(self, index):
         return self._players.__getitem__(index)
 
-    def random_player(self):
-        assert len(self._players) > 0
-        return self._players[0]
-
 
 class Teams:
     _teams: Tuple[Team, Team]
