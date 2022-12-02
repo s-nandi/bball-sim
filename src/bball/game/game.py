@@ -5,7 +5,7 @@ from bball.ball import BallMode, Ball
 from bball.court import Court, Hoop
 from bball.player import Player
 from bball.utils import close_to
-from bball.scoreboard import Score, Scoreboard
+from bball.game.scoreboard import Score, Scoreboard
 from bball.team import Team, Teams, other_team_index
 
 MonitoringFunction = Callable[[], bool]
