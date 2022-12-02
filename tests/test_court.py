@@ -1,6 +1,6 @@
 from typing import Tuple
-from bball_server import Court, Hoop, Player, Space
-from bball_server.create import (
+from bball import Court, Hoop, Player, Space
+from bball.create import (
     create_initialized_player,
     create_court,
     create_three_point_line,

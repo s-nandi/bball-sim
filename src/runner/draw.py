@@ -1,7 +1,7 @@
 import math
 from typing import Tuple
 import pygame
-from bball_server import Game, DrawInterface, Color, Point, Corners
+from bball import Game, DrawInterface, Color, Point, Corners
 
 
 def scale_up(point: Point, scale: float):

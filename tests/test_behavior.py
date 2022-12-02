@@ -1,15 +1,15 @@
 import math
 from random import uniform, seed
 import pytest
-from bball_server import (
+from bball import (
     Team,
     Teams,
     ReachVelocityBehavior,
     StopBehavior,
     ReachPositionBehavior,
 )
-from bball_server.utils import close_to, approx
-from bball_server.create import create_initialized_player, create_space
+from bball.utils import close_to, approx
+from bball.create import create_initialized_player, create_space
 
 seed(1)
 

@@ -1,5 +1,5 @@
-from bball_server.utils import close_to
-from bball_server.create import create_initialized_player, create_uninitialized_player
+from bball.utils import close_to
+from bball.create import create_initialized_player, create_uninitialized_player
 from ..utils import require_exception
 
 

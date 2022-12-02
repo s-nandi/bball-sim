@@ -1,8 +1,8 @@
 import math
 from dataclasses import dataclass
-from bball_server import BallMode, Scoreboard, Team
-from bball_server.utils import close_to, distance_between, approx
-from bball_server.create import (
+from bball import BallMode, Scoreboard, Team
+from bball.utils import close_to, distance_between, approx
+from bball.create import (
     create_initialized_player,
     create_space,
     create_game_settings,

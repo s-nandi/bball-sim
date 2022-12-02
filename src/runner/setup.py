@@ -1,4 +1,4 @@
-from bball_server import Game, Space, draw_game
+from bball import Game, Space, draw_game
 from simulation.engine import Engine
 from runner.draw import Drawer, max_resolution_for
 

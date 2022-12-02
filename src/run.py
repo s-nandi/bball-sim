@@ -1,5 +1,5 @@
-from bball_server import Game, Team
-from bball_server.create import (
+from bball import Game, Team
+from bball.create import (
     create_game,
     create_initialized_player,
     create_court,

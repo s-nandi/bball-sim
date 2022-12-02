@@ -1,8 +1,8 @@
 import pytest
-from bball_server import Team, BallMode
-from bball_server.strategy import EveryoneRunToBasketStrategy, StandBetweenBasket
-from bball_server.utils import distance_between
-from bball_server.create import (
+from bball import Team, BallMode
+from bball.strategy import EveryoneRunToBasketStrategy, StandBetweenBasket
+from bball.utils import distance_between
+from bball.create import (
     create_initialized_player,
     create_space,
     create_game,
