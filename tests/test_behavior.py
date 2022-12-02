@@ -106,12 +106,11 @@ def test_position_reaching(target_position):
     turn_steps = 360 / player.physical_attributes.max_turn_degrees / time_frame
     acceleration_steps = math.hypot(target_position[0], target_position[1]) / time_frame
     allowed_steps = turn_steps + acceleration_steps
-    # player.turn(uniform(-1, 1)).accelerate(uniform(-1, 1))
-    # space.step(time_frame)
     for _ in range(math.ceil(allowed_steps)):
         if not behavior.drive(player):
             break
         space.step(time_frame)
+    assert close_to(player.velocity, (0, 0))
     assert close_to(player.position, target_position)
 
 
@@ -132,4 +131,5 @@ def test_position_reaching_with_initial_movement(initial_steps, target_position)
         if not behavior.drive(player):
             break
         space.step(time_frame)
+    assert close_to(player.velocity, (0, 0))
     assert close_to(player.position, target_position)
