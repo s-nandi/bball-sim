@@ -12,6 +12,7 @@ BLACK = (0, 0, 0)
 TEAM_COLORS = [(153, 186, 221), (24, 70, 59)]
 BASKETBALL_COLOR = (238, 103, 48)
 COURT_LINE_COLOR = (0, 103, 130)
+COURT_LINE_THICKNESS = 7
 HOOP_COLOR = BLACK
 TEXT_COLOR = BLACK
 
@@ -24,14 +25,14 @@ def draw_teams(draw_object: DrawInterface, teams: Teams):
     for index, team in enumerate(teams):
         color = TEAM_COLORS[index]
         for player in team:
-            draw_object.draw_circle(player.position, 0.9, color, True)
+            draw_object.draw_filled_circle(player.position, 0.9, color)
 
 
 def draw_rectangular_three_point_line(
     draw_object: DrawInterface, line: RectangleThreePointLine
 ):
     corners = (line.x_lo, line.y_lo), (line.x_hi, line.y_hi)
-    draw_object.draw_rectangle(corners, COURT_LINE_COLOR, False)
+    draw_object.draw_rectangle(corners, COURT_LINE_COLOR, COURT_LINE_THICKNESS)
 
 
 def draw_three_point_line(draw_object: DrawInterface, line: ThreePointLine):
@@ -42,18 +43,22 @@ def draw_three_point_line(draw_object: DrawInterface, line: ThreePointLine):
 
 
 def draw_hoop(draw_object: DrawInterface, hoop: Hoop):
-    draw_object.draw_circle(hoop.position, 2 * BALL_RADIUS, HOOP_COLOR, False)
+    draw_object.draw_circle(
+        hoop.position, 2 * BALL_RADIUS, HOOP_COLOR, COURT_LINE_THICKNESS
+    )
 
 
 def draw_court_boundary(draw_object: DrawInterface, dimension: Tuple[float, float]):
     width, height = dimension
     corners = (0, 0), (width, height)
-    draw_object.draw_rectangle(corners, COURT_LINE_COLOR, False)
+    draw_object.draw_rectangle(corners, COURT_LINE_COLOR, COURT_LINE_THICKNESS)
 
 
 def draw_half_court_line(draw_object: DrawInterface, dimension: Tuple[float, float]):
     width, height = dimension
-    draw_object.draw_line((width / 2, 0), (width / 2, height), COURT_LINE_COLOR)
+    draw_object.draw_line(
+        (width / 2, 0), (width / 2, height), COURT_LINE_COLOR, COURT_LINE_THICKNESS
+    )
 
 
 def draw_court(draw_object: DrawInterface, court: Court):
@@ -65,7 +70,7 @@ def draw_court(draw_object: DrawInterface, court: Court):
 
 
 def draw_ball(draw_object: DrawInterface, ball: Ball):
-    draw_object.draw_circle(ball.position, BALL_RADIUS, BASKETBALL_COLOR, True)
+    draw_object.draw_filled_circle(ball.position, BALL_RADIUS, BASKETBALL_COLOR)
 
 
 def draw_score(draw_object: DrawInterface, score: Score):

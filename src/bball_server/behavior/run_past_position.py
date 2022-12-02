@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from bball_server.utils import Point, close_to, vector_angle_degrees, difference_between
 from bball_server.player import Player
 from bball_server.behavior.reach_orientation import ReachOrientationBehavior
