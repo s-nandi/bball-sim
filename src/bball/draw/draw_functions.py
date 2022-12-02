@@ -3,7 +3,7 @@ from bball.game import Game, Score
 from bball.ball import Ball
 from bball.team import Teams
 from bball.court import Court, Hoop, ThreePointLine, RectangleThreePointLine
-from bball.draw_interface import DrawInterface
+from bball.draw.draw_interface import DrawInterface
 
 BALL_RADIUS = 0.2
 
