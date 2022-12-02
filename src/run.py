@@ -1,29 +1,9 @@
-from bball import Game, Team
-from bball.create import (
-    create_game,
-    create_initialized_player,
-    create_court,
-    create_player_attributes,
-    create_hoop,
-    create_three_point_line,
-)
+from bball.initiate import two_uniform_players
 from runner import run_game
 
 
-def initial_game() -> Game:
-    attributes = create_player_attributes(max_acceleration=2.34)
-    player_1 = create_initialized_player(position=(4, 4), attributes=attributes)
-    player_2 = create_initialized_player(position=(7, 7), attributes=attributes)
-    width = 28.65
-    height = 15.24
-    three_point_line = create_three_point_line(width, height)
-    hoop = create_hoop(width, height, 1.6, three_point_line)
-    court = create_court(width, height, hoop)
-    return create_game(teams=[Team(player_1), Team(player_2)], court=court)
-
-
 def main():
-    run_game(initial_game(), fps=30)
+    run_game(two_uniform_players(), fps=30)
 
 
 if __name__ == "__main__":
