@@ -8,7 +8,7 @@ from bball.strategy.strategy_interface import StrategyInterface
 
 
 @dataclass
-class RunToBasket(StrategyInterface):
+class RunToBasketAndShoot(StrategyInterface):
     team: Team
     time_frame: float
     distance_threshold: float

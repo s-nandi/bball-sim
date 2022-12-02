@@ -1,6 +1,6 @@
 import pytest
 from bball import Team, BallMode
-from bball.strategy import RunToBasket, StandBetweenBasket
+from bball.strategy import RunToBasketAndShoot, StandBetweenBasket
 from bball.utils import distance_between
 from bball.create import (
     create_initialized_player,
@@ -20,7 +20,7 @@ def test_run_to_basket_strategy():
     time_frame = 1
     steps = 20
     threshold = 5
-    strategy = RunToBasket(
+    strategy = RunToBasketAndShoot(
         team=game.teams[0], time_frame=time_frame, distance_threshold=threshold
     )
     target_hoop = game.target_hoop(player)
