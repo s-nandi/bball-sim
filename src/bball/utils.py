@@ -127,10 +127,10 @@ def clamp(value: float, min_value: float, max_value: float) -> float:
     return max(min_value, min(value, max_value))
 
 
-def same_direction_as(point_1: Point, point_2: Point, point_3: Point) -> bool:
-    pt_1 = convert_to_vec2d(point_1)
-    pt_2 = convert_to_vec2d(point_2)
-    pt_3 = convert_to_vec2d(point_3)
+def in_between_of(candidate: Point, extreme_1: Point, extreme_2: Point) -> bool:
+    pt_1 = convert_to_vec2d(extreme_1)
+    pt_2 = convert_to_vec2d(candidate)
+    pt_3 = convert_to_vec2d(extreme_2)
     vec_1 = pt_2 - pt_1
     vec_2 = pt_3 - pt_2
     dot = vec_1.dot(convert_to_tuple(vec_2))

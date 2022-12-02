@@ -1,10 +1,9 @@
 from dataclasses import dataclass, field
-from typing import List, Union
+from typing import List
 from bball.game import Game
 from bball.player import Player
 from bball.team import Team, other_team_index
-from bball.behavior import RunPastPositionBehavior, StopBehavior
-from bball.utils import midpoint_of, sum_of, same_direction_as
+from bball.behavior import StandBetween
 from bball.strategy.strategy_interface import StrategyInterface
 
 
@@ -13,7 +12,7 @@ class StandBetweenBasket(StrategyInterface):
     team: Team
     time_frame: float
     _have_matchups: bool = field(init=False, default=False)
-    _behaviors: List[Union[StopBehavior, RunPastPositionBehavior]] = field(init=False)
+    _behaviors: List[StandBetween] = field(init=False)
     _opponent_team: Team = field(init=False)
     _matchups: List[Player] = field(init=False)
 
@@ -35,16 +34,8 @@ class StandBetweenBasket(StrategyInterface):
         index_player = enumerate(self.team)
         for (player_index, player), matchup in zip(index_player, self._matchups):
             target_hoop = game.target_hoop(matchup)
-            projected_matchup_position = sum_of(matchup.position, matchup.velocity)
-            midpoint = midpoint_of(target_hoop.position, projected_matchup_position)
-            already_in_front = same_direction_as(
-                target_hoop.position, player.position, midpoint
+            self._behaviors[player_index] = StandBetween(
+                matchup, target_hoop, self.time_frame
             )
-            if already_in_front:
-                self._behaviors[player_index] = StopBehavior(self.time_frame)
-            else:
-                self._behaviors[player_index] = RunPastPositionBehavior(
-                    midpoint, self.time_frame
-                )
         for behavior, player in zip(self._behaviors, self.team):
             behavior.drive(player)
