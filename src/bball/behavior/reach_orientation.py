@@ -5,7 +5,7 @@ from bball.behavior.utils import turn_multiplier
 
 
 @dataclass
-class ReachOrientationBehavior:
+class ReachOrientation:
     target_angle_degrees: float
     time_frame: float
 

@@ -4,9 +4,9 @@ import pytest
 from bball import (
     Team,
     Teams,
-    ReachVelocityBehavior,
-    StopBehavior,
-    ReachPositionBehavior,
+    ReachVelocity,
+    Stop,
+    ReachPosition,
 )
 from bball.utils import close_to, approx
 from bball.create import create_initialized_player, create_space
@@ -20,7 +20,7 @@ def test_steady_velocity_behavior():
     space = create_space().add(player)
     target_velocity = (-2, 2)
     time_frame = 1
-    behavior = ReachVelocityBehavior(target_velocity, time_frame)
+    behavior = ReachVelocity(target_velocity, time_frame)
     for _ in range(steps):
         if not behavior.drive(player):
             break
@@ -43,7 +43,7 @@ def test_steady_velocity_behavior_with_initial_movement(
     rotation_steps = 2 if target_velocity_x < 0 else 0
     acceleration_steps = abs(target_velocity_x)
     target_velocity = (target_velocity_x, 0)
-    behavior = ReachVelocityBehavior(target_velocity, time_frame)
+    behavior = ReachVelocity(target_velocity, time_frame)
     allowed_steps = initial_steps + (rotation_steps + acceleration_steps) / time_frame
     for _ in range(math.ceil(allowed_steps)):
         if not behavior.drive(team[0]):
@@ -72,7 +72,7 @@ def test_stopping_behavior(_trial_index, initial_steps):
     assert player_1.velocity[0] < 0
     assert player_2.velocity[0] > 0
     time_frame = 1
-    behavior = StopBehavior(time_frame)
+    behavior = Stop(time_frame)
     for _ in range(initial_steps):
         moved_1 = behavior.drive(player_1)
         moved_2 = behavior.drive(player_2)
@@ -104,7 +104,7 @@ def test_position_reaching(target_position):
     player = create_initialized_player()
     space = create_space().add(player)
     time_frame = 0.2
-    behavior = ReachPositionBehavior(target_position, time_frame)
+    behavior = ReachPosition(target_position, time_frame)
     turn_steps = 360 / player.physical_attributes.max_turn_degrees / time_frame
     acceleration_steps = math.hypot(target_position[0], target_position[1]) / time_frame
     allowed_steps = turn_steps + acceleration_steps
@@ -122,7 +122,7 @@ def test_position_reaching_with_initial_movement(initial_steps, target_position)
     player = create_initialized_player()
     space = create_space().add(player)
     time_frame = 0.2
-    behavior = ReachPositionBehavior(target_position, time_frame)
+    behavior = ReachPosition(target_position, time_frame)
     turn_steps = 360 / player.physical_attributes.max_turn_degrees / time_frame
     acceleration_steps = math.hypot(target_position[0], target_position[1]) / time_frame
     allowed_steps = turn_steps + acceleration_steps + initial_steps

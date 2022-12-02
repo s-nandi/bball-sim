@@ -5,7 +5,7 @@ from bball.behavior.utils import acceleration_multiplier
 
 
 @dataclass
-class ScheduledAccelerationBehavior:
+class ScheduledAcceleration:
     acceleration_with_counts: List[Tuple[float, int]]
     current_index: int = field(init=False, default=0)
     current_count: int = field(init=False, default=0)

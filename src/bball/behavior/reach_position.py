@@ -9,9 +9,9 @@ from bball.utils import (
     difference_between,
 )
 from bball.player import Player
-from bball.behavior.reach_orientation import ReachOrientationBehavior
-from bball.behavior.stop import StopBehavior
-from bball.behavior.scheduled_acceleration import ScheduledAccelerationBehavior
+from bball.behavior.reach_orientation import ReachOrientation
+from bball.behavior.stop import Stop
+from bball.behavior.scheduled_acceleration import ScheduledAcceleration
 
 
 def distance_covered(steps: int, a_max, time_frame):
@@ -40,26 +40,22 @@ def acceleration_for(distance: float, steps: int, a_max, time_frame):
 
 
 @dataclass
-class ReachPositionBehavior:
+class ReachPosition:
     target_position: Point
     time_frame: float
-    _scheduled_behavior: Optional[ScheduledAccelerationBehavior] = field(
+    _scheduled_behavior: Optional[ScheduledAcceleration] = field(
         init=False, default=None
     )
 
     def drive(self, player: Player) -> bool:
         if close_to(player.position, self.target_position):
-            return StopBehavior(self.time_frame).drive(player)
+            return Stop(self.time_frame).drive(player)
 
-        if self._scheduled_behavior is None and StopBehavior(self.time_frame).drive(
-            player
-        ):
+        if self._scheduled_behavior is None and Stop(self.time_frame).drive(player):
             return True
         position_delta = difference_between(self.target_position, player.position)
         target_orientation_degrees = vector_angle_degrees(position_delta)
-        if ReachOrientationBehavior(target_orientation_degrees, self.time_frame).drive(
-            player
-        ):
+        if ReachOrientation(target_orientation_degrees, self.time_frame).drive(player):
             self._scheduled_behavior = None
             return True
 
@@ -71,7 +67,7 @@ class ReachPositionBehavior:
             target_acceleration = acceleration_for(
                 distance, num_steps, max_acceleration, self.time_frame
             )
-            self._scheduled_behavior = ScheduledAccelerationBehavior(
+            self._scheduled_behavior = ScheduledAcceleration(
                 [
                     (target_acceleration, num_steps),
                     (0, 1),

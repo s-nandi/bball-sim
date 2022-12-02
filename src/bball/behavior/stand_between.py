@@ -2,8 +2,8 @@ from dataclasses import dataclass
 from typing import Union
 from bball.court import Hoop
 from bball.player import Player
-from bball.behavior.run_past_position import RunPastPositionBehavior
-from bball.behavior.stop import StopBehavior
+from bball.behavior.run_past_position import RunPastPosition
+from bball.behavior.stop import Stop
 from bball.utils import midpoint_of, sum_of, in_between_of, Point
 
 ObjectWithPosition = Union[Player, Hoop, Point]
@@ -35,5 +35,5 @@ class StandBetween:
             player.position, position_keep_behind, midpoint
         )
         if midpoint_is_in_front:
-            return StopBehavior(self.time_frame).drive(player)
-        return RunPastPositionBehavior(midpoint, self.time_frame).drive(player)
+            return Stop(self.time_frame).drive(player)
+        return RunPastPosition(midpoint, self.time_frame).drive(player)

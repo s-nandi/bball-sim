@@ -11,11 +11,11 @@ from bball.behavior.utils import (
     is_moving_in_orientation_direction,
     acceleration_multiplier,
 )
-from bball.behavior.reach_orientation import ReachOrientationBehavior
+from bball.behavior.reach_orientation import ReachOrientation
 
 
 @dataclass
-class ReachVelocityBehavior:
+class ReachVelocity:
     target_velocity: Vector
     time_frame: float
     target_angle_degrees: float = field(init=False)
@@ -40,9 +40,7 @@ class ReachVelocityBehavior:
         return True
 
     def drive(self, player: Player) -> bool:
-        if ReachOrientationBehavior(self.target_angle_degrees, self.time_frame).drive(
-            player
-        ):
+        if ReachOrientation(self.target_angle_degrees, self.time_frame).drive(player):
             return True
         if self._fix_velocity_magnitude_assuming_alignment(player):
             return True

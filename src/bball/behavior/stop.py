@@ -8,7 +8,7 @@ from bball.behavior.utils import (
 
 
 @dataclass
-class StopBehavior:
+class Stop:
     time_frame: float
 
     def drive(self, player: Player) -> bool:

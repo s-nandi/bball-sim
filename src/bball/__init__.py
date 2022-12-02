@@ -10,6 +10,6 @@ from .shot_probability import (
 from .game import Game, GameSettings
 from .scoreboard import Scoreboard, Score
 from .team import Team, Teams
-from .behavior import ReachVelocityBehavior, StopBehavior, ReachPositionBehavior
+from .behavior import ReachVelocity, Stop, ReachPosition
 from .draw import draw_game
 from .draw_interface import DrawInterface, Color, Point, Corners
