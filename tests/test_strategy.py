@@ -11,6 +11,7 @@ from bball.create import (
     create_guaranteed_shot_probability,
     create_player_attributes,
     create_strategy,
+    create_hoop,
 )
 
 
@@ -65,7 +66,7 @@ def test_stand_between_player_and_basket(attacker_accel):
 
 def test_scoring_with_composite_strategy():
     duration = 50
-    time_frame = 0.2
+    time_frame = 1 / 30
     attributes = create_player_attributes(
         shot_probability=create_guaranteed_shot_probability()
     )
@@ -83,14 +84,16 @@ def test_scoring_with_composite_strategy():
 
 
 def test_stay_relatively_on_court_with_composite_strategy():
-    duration = 300
-    time_frame = 0.2
+    duration = 50
+    time_frame = 1 / 30
+    width, height = 28, 15
     attributes = create_player_attributes(
         shot_probability=create_guaranteed_shot_probability(), max_acceleration=2.5
     )
     player_1 = create_initialized_player(position=(4, 4), attributes=attributes)
     player_2 = create_initialized_player(position=(7, 7), attributes=attributes)
-    court = create_court(28, 15)
+    hoop = create_hoop(width, height, 2)
+    court = create_court(width, height, hoop)
     game = create_game(teams=[Team(player_1), Team(player_2)], court=court)
     space = create_space().add(game)
     game.assign_team_strategy(0, create_strategy(5))
