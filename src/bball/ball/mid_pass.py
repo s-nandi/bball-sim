@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 import pymunk
 from bball.validator import valid_pass_velocity
-from bball.utils import convert_to_tuple
+from bball.utils import convert_to_tuple, approx
 from bball.ball.state import BallState
 from bball.ball.ball_mode import BallMode
 
@@ -43,7 +43,7 @@ class MidPass(BallState):
         receiver_position = self._players_involved.receiver.position
         distance = self._original_position.get_distance(receiver_position)
         covered = self._pass_velocity * self._time_since_pass
-        if covered >= distance:
+        if approx(covered, distance) or covered > distance:
             return self._complete_pass()
         fraction_completed = covered / distance
         assert 0.0 <= fraction_completed <= 1.0
