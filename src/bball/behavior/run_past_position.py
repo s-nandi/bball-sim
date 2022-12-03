@@ -9,10 +9,11 @@ from bball.behavior.utils import is_moving_in_orientation_direction
 @dataclass
 class RunPastPosition:
     target_position: Point
+    distance_threshold: float
     time_frame: float
 
     def drive(self, player: Player) -> bool:
-        if close_to(player.position, self.target_position):
+        if close_to(player.position, self.target_position, self.distance_threshold):
             return Stop(self.time_frame).drive(player)
 
         position_delta = difference_between(self.target_position, player.position)

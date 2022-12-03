@@ -36,4 +36,5 @@ class StandBetween:
         )
         if midpoint_is_in_front:
             return Stop(self.time_frame).drive(player)
-        return RunPastPosition(midpoint, self.time_frame).drive(player)
+        player_size = player.physical_attributes.size
+        return RunPastPosition(midpoint, 2 * player_size, self.time_frame).drive(player)

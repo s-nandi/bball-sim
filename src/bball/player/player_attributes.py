@@ -12,6 +12,7 @@ class PlayerAttributes:
     @dataclass
     class Physical:
         mass: float
+        size: float
         max_acceleration: float
         max_turn_degrees: float
         velocity_decay: float

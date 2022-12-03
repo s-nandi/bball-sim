@@ -8,7 +8,6 @@ from bball.utils import angle_degrees_to_vector, sum_of
 from bball.draw.draw_interface import DrawInterface, Color
 
 BALL_RADIUS = 0.2
-PLAYER_RADIUS = 0.9
 PLAYER_ORIENTATION_THICKNESS = 5
 
 BLACK = (0, 0, 0)
@@ -21,8 +20,9 @@ TEXT_COLOR = BLACK
 
 
 def draw_player(draw_object: DrawInterface, player: Player, color: Color):
-    draw_object.draw_filled_circle(player.position, PLAYER_RADIUS, color)
-    delta = angle_degrees_to_vector(player.orientation_degrees, PLAYER_RADIUS)
+    radius = player.physical_attributes.size
+    draw_object.draw_filled_circle(player.position, radius, color)
+    delta = angle_degrees_to_vector(player.orientation_degrees, radius)
     draw_object.draw_line(
         player.position,
         sum_of(player.position, delta),
