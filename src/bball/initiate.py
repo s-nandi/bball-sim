@@ -11,10 +11,14 @@ from bball.create import (
 
 def two_uniform_players() -> Game:
     attributes = create_player_attributes(max_acceleration=2.34, max_turn_degrees=360)
-    player_1 = create_initialized_player(position=(4, 4), attributes=attributes)
-    player_2 = create_initialized_player(position=(7, 7), attributes=attributes)
     width = 28.65
     height = 15.24
+    player_1 = create_initialized_player(
+        position=(4, height / 2 + 2), attributes=attributes
+    )
+    player_2 = create_initialized_player(
+        position=(4, height / 2 - 2), attributes=attributes
+    )
     three_point_line = create_three_point_line(width, height)
     hoop = create_hoop(width, height, 1.6, three_point_line)
     court = create_court(width, height, hoop)
