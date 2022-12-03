@@ -13,9 +13,16 @@ def loop(game: Game, drawer: Drawer, time_step: float):
     return _loop
 
 
-def run_game(game: Game, fps: int):
+def run_game(game: Game, fps: int, monitor=None):
     resolution = max_resolution_for(game)
     engine = Engine(resolution, fps)
     drawer = Drawer(engine.surface, resolution[0] / game.court.dimensions[0])
-    callback = loop(game, drawer, 1 / fps)
-    engine.run(callback)
+
+    main_loop = loop(game, drawer, 1 / fps)
+
+    def game_loop():
+        if monitor is not None:
+            monitor()
+        main_loop()
+
+    engine.run(game_loop)
