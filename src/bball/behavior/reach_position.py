@@ -40,7 +40,7 @@ class ReachPosition:
 
             num_steps = min_steps_needed(max_acceleration, distance, self.time_frame)
             target_acceleration = acceleration_for(
-                distance, max_acceleration, self.time_frame
+                max_acceleration, distance, self.time_frame
             )
             self._scheduled_behavior = ScheduledAcceleration(
                 [

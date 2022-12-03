@@ -48,7 +48,7 @@ def min_steps_needed(a_max: float, distance: float, time_frame: float):
     return num_steps
 
 
-def acceleration_for(distance: float, a_max: float, time_frame: float):
+def acceleration_for(a_max: float, distance: float, time_frame: float):
     steps = min_steps_needed(a_max, distance, time_frame)
     a_lo = 0.0
     a_hi = a_max
