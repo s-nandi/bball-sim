@@ -25,15 +25,15 @@ def test_run_to_basket_strategy():
     steps = 20
     threshold = 5
     strategy = RunToBasketAndShoot(
-        team=game.teams[0], time_frame=time_frame, distance_threshold=threshold
-    )
+        time_frame=time_frame, distance_threshold=threshold
+    ).for_team_index_in_game(0, game)
     target_hoop = game.target_hoop(player)
     did_shoot = False
     for _ in range(steps):
         is_close_enough = (
             distance_between(player.position, target_hoop.position) <= threshold
         )
-        strategy.drive(game)
+        strategy.drive()
         space.step(time_frame)
         if ball.mode in [BallMode.MIDSHOT, BallMode.REACHEDSHOT]:
             did_shoot = True
@@ -56,12 +56,12 @@ def test_stand_between_player_and_basket(attacker_accel):
     ball.jump_ball_won_by(player_1)
     player_1.accelerate(attacker_accel)
     time_frame = 0.1
-    strategy = StandBetweenBasket(team=game.teams[1], time_frame=time_frame)
+    strategy = StandBetweenBasket(time_frame=time_frame).for_team_index_in_game(1, game)
     target_hoop = game.target_hoop(player_1)
     for _ in range(width - initial_padding - 1):
         assert player_1.position[0] <= target_hoop.position[0]
         assert player_1.position[0] <= player_2.position[0] <= target_hoop.position[0]
-        strategy.drive(game)
+        strategy.drive()
         space.step(time_frame)
 
 
@@ -76,10 +76,12 @@ def test_scoring_with_composite_strategy():
     court = create_court()
     game = create_game(teams=[Team(player_1), Team(player_2)], court=court)
     space = create_space().add(game)
-    strategies = [create_strategy(team, time_frame) for team in game.teams]
+    strategies = [
+        create_strategy(time_frame).for_team_index_in_game(i, game) for i in range(2)
+    ]
     num_steps = math.ceil(duration / time_frame)
     for _ in range(num_steps):
         for strategy in strategies:
-            strategy.drive(game)
+            strategy.drive()
         space.step(time_frame)
     assert game.score[0] > 0 and game.score[1] > 0

@@ -1,42 +1,32 @@
-from typing import Type, Optional, Dict
-from bball.game import Game
-from bball.team import Team
+from dataclasses import dataclass
 from bball.strategy.strategy_interface import StrategyInterface
 
 
+@dataclass
 class CompositeStrategy(StrategyInterface):
-    team: Team
     offensive_strategy: StrategyInterface
     defensive_strategy: StrategyInterface
 
-    # pylint: disable=too-many-arguments
     def __init__(
         self,
-        team: Team,
-        time_frame: float,
-        offensive_strategy_type: Type[StrategyInterface],
-        offensive_strategy_params: Optional[Dict],
-        defensive_strategy_type: Type[StrategyInterface],
-        defensive_strategy_params: Optional[Dict],
+        offensive_strategy: StrategyInterface,
+        defensive_strategy: StrategyInterface,
     ):
-        if offensive_strategy_params is None:
-            offensive_strategy_params = {}
-        if defensive_strategy_params is None:
-            defensive_strategy_params = {}
+        self.offensive_strategy = offensive_strategy
+        self.defensive_strategy = defensive_strategy
 
-        self.team = team
-        self.offensive_strategy = offensive_strategy_type(
-            team, time_frame, **offensive_strategy_params
-        )
-        self.defensive_strategy = defensive_strategy_type(
-            team, time_frame, *defensive_strategy_params
-        )
+    def _after_team_set(self):
+        self.offensive_strategy.for_team_index_in_game(
+            self._team_index, self._game
+        )._after_team_set()
+        self.defensive_strategy.for_team_index_in_game(self._team_index, self._game)
+        self.defensive_strategy._after_team_set()
 
-    def drive(self, game: Game):
-        offensive_team_index = game.team_with_last_posession
+    def drive(self):
+        offensive_team_index = self._game.team_with_last_posession
         if offensive_team_index is None:
             return
-        if self.team == game.teams[offensive_team_index]:
-            self.offensive_strategy.drive(game)
+        if offensive_team_index == self._team_index:
+            self.offensive_strategy.drive()
         else:
-            self.defensive_strategy.drive(game)
+            self.defensive_strategy.drive()
