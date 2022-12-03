@@ -1,9 +1,8 @@
 from __future__ import annotations
 from typing import Tuple, TYPE_CHECKING
+from bball.utils import position_of
 
 if TYPE_CHECKING:
-    from bball.player import Player
-    from bball.ball import Ball
     from bball.court.hoop import Hoop
     from bball.utils import Point, ObjectWithPosition
 
@@ -34,7 +33,7 @@ class Court:
         return self._hoops[index]
 
     def is_inbounds(self, obj: ObjectWithPosition) -> bool:
-        return self._contains_position(obj.position)
+        return self._contains_position(position_of(obj))
 
     def _contains_position(self, position: Point):
         inbounds = True

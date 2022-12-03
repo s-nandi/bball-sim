@@ -1,24 +1,13 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from dataclasses import dataclass
-from typing import Union
-from bball.court import Hoop
 from bball.player import Player
 from bball.behavior.run_past_position import RunPastPosition
 from bball.behavior.stop import Stop
-from bball.utils import midpoint_of, sum_of, in_between_of, Point
+from bball.utils import midpoint_of, in_between_of, projected_position_of
 
-ObjectWithPosition = Union[Player, Hoop, Point]
-
-
-def position_of(obj: ObjectWithPosition) -> Point:
-    if isinstance(obj, tuple):
-        return obj
-    return obj.position
-
-
-def projected_position_of(obj: ObjectWithPosition) -> Point:
-    if isinstance(obj, Player):
-        return sum_of(obj.position, obj.velocity)
-    return position_of(obj)
+if TYPE_CHECKING:
+    from bball.utils import ObjectWithPosition
 
 
 @dataclass

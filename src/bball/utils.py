@@ -1,3 +1,4 @@
+from __future__ import annotations
 import math
 from typing import Tuple, Union, TYPE_CHECKING
 import pymunk
@@ -7,13 +8,27 @@ Vector = Tuple[float, float]
 if TYPE_CHECKING:
     from bball.player import Player
     from bball.ball import Ball
+    from bball.court import Hoop
 
-    ObjectWithPosition = Union[Player, Ball]
+    ObjectWithPosition = Union[Player, Hoop, Point, Ball]
 
 ZERO_VECTOR = (0, 0)
 BASE_DIRECTION = (1, 0)
 
 ROUND_DIGITS = 4
+
+
+def position_of(obj: ObjectWithPosition) -> Point:
+    if isinstance(obj, tuple):
+        return (obj[0], obj[1])
+    return obj.position
+
+
+def projected_position_of(obj: ObjectWithPosition) -> Point:
+    try:
+        return sum_of(obj.position, obj.velocity)  # type: ignore
+    except AttributeError:
+        return position_of(obj)
 
 
 def coords_to_string(tup: Tuple[float, float]) -> str:
