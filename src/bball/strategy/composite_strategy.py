@@ -16,17 +16,14 @@ class CompositeStrategy(StrategyInterface):
         self.defensive_strategy = defensive_strategy
 
     def _after_team_set(self):
-        self.offensive_strategy.for_team_index_in_game(
-            self._team_index, self._game
-        )._after_team_set()
+        self.offensive_strategy.for_team_index_in_game(self._team_index, self._game)
         self.defensive_strategy.for_team_index_in_game(self._team_index, self._game)
-        self.defensive_strategy._after_team_set()
 
-    def drive(self):
+    def _drive(self):
         offensive_team_index = self._game.team_with_last_posession
         if offensive_team_index is None:
             return
         if offensive_team_index == self._team_index:
-            self.offensive_strategy.drive()
+            self.offensive_strategy.drive(self._time_frame)
         else:
-            self.defensive_strategy.drive()
+            self.defensive_strategy.drive(self._time_frame)

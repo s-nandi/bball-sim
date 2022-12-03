@@ -24,16 +24,14 @@ def test_run_to_basket_strategy():
     time_frame = 1
     steps = 20
     threshold = 5
-    strategy = RunToBasketAndShoot(
-        time_frame=time_frame, distance_threshold=threshold
-    ).for_team_index_in_game(0, game)
+    strategy = RunToBasketAndShoot(threshold).for_team_index_in_game(0, game)
     target_hoop = game.target_hoop(player)
     did_shoot = False
     for _ in range(steps):
         is_close_enough = (
             distance_between(player.position, target_hoop.position) <= threshold
         )
-        strategy.drive()
+        strategy.drive(time_frame)
         space.step(time_frame)
         if ball.mode in [BallMode.MIDSHOT, BallMode.REACHEDSHOT]:
             did_shoot = True
@@ -56,12 +54,12 @@ def test_stand_between_player_and_basket(attacker_accel):
     ball.jump_ball_won_by(player_1)
     player_1.accelerate(attacker_accel)
     time_frame = 0.1
-    strategy = StandBetweenBasket(time_frame=time_frame).for_team_index_in_game(1, game)
+    strategy = StandBetweenBasket().for_team_index_in_game(1, game)
     target_hoop = game.target_hoop(player_1)
     for _ in range(width - initial_padding - 1):
         assert player_1.position[0] <= target_hoop.position[0]
         assert player_1.position[0] <= player_2.position[0] <= target_hoop.position[0]
-        strategy.drive()
+        strategy.drive(time_frame)
         space.step(time_frame)
 
 

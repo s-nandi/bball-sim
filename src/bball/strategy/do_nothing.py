@@ -5,5 +5,5 @@ class DoNothing(StrategyInterface):
     def _after_team_set(self):
         pass
 
-    def drive(self):
+    def _drive(self):
         pass

@@ -7,17 +7,16 @@ from bball.strategy.strategy_interface import StrategyInterface
 
 @dataclass
 class RunToBasketAndShoot(StrategyInterface):
-    time_frame: float
     distance_threshold: float
     _behaviors: List[Optional[ReachPosition]] = field(init=False)
 
     def _after_team_set(self):
         self._behaviors = [
-            ReachPosition(self._game.target_hoop(player).position, self.time_frame)
+            ReachPosition(self._game.target_hoop(player).position, self._time_frame)
             for player in self._team
         ]
 
-    def drive(self):
+    def _drive(self):
         for behavior, player in zip(self._behaviors, self._team):
             target_hoop = self._game.target_hoop(player)
             close_enough = (

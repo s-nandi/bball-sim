@@ -89,7 +89,7 @@ class Space:
         return self
 
     def _substep(self, time_frame: float):
-        self._run_strategies(self._games)
+        self._run_strategies(self._games, time_frame)
         self._step_each(self._players, time_frame)
         self._space.step(time_frame)
         if self._step_one(self._balls, time_frame):
@@ -97,12 +97,13 @@ class Space:
         if self._step_one(self._games, time_frame):
             return
 
-    def _run_strategies(self, games: Sequence[Game]):
+    def _run_strategies(self, games: Sequence[Game], time_frame: float):
         if len(games) == 0:
             return
+        assert len(games) == 1
         for team in games[0].teams:
             if team._strategy is not None:
-                team._strategy.drive()
+                team._strategy.drive(time_frame)
 
     def _step_each(self, objs: Sequence[StoredObject], time_frame: float):
         for obj in objs:

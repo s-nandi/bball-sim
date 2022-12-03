@@ -8,7 +8,6 @@ def loop(game: Game, drawer: Drawer, time_step: float):
 
     def _loop():
         draw_game(drawer, game)
-        game.teams[0][0].accelerate(1)
         space.step(time_step)
 
     return _loop
