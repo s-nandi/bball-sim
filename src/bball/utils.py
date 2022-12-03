@@ -73,9 +73,7 @@ def approx(value_1: float, value_2: float, eps: float = DEFAULT_EPS):
 
 
 def close_to(point_1: Point, point_2: Point, eps: float = DEFAULT_EPS) -> bool:
-    delta_x = point_1[0] - point_2[0]
-    delta_y = point_1[1] - point_2[1]
-    return approx(delta_x, 0, eps) and approx(delta_y, 0, eps)
+    return distance_between(point_1, point_2) <= eps
 
 
 def distance_between(point_1: Point, point_2: Point) -> float:
