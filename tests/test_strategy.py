@@ -80,3 +80,35 @@ def test_scoring_with_composite_strategy():
     for _ in range(num_steps):
         space.step(time_frame)
     assert game.score[0] > 0 and game.score[1] > 0
+
+
+def test_stay_relatively_on_court_with_composite_strategy():
+    duration = 300
+    time_frame = 0.2
+    attributes = create_player_attributes(
+        shot_probability=create_guaranteed_shot_probability(), max_acceleration=2.5
+    )
+    player_1 = create_initialized_player(position=(4, 4), attributes=attributes)
+    player_2 = create_initialized_player(position=(7, 7), attributes=attributes)
+    court = create_court(28, 15)
+    game = create_game(teams=[Team(player_1), Team(player_2)], court=court)
+    space = create_space().add(game)
+    game.assign_team_strategy(0, create_strategy(5))
+    game.assign_team_strategy(1, create_strategy(3))
+    num_steps = math.ceil(duration / time_frame)
+
+    def assert_relatively_on_court(player, threshold: float):
+        position_x = player.position[0]
+        position_y = player.position[1]
+        width = court.width
+        height = court.height
+        assert position_x >= -threshold
+        assert position_x <= width + threshold
+        assert position_y >= -threshold
+        assert position_y <= height + threshold
+
+    threshold = 1
+    for _ in range(num_steps):
+        assert_relatively_on_court(player_1, threshold)
+        assert_relatively_on_court(player_2, threshold)
+        space.step(time_frame)
