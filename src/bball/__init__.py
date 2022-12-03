@@ -12,3 +12,4 @@ from .team import Team, Teams
 from .behavior import ReachVelocity, Stop, ReachPosition
 from .draw import draw_game, DrawInterface, Color, Corners
 from .utils import Point
+from .strategy import StrategyInterface, DoNothing

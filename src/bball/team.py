@@ -1,9 +1,14 @@
-from typing import List, Tuple
-from bball.player import Player
+from __future__ import annotations
+from typing import List, Tuple, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from bball.player import Player
+    from bball.strategy import StrategyInterface
 
 
 class Team:
     _players: List[Player]
+    _strategy: Optional[StrategyInterface] = None
 
     def __init__(self, *players: Player):
         self._players = list(players)

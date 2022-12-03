@@ -7,6 +7,7 @@ from bball.player import Player
 from bball.utils import close_to
 from bball.game.scoreboard import Score, Scoreboard
 from bball.team import Team, Teams, other_team_index
+from bball.strategy import StrategyInterface
 
 MonitoringFunction = Callable[[], bool]
 
@@ -23,6 +24,10 @@ class Game:
     court: Court
     settings: GameSettings = field(default_factory=GameSettings)
     _scoreboard: Scoreboard = field(init=False, default_factory=Scoreboard)
+
+    def assign_team_strategy(self, team_index: int, strategy: StrategyInterface):
+        strategy.for_team_index_in_game(team_index, self)
+        self.teams[team_index]._strategy = strategy
 
     @property
     def _checks(self) -> List[MonitoringFunction]:

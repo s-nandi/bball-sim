@@ -1,7 +1,10 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
-from bball.game import Game
-from bball.team import Team
+
+if TYPE_CHECKING:
+    from bball.game import Game
+    from bball.team import Team
 
 
 class StrategyInterface(ABC):

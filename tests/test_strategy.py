@@ -76,12 +76,9 @@ def test_scoring_with_composite_strategy():
     court = create_court()
     game = create_game(teams=[Team(player_1), Team(player_2)], court=court)
     space = create_space().add(game)
-    strategies = [
-        create_strategy(time_frame).for_team_index_in_game(i, game) for i in range(2)
-    ]
+    for team_index in range(2):
+        game.assign_team_strategy(team_index, create_strategy(time_frame))
     num_steps = math.ceil(duration / time_frame)
     for _ in range(num_steps):
-        for strategy in strategies:
-            strategy.drive()
         space.step(time_frame)
     assert game.score[0] > 0 and game.score[1] > 0
