@@ -85,6 +85,7 @@ def test_stopping_behavior(_trial_index, initial_steps):
 
 
 TARGET_POSITIONS = [
+    (0.84, 0),
     (1.2, 0),
     (1.21, 0),
     (4.5, 0.001),
