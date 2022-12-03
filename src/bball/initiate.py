@@ -1,12 +1,15 @@
 from bball import Game, Team
 from bball.create import (
     create_game,
+    create_game_settings,
     create_initialized_player,
     create_court,
     create_player_attributes,
     create_hoop,
     create_three_point_line,
 )
+
+USE_EXPECTED_VALUE = True
 
 
 def two_uniform_players() -> Game:
@@ -22,4 +25,8 @@ def two_uniform_players() -> Game:
     three_point_line = create_three_point_line(width, height)
     hoop = create_hoop(width, height, 1.6, three_point_line)
     court = create_court(width, height, hoop)
-    return create_game(teams=[Team(player_1), Team(player_2)], court=court)
+    return create_game(
+        teams=[Team(player_1), Team(player_2)],
+        court=court,
+        settings=create_game_settings(USE_EXPECTED_VALUE),
+    )

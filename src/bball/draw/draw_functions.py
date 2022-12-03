@@ -84,7 +84,10 @@ def draw_ball(draw_object: DrawInterface, ball: Ball):
 
 
 def draw_score(draw_object: DrawInterface, score: Score):
-    draw_object.write_text((40, 25), TEXT_COLOR, f"{score[0]} - {score[1]}", 30)
+    format_score = lambda val: str(round(val, 2))
+    score_0 = format_score(score[0])
+    score_1 = format_score(score[1])
+    draw_object.write_text((40, 25), TEXT_COLOR, f"{score_0}  -  {score_1}", 35)
 
 
 def draw_game(draw_object: DrawInterface, game: Game):
