@@ -3,7 +3,7 @@ def valid_max_acceleration(acceleration: float) -> bool:
 
 
 def valid_max_turn_degrees(turn_degrees: float) -> bool:
-    return 0 <= turn_degrees <= 180
+    return 0 <= turn_degrees
 
 
 def valid_multiplier(strength: float) -> bool:

@@ -24,7 +24,7 @@ class RunToBasketAndShoot(StrategyInterface):
                 <= self.distance_threshold
             )
             if player.has_ball and close_enough:
-                player.shoot_at(target_hoop.position, 1)
+                player.shoot_at(target_hoop.position, 10)
             else:
                 assert behavior is not None
                 behavior.drive(player)
