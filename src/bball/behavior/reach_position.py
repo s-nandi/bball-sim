@@ -11,7 +11,7 @@ from bball.player import Player
 from bball.behavior.reach_orientation import ReachOrientation
 from bball.behavior.stop import Stop
 from bball.behavior.scheduled_acceleration import ScheduledAcceleration
-from bball.behavior.utils import acceleration_for, min_steps_needed
+from bball.behavior.utils import acceleration_for
 
 
 @dataclass
@@ -37,16 +37,14 @@ class ReachPosition:
         if self._scheduled_behavior is None:
             distance = vector_length(position_delta)
             max_acceleration = player.physical_attributes.max_acceleration
-
-            num_steps = min_steps_needed(max_acceleration, distance, self.time_frame)
-            target_acceleration = acceleration_for(
-                max_acceleration, distance, self.time_frame
+            target_acceleration, num_steps = acceleration_for(
+                max_acceleration, 0.0, distance, self.time_frame
             )
             self._scheduled_behavior = ScheduledAcceleration(
                 [
-                    (target_acceleration, num_steps),
+                    (target_acceleration, num_steps / 2),
                     (0, 1),
-                    (-target_acceleration, num_steps),
+                    (-target_acceleration, num_steps / 2),
                 ]
             )
         return self._scheduled_behavior.drive(player)

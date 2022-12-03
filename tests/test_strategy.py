@@ -2,7 +2,7 @@ import math
 import pytest
 from bball import Team, BallMode
 from bball.strategy import RunToBasketAndShoot, StandBetweenBasket
-from bball.utils import distance_between
+from bball.utils import distance_between, close_to
 from bball.create import (
     create_initialized_player,
     create_space,
@@ -87,6 +87,7 @@ def test_scoring_with_composite_strategy():
 def test_stay_relatively_on_court_with_composite_strategy():
     duration = 50
     time_frame = 1 / 30
+    num_steps = math.ceil(duration / time_frame)
     width, height = 28, 15
     attributes = create_player_attributes(
         shot_probability=create_guaranteed_shot_probability(), max_acceleration=2.5
@@ -99,7 +100,6 @@ def test_stay_relatively_on_court_with_composite_strategy():
     space = create_space().add(game)
     game.assign_team_strategy(0, create_strategy(5))
     game.assign_team_strategy(1, create_strategy(3))
-    num_steps = math.ceil(duration / time_frame)
 
     def assert_relatively_on_court(player, threshold: float):
         position_x = player.position[0]
@@ -115,4 +115,33 @@ def test_stay_relatively_on_court_with_composite_strategy():
     for _ in range(num_steps):
         assert_relatively_on_court(player_1, threshold)
         assert_relatively_on_court(player_2, threshold)
+        space.step(time_frame)
+
+
+def test_stay_close_with_composite_strategy():
+    duration = 250
+    time_frame = 1 / 30
+    num_steps = math.ceil(duration / time_frame)
+    attributes = create_player_attributes(max_acceleration=2, max_turn_degrees=480)
+    width = 20
+    height = 15
+    player_1 = create_initialized_player(
+        position=(4, height / 2 + 0.5), attributes=attributes
+    )
+    player_2 = create_initialized_player(
+        position=(4, height / 2 - 0.5), attributes=attributes
+    )
+    hoop = create_hoop(width, height, offset_from_left=2)
+    court = create_court(width, height, hoop)
+    game = create_game(teams=[Team(player_1), Team(player_2)], court=court)
+    space = create_space().add(game)
+    game.assign_team_strategy(0, create_strategy(0.01))
+    game.assign_team_strategy(1, create_strategy(0.01))
+
+    threshold = 1.5
+    # First, get into steady state where players trail behind each other
+    for _ in range(num_steps):
+        space.step(time_frame)
+    for _ in range(num_steps):
+        assert close_to(player_1.position, player_2.position, threshold)
         space.step(time_frame)
