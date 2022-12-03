@@ -72,11 +72,12 @@ def test_scoring_with_composite_strategy():
     )
     player_1 = create_initialized_player(position=(4, 4), attributes=attributes)
     player_2 = create_initialized_player(position=(7, 7), attributes=attributes)
-    court = create_court()
+    hoop = create_hoop(offset_from_left=0.2)
+    court = create_court(hoop=hoop)
     game = create_game(teams=[Team(player_1), Team(player_2)], court=court)
     space = create_space().add(game)
     for team_index in range(2):
-        game.assign_team_strategy(team_index, create_strategy(time_frame))
+        game.assign_team_strategy(team_index, create_strategy(0.1))
     num_steps = math.ceil(duration / time_frame)
     for _ in range(num_steps):
         space.step(time_frame)
