@@ -1,11 +1,15 @@
 from typing import Tuple
+from bball.player import Player
 from bball.game import Game, Score
 from bball.ball import Ball
 from bball.team import Teams
 from bball.court import Court, Hoop, ThreePointLine, RectangleThreePointLine
-from bball.draw.draw_interface import DrawInterface
+from bball.utils import angle_degrees_to_vector, sum_of
+from bball.draw.draw_interface import DrawInterface, Color
 
 BALL_RADIUS = 0.2
+PLAYER_RADIUS = 0.9
+PLAYER_ORIENTATION_THICKNESS = 5
 
 BLACK = (0, 0, 0)
 TEAM_COLORS = [(153, 186, 221), (24, 70, 59)]
@@ -16,11 +20,22 @@ HOOP_COLOR = BLACK
 TEXT_COLOR = BLACK
 
 
+def draw_player(draw_object: DrawInterface, player: Player, color: Color):
+    draw_object.draw_filled_circle(player.position, PLAYER_RADIUS, color)
+    delta = angle_degrees_to_vector(player.orientation_degrees, PLAYER_RADIUS)
+    draw_object.draw_line(
+        player.position,
+        sum_of(player.position, delta),
+        BLACK,
+        PLAYER_ORIENTATION_THICKNESS,
+    )
+
+
 def draw_teams(draw_object: DrawInterface, teams: Teams):
     for index, team in enumerate(teams):
         color = TEAM_COLORS[index]
         for player in team:
-            draw_object.draw_filled_circle(player.position, 0.9, color)
+            draw_player(draw_object, player, color)
 
 
 def draw_rectangular_three_point_line(
