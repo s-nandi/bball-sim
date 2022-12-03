@@ -26,9 +26,13 @@ def create_three_point_line(
     return line
 
 
+DEFAULT_WIDTH = 12
+DEFAULT_HEIGHT = 5
+
+
 def create_hoop(
-    width: float,
-    height: float,
+    width: float = DEFAULT_WIDTH,
+    height: float = DEFAULT_HEIGHT,
     offset_from_left: float = 0.0,
     three_point_line: Optional[ThreePointLine] = None,
 ):
