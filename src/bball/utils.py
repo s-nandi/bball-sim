@@ -140,6 +140,10 @@ def clamp(value: float, min_value: float, max_value: float) -> float:
     return max(min_value, min(value, max_value))
 
 
+def dot_product(vector_1: Vector, vector_2: Vector) -> float:
+    return convert_to_vec2d(vector_1).dot(vector_2)
+
+
 def in_between_of(candidate: Point, extreme_1: Point, extreme_2: Point) -> bool:
     pt_1 = convert_to_vec2d(extreme_1)
     pt_2 = convert_to_vec2d(candidate)
