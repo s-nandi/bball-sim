@@ -22,9 +22,9 @@ def loop(game: Game, engine: Engine, drawer: Drawer, time_step: float):
     return _loop
 
 
-def run_game(game: Game, fps: int, monitor=None):
-    resolution = resolution_for(game)
-    padded_resolution = padded_resolution_for(game)
+def run_game(game: Game, fps: int, display_scale: float, monitor=None):
+    resolution = resolution_for(game, display_scale)
+    padded_resolution = padded_resolution_for(game, display_scale, display_scale)
     scale = resolution[0] / game.court.dimensions[0]
     padding = (padded_resolution[0] - resolution[0]) / 2
 
