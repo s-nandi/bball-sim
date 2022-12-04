@@ -26,7 +26,7 @@ class RunPastPosition:
     time_frame: float
 
     def drive(self, player: Player) -> bool:
-        if close_to(player.position, self.target_position):
+        if close_to(player.position, self.target_position, self.distance_threshold):
             return Stop(self.time_frame).drive(player)
 
         position_delta = difference_between(self.target_position, player.position)

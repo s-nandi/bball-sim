@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 @dataclass
 class RunToTargetAndShoot(StrategyInterface):
     target: ObjectWithPosition
-    distance_threshold: float
+    shooting_distance: float
     _behaviors: List[RunPastPosition] = field(init=False)
 
     def update_behaviors(self):
@@ -29,7 +29,7 @@ class RunToTargetAndShoot(StrategyInterface):
         for behavior, player in zip(self._behaviors, self._team):
             close_enough = (
                 distance_between(player.position, position_of(self.target))
-                <= self.distance_threshold
+                <= self.shooting_distance
             )
             if player.has_ball and close_enough:
                 target_hoop = self._game.target_hoop(player)
