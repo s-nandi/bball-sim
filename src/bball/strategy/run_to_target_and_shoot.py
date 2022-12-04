@@ -1,8 +1,8 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List, TYPE_CHECKING
-from bball.behavior import ReachPosition
-from bball.utils import distance_between, position_of
+from bball.behavior import RunPastPosition
+from bball.utils import distance_between, position_of, DEFAULT_EPS
 from bball.strategy.strategy_interface import StrategyInterface
 
 if TYPE_CHECKING:
@@ -13,15 +13,19 @@ if TYPE_CHECKING:
 class RunToTargetAndShoot(StrategyInterface):
     target: ObjectWithPosition
     distance_threshold: float
-    _behaviors: List[ReachPosition] = field(init=False)
+    _behaviors: List[RunPastPosition] = field(init=False)
 
-    def _after_team_set(self):
+    def update_behaviors(self):
         self._behaviors = [
-            ReachPosition(position_of(self.target), self._time_frame)
+            RunPastPosition(position_of(self.target), DEFAULT_EPS, self._time_frame)
             for _ in self._team
         ]
 
+    def _after_team_set(self):
+        self.update_behaviors()
+
     def _drive(self):
+        self.update_behaviors()
         for behavior, player in zip(self._behaviors, self._team):
             close_enough = (
                 distance_between(player.position, position_of(self.target))

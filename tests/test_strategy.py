@@ -146,7 +146,7 @@ def test_stay_close_with_composite_strategy():
     game.assign_team_strategy(1, create_strategy(0.01))
     space = create_space().add(game)
 
-    threshold = 1.5
+    threshold = 1.8
     # First, get into steady state where players trail behind each other
     for _ in range(num_steps):
         space.step(time_frame)
