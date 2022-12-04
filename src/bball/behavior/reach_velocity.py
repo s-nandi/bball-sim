@@ -27,7 +27,6 @@ class ReachVelocity:
     def _fix_velocity_magnitude_assuming_alignment(self, player: Player) -> bool:
         if close_to(player.velocity, self.target_velocity):
             return False
-
         moving_in_orientation_direction = is_moving_in_orientation_direction(
             player.velocity, player.orientation_degrees
         )
@@ -35,7 +34,7 @@ class ReachVelocity:
             delta = vector_length(self.target_velocity) - vector_length(player.velocity)
         else:
             delta = vector_length(self.target_velocity) + vector_length(player.velocity)
-        multiplier = acceleration_multiplier(player, delta, self.time_frame)
+        multiplier = acceleration_multiplier(player, delta / self.time_frame)
         player.accelerate(multiplier)
         return True
 

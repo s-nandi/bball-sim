@@ -9,15 +9,13 @@ from bball.utils import (
 from bball.player import Player
 
 
-def turn_multiplier(player: Player, turn_degrees: float, time_frame: float) -> float:
-    multiplier = turn_degrees / time_frame / player.physical_attributes.max_turn_degrees
+def turn_multiplier(player: Player, turn_degrees: float) -> float:
+    multiplier = turn_degrees / player.physical_attributes.max_turn_degrees
     return clamp(multiplier, -1.0, 1.0)
 
 
-def acceleration_multiplier(
-    player: Player, acceleration: float, time_frame: float = 1.0
-) -> float:
-    multiplier = acceleration / time_frame / player.physical_attributes.max_acceleration
+def acceleration_multiplier(player: Player, acceleration: float) -> float:
+    multiplier = acceleration / player.physical_attributes.max_acceleration
     return clamp(multiplier, -1.0, 1.0)
 
 

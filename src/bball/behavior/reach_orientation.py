@@ -23,6 +23,6 @@ class ReachOrientation:
         delta = turn_degrees_required(
             player.orientation_degrees, self.target_angle_degrees
         )
-        multiplier = turn_multiplier(player, delta, self.time_frame)
+        multiplier = turn_multiplier(player, delta / self.time_frame)
         player.turn(multiplier)
         return True

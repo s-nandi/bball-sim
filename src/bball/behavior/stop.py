@@ -21,6 +21,6 @@ class Stop:
             delta = -vector_length(player.velocity)
         else:
             delta = vector_length(player.velocity)
-        multiplier = acceleration_multiplier(player, delta, self.time_frame)
+        multiplier = acceleration_multiplier(player, delta / self.time_frame)
         player.accelerate(multiplier)
         return True
