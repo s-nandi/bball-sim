@@ -2,7 +2,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Tuple, Optional, TYPE_CHECKING
 from bball.validator import valid_positive_multiplier
-from bball.utils import interpolate
 
 if TYPE_CHECKING:
     from bball.player import Player
@@ -22,18 +21,9 @@ class InboundData:
             assert valid_positive_multiplier(position_multiplier[0])
             assert valid_positive_multiplier(position_multiplier[1])
 
-    def _map_multiplier_to_position(
-        self,
-        multiplier: Point,
-        half_court: HalfCourt,
-    ) -> Point:
-        x_position = interpolate(half_court.back, half_court.front, multiplier[0])
-        y_position = interpolate(half_court.left, half_court.right, multiplier[1])
-        return (x_position, y_position)
-
     def positions_for_half_court(self, half_court: HalfCourt):
         return [
-            self._map_multiplier_to_position(multiplier, half_court)
+            half_court.multiplier_to_position(multiplier)
             for multiplier in self.position_multipliers
         ]
 

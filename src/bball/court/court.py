@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Tuple, TYPE_CHECKING
-from bball.utils import position_of
+from bball.utils import position_of, interpolate
 
 if TYPE_CHECKING:
     from bball.court.hoop import Hoop
@@ -14,6 +14,11 @@ class HalfCourt:
     front: float
     left: float
     right: float
+
+    def multiplier_to_position(self, multiplier: Point) -> Point:
+        x_position = interpolate(self.back, self.front, multiplier[0])
+        y_position = interpolate(self.left, self.right, multiplier[1])
+        return (x_position, y_position)
 
 
 class Court:
