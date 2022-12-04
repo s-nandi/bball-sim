@@ -4,9 +4,9 @@ from experiment import initiate
 
 
 def main():
-    game = initiate.tests.setup_stay_relatively_on_court_with_composite_strategy(1.0)
+    game = initiate.tests.setup_collision_with_use_behavior(7, 2.0, 1.0)
 
-    monitor = Monitor(1.0)
+    monitor = Monitor(float("inf"))
     run_game(game, fps=60, monitor=lambda: monitor.monitor(game))
     print("max dist", monitor.max_distance)
     print("duration", monitor.time_since_start)
