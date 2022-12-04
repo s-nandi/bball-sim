@@ -8,6 +8,7 @@ from bball.create import (
     create_hoop,
     create_three_point_line,
     create_strategy,
+    create_guaranteed_shot_probability,
 )
 
 USE_EXPECTED_VALUE = True
@@ -63,18 +64,18 @@ def players_collision() -> Game:
 
 
 def test() -> Game:
-    attributes = create_player_attributes(max_acceleration=2, max_turn_degrees=480)
-    width = 20
-    height = 15
-    player_1 = create_initialized_player(
-        position=(4, height / 2 + 0.5), attributes=attributes
+    player_size = 1.0
+    width, height = 28, 15
+    attributes = create_player_attributes(
+        shot_probability=create_guaranteed_shot_probability(),
+        max_acceleration=2.5,
+        size=player_size,
     )
-    player_2 = create_initialized_player(
-        position=(4, height / 2 - 0.5), attributes=attributes
-    )
-    hoop = create_hoop(width, height, offset_from_left=2)
+    player_1 = create_initialized_player(position=(4, 4), attributes=attributes)
+    player_2 = create_initialized_player(position=(7, 7), attributes=attributes)
+    hoop = create_hoop(width, height, 2)
     court = create_court(width, height, hoop)
     game = create_game(teams=[Team(player_1), Team(player_2)], court=court)
-    game.assign_team_strategy(0, create_strategy(0.01))
-    game.assign_team_strategy(1, create_strategy(0.01))
+    game.assign_team_strategy(0, create_strategy(5))
+    game.assign_team_strategy(1, create_strategy(3))
     return game
