@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import Optional, List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING
 from bball.behavior import ReachPosition
 from bball.utils import distance_between, position_of
 from bball.strategy.strategy_interface import StrategyInterface
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 class RunToTargetAndShoot(StrategyInterface):
     target: ObjectWithPosition
     distance_threshold: float
-    _behaviors: List[Optional[ReachPosition]] = field(init=False)
+    _behaviors: List[ReachPosition] = field(init=False)
 
     def _after_team_set(self):
         self._behaviors = [
