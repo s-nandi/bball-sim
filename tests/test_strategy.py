@@ -199,7 +199,9 @@ def test_stay_close_with_composite_strategy():
     duration = 50
     time_frame = 1 / 30
     num_steps = math.ceil(duration / time_frame)
-    attributes = create_player_attributes(max_acceleration=2, max_turn_degrees=480)
+    attributes = create_player_attributes(
+        max_acceleration=2, max_turn_degrees=480, velocity_decay=0.001
+    )
     width = 20
     height = 15
     player_1 = create_initialized_player(
@@ -254,18 +256,25 @@ def test_eventual_inbounds_with_everyone_initially_out_of_bounds():
     assert game.score[0] > 0 or game.score[1] > 0
 
 
-def setup_consistent_inbounds_despite_collisions(use_expected_value: bool):
+def setup_consistent_inbounds_despite_collisions(
+    mass_2: float, use_expected_value: bool
+):
     size = 0.9
     max_acceleration = 2.34
     max_turn_degrees = 360
+    velocity_decay = 0.005
     attributes_1 = create_player_attributes(
-        size=size, max_acceleration=max_acceleration, max_turn_degrees=max_turn_degrees
-    )
-    attributes_2 = create_player_attributes(
-        mass=2,
         size=size,
         max_acceleration=max_acceleration,
         max_turn_degrees=max_turn_degrees,
+        velocity_decay=velocity_decay,
+    )
+    attributes_2 = create_player_attributes(
+        mass=mass_2,
+        size=size,
+        max_acceleration=max_acceleration,
+        max_turn_degrees=max_turn_degrees,
+        velocity_decay=velocity_decay,
     )
     width = 28.65
     height = 15.24
@@ -283,20 +292,21 @@ def setup_consistent_inbounds_despite_collisions(use_expected_value: bool):
         court=court,
         settings=create_game_settings(use_expected_value),
     )
-    game.assign_team_strategy(0, create_strategy(0.1))
+    game.assign_team_strategy(0, create_strategy(1))
     game.assign_team_strategy(1, create_strategy(20))
     return game
 
 
 def test_consistent_inbounds_despite_collisions():
-    duration = 200
-    time_frame = 1 / 20
+    duration = 800
+    time_frame = 1 / 5
     num_steps = math.ceil(duration / time_frame)
-    game = setup_consistent_inbounds_despite_collisions(True)
+    game = setup_consistent_inbounds_despite_collisions(2.0, True)
     space = create_space(game)
     [player_1], [player_2] = game.teams
-    threshold = 200
+    threshold = game.court.width / 5
     for _ in range(num_steps):
         assert_relatively_on_court(game.court, player_1, threshold)
         assert_relatively_on_court(game.court, player_2, threshold)
         space.step(time_frame)
+    assert game.score[0] > 0 and game.score[1] > 0
