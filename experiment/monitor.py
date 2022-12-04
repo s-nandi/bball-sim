@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from typing import Optional
+from time import monotonic
 from bball.game import Game
 from bball.player import Player
 from bball.utils import distance_between
@@ -22,8 +24,18 @@ def monitor_distance(game: Game):
 @dataclass
 class Monitor:
     max_distance: float = 0.0
+    _start_time: Optional[float] = None
+
+    @property
+    def time_since_start(self) -> float:
+        if self._start_time is None:
+            return 0.0
+        current_time = monotonic()
+        return current_time - self._start_time
 
     def monitor(self, game: Game):
+        if self._start_time is None:
+            self._start_time = monotonic()
         monitor_bounds(game, 1.0)
         distance = monitor_distance(game)
         self.max_distance = max(self.max_distance, distance)
