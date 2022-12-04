@@ -1,14 +1,10 @@
-from bball.initiate import two_uniform_players, players_collision
-from bball.create import create_strategy
-
 from runner import run_game
 from experiment.monitor import Monitor
+from experiment import initiate
 
 
 def main():
-    game = players_collision()
-    game.assign_team_strategy(0, create_strategy(0.1))
-    game.assign_team_strategy(1, create_strategy(20))
+    game = initiate.players_collision()
 
     monitor = Monitor()
     run_game(game, fps=60, monitor=lambda: monitor.monitor(game))
