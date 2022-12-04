@@ -63,6 +63,8 @@ class Space:
 
     def _add_physics_object(self, physics_object: PhysicsObject) -> Space:
         self._space.add(physics_object._body)
+        if physics_object._shape is not None:
+            self._space.add(physics_object._shape)
         return self
 
     def _add_ball(self, ball: Ball) -> Space:

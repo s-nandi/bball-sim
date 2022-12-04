@@ -1,3 +1,4 @@
+from typing import Optional
 import pymunk
 from bball.utils import (
     to_degrees,
@@ -23,12 +24,19 @@ def velocity_func_with_decay(velocity_decay: float):
 
 class PhysicsObject:
     _body: pymunk.Body
+    _shape: Optional[pymunk.Shape]
     _has_position: bool
     _has_orientation: bool
 
-    def __init__(self, mass: float, velocity_decay: float):
-        moment = pymunk.moment_for_circle(mass, 0, 1)
-        self._body = pymunk.Body(mass, moment)
+    def __init__(self, size: float, mass: float, velocity_decay: float):
+        if size > 0:
+            self._body = pymunk.Body()
+            self._shape = pymunk.Circle(self._body, size)
+            self._shape.mass = mass
+        else:
+            moment = pymunk.moment_for_circle(mass, 0, 1)
+            self._body = pymunk.Body(mass, moment)
+            self._shape = None
         self._body.velocity_func = velocity_func_with_decay(velocity_decay)
         self._has_position = False
         self._has_orientation = False

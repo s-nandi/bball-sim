@@ -7,7 +7,8 @@ from bball.court import Court, Hoop, ThreePointLine, RectangleThreePointLine
 from bball.utils import angle_degrees_to_vector, sum_of
 from bball.draw.draw_interface import DrawInterface, Color
 
-BALL_RADIUS = 0.2
+BALL_RADIUS = 0.5
+DEFAULT_PLAYER_RADIUS = 0.9
 PLAYER_ORIENTATION_THICKNESS = 5
 
 BLACK = (0, 0, 0)
@@ -21,6 +22,8 @@ TEXT_COLOR = BLACK
 
 def draw_player(draw_object: DrawInterface, player: Player, color: Color):
     radius = player.physical_attributes.size
+    if radius == 0:
+        radius = DEFAULT_PLAYER_RADIUS
     draw_object.draw_filled_circle(player.position, radius, color)
     delta = angle_degrees_to_vector(player.orientation_degrees, radius)
     draw_object.draw_line(

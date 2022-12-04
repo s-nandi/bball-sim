@@ -6,7 +6,7 @@ from bball.create.shot_probability import DEFAULT_SHOT_PROBABILITY
 # pylint: disable=too-many-arguments
 def create_player_attributes(
     mass: float = 1.0,
-    size: float = 0.9,
+    size: float = 0,
     max_acceleration: float = 1.0,
     max_turn_degrees: float = 90.0,
     velocity_decay: float = 0.0,

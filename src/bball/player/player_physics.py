@@ -6,7 +6,11 @@ from bball.utils import to_radians
 
 class PlayerPhysics(PhysicsObject):
     def __init__(self, physical_attributes: PlayerAttributes.Physical):
-        super().__init__(physical_attributes.mass, physical_attributes.velocity_decay)
+        super().__init__(
+            physical_attributes.size,
+            physical_attributes.mass,
+            physical_attributes.velocity_decay,
+        )
 
     def _step(self, move: PlayerMove, time_step: float) -> bool:
         assert self.is_initialized
