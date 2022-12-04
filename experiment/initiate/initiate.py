@@ -1,5 +1,6 @@
-from bball import Game, Team
+from bball import Game
 from bball.create import (
+    create_teams,
     create_game,
     create_game_settings,
     create_initialized_player,
@@ -27,7 +28,7 @@ def two_uniform_players() -> Game:
     hoop = create_hoop(width, height, 1.6, three_point_line)
     court = create_court(width, height, hoop)
     game = create_game(
-        teams=[Team(player_1), Team(player_2)],
+        teams=create_teams(player_1, player_2),
         court=court,
         settings=create_game_settings(USE_EXPECTED_VALUE),
     )
@@ -62,7 +63,7 @@ def players_collision() -> Game:
     hoop = create_hoop(width, height, 1.6, three_point_line)
     court = create_court(width, height, hoop)
     game = create_game(
-        teams=[Team(player_1), Team(player_2)],
+        teams=create_teams(player_1, player_2),
         court=court,
         settings=create_game_settings(USE_EXPECTED_VALUE),
     )
