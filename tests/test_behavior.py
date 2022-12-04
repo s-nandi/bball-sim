@@ -9,7 +9,11 @@ from bball import (
     ReachPosition,
 )
 from bball.utils import close_to, approx
-from bball.create import create_initialized_player, create_space
+from bball.create import (
+    create_initialized_player,
+    create_player_attributes,
+    create_space,
+)
 
 seed(1)
 
@@ -136,3 +140,34 @@ def test_position_reaching_with_initial_movement(initial_steps, target_position)
         space.step(time_frame)
     assert close_to(player.velocity, (0, 0))
     assert close_to(player.position, target_position)
+
+
+def test_stopping():
+    distance = 5
+    time_frame = 0.2
+    steps_before_expecting_collision = math.ceil(distance / time_frame**2)
+
+    attributes = create_player_attributes(size=1)
+    player_1 = create_initialized_player(attributes=attributes)
+    player_2 = create_initialized_player(attributes=attributes, position=(distance, 0))
+    players = [player_1, player_2]
+    space = create_space().add(player_1, player_2)
+    for _ in range(steps_before_expecting_collision):
+        player_1.accelerate(1)
+        space.step(time_frame)
+    assert not close_to(player_1.velocity, (0, 0))
+    assert not close_to(player_2.velocity, (0, 0))
+    time_before_requiring_stop = max(
+        abs(player_1.velocity[0]),
+        abs(player_1.velocity[1]),
+        abs(player_2.velocity[0]),
+        abs(player_2.velocity[1]),
+    )
+    steps_before_requiring_stop = math.ceil(time_before_requiring_stop / time_frame)
+    behaviors = [Stop(time_frame) for _ in players]
+    for _ in range(steps_before_requiring_stop):
+        for behavior, player in zip(behaviors, players):
+            behavior.drive(player)
+        space.step(time_frame)
+    assert close_to(player_1.velocity, (0, 0))
+    assert close_to(player_2.velocity, (0, 0))
