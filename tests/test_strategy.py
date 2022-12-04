@@ -97,9 +97,9 @@ def test_stay_relatively_on_court_with_composite_strategy():
     hoop = create_hoop(width, height, 2)
     court = create_court(width, height, hoop)
     game = create_game(teams=[Team(player_1), Team(player_2)], court=court)
-    space = create_space().add(game)
     game.assign_team_strategy(0, create_strategy(5))
     game.assign_team_strategy(1, create_strategy(3))
+    space = create_space().add(game)
 
     def assert_relatively_on_court(player, threshold: float):
         position_x = player.position[0]
@@ -134,9 +134,9 @@ def test_stay_close_with_composite_strategy():
     hoop = create_hoop(width, height, offset_from_left=2)
     court = create_court(width, height, hoop)
     game = create_game(teams=[Team(player_1), Team(player_2)], court=court)
-    space = create_space().add(game)
     game.assign_team_strategy(0, create_strategy(0.01))
     game.assign_team_strategy(1, create_strategy(0.01))
+    space = create_space().add(game)
 
     threshold = 1.5
     # First, get into steady state where players trail behind each other
