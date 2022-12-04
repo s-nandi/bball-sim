@@ -10,6 +10,10 @@ def valid_multiplier(strength: float) -> bool:
     return -1 <= strength <= 1
 
 
+def valid_positive_multiplier(strength: float) -> bool:
+    return 0 <= strength <= 1
+
+
 def valid_angle_degrees(angle_degrees: float) -> bool:
     return -180 <= angle_degrees < 180
 

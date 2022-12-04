@@ -5,7 +5,7 @@ from experiment import initiate
 
 
 def main():
-    game = initiate.tests.setup_consistent_inbounds_despite_collisions(10.0, True)
+    game = initiate.two_uniform_players()
 
     monitor = Monitor(float("inf"))
     run_game(game, fps=60, display_scale=0.3, monitor=lambda: monitor.monitor(game))

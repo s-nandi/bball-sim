@@ -76,6 +76,9 @@ class PhysicsObject:
         assert self.is_initialized
         return convert_to_tuple(self._body.velocity)
 
+    def reset_velocity(self) -> None:
+        self._body.velocity = (0, 0)
+
     @property
     def acceleration(self) -> Vector:
         return angle_degrees_to_vector(

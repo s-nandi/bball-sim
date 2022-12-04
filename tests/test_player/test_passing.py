@@ -2,7 +2,12 @@ import math
 from dataclasses import dataclass
 from bball import Player, Space, Ball, BallMode
 from bball.utils import close_to
-from bball.create import create_space, create_ball, create_initialized_player
+from bball.create import (
+    create_space,
+    create_ball,
+    create_initialized_player,
+    create_player_attributes,
+)
 
 
 @dataclass
@@ -23,14 +28,16 @@ def check_pass_completes_after(test: PassingTest, expected_time: int):
 
 
 def setup_passing_test(pass_distance, pass_velocity) -> PassingTest:
-    passer = create_initialized_player(position=(0, 0))
+    passer = create_initialized_player(
+        attributes=create_player_attributes(pass_velocity=pass_velocity),
+    )
     receiver = create_initialized_player(position=(pass_distance, 0))
     ball = create_ball()
     space = create_space().add(passer, receiver, ball)
     ball.jump_ball_won_by(passer)
     assert passer.has_ball
     assert not receiver.has_ball
-    passer.pass_to(receiver, pass_velocity=pass_velocity)
+    passer.pass_to(receiver)
     space.step(0)
     return PassingTest(space, ball, passer, receiver)
 

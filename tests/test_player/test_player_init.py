@@ -48,10 +48,10 @@ def test_player_usage_before_init():
 
     def pass_to():
         receiver = create_initialized_player(position=(1, 1))
-        player.pass_to(receiver, pass_velocity=1)
+        player.pass_to(receiver)
 
     def shoot_at():
-        player.shoot_at((1, 1), shot_velocity=1)
+        player.shoot_at((1, 1))
 
     require_exception(accelerate, AssertionError)
     require_exception(turn, AssertionError)

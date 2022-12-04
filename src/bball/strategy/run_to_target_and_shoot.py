@@ -32,6 +32,6 @@ class RunToTargetAndShoot(StrategyInterface):
             )
             if player.has_ball and close_enough:
                 target_hoop = self._game.target_hoop(player)
-                player.shoot_at(target_hoop.position, 10)
+                player.shoot_at(target_hoop.position)
             else:
                 behavior.drive(player, self._time_frame)

@@ -18,6 +18,10 @@ BASE_DIRECTION = (1, 0)
 ROUND_DIGITS = 4
 
 
+def interpolate(value_1: float, value_2: float, interp: float) -> float:
+    return value_1 * (1 - interp) + value_2 * interp
+
+
 def position_of(obj: ObjectWithPosition) -> Point:
     if isinstance(obj, tuple):
         return (obj[0], obj[1])
@@ -111,7 +115,7 @@ def multiply_by(vector: Vector, coefficient: float):
     return convert_to_tuple(convert_to_vec2d(vector) * coefficient)
 
 
-def interpolate(point_1: Point, point_2: Point, interp: float) -> Point:
+def interpolate_points(point_1: Point, point_2: Point, interp: float) -> Point:
     assert 0 <= interp <= 1
     vec_1 = convert_to_vec2d(point_1)
     vec_2 = convert_to_vec2d(point_2)
@@ -120,7 +124,7 @@ def interpolate(point_1: Point, point_2: Point, interp: float) -> Point:
 
 
 def midpoint_of(point_1: Point, point_2: Point) -> Point:
-    return interpolate(point_1, point_2, 0.5)
+    return interpolate_points(point_1, point_2, 0.5)
 
 
 def vector_angle_degrees(vector: Vector) -> float:

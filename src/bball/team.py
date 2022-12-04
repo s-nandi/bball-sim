@@ -1,9 +1,41 @@
 from __future__ import annotations
+from dataclasses import dataclass
 from typing import List, Tuple, Optional, TYPE_CHECKING
+from bball.validator import valid_positive_multiplier
+from bball.utils import interpolate
 
 if TYPE_CHECKING:
     from bball.player import Player
     from bball.strategy import StrategyInterface
+    from bball.utils import Point
+    from bball.court import HalfCourt
+
+
+@dataclass
+class InboundData:
+    player_with_ball: int
+    position_multipliers: List[Point]
+    orientation_deltas: List[float]
+
+    def __post_init__(self):
+        for position_multiplier in self.position_multipliers:
+            assert valid_positive_multiplier(position_multiplier[0])
+            assert valid_positive_multiplier(position_multiplier[1])
+
+    def _map_multiplier_to_position(
+        self,
+        multiplier: Point,
+        half_court: HalfCourt,
+    ) -> Point:
+        x_position = interpolate(half_court.back, half_court.front, multiplier[0])
+        y_position = interpolate(half_court.left, half_court.right, multiplier[1])
+        return (x_position, y_position)
+
+    def positions_for_half_court(self, half_court: HalfCourt):
+        return [
+            self._map_multiplier_to_position(multiplier, half_court)
+            for multiplier in self.position_multipliers
+        ]
 
 
 class Team:
@@ -21,6 +53,15 @@ class Team:
 
     def __getitem__(self, index):
         return self._players.__getitem__(index)
+
+    def reset_on_inbound(self, given_possession: bool) -> InboundData:
+        player_with_ball = 0 if given_possession else -1
+        positions = [
+            (0.1, (i + 1) / (len(self._players) + 1))
+            for i, _ in enumerate(self._players)
+        ]
+        orientations = [0.0] * len(self._players)
+        return InboundData(player_with_ball, positions, orientations)
 
 
 class Teams:

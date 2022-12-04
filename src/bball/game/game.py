@@ -18,6 +18,7 @@ TimedMonitoringFunction = Callable[[float], bool]
 class GameSettings:
     shot_clock_duration: Optional[float] = None
     use_expected_value_for_points: bool = False
+    use_instant_inbounding: bool = True
 
     def __post_init__(self):
         if self.shot_clock_duration is None:
@@ -146,10 +147,27 @@ class Game:
             if not self.ball.should_flip_possession
             else other_team_index(team_with_possession)
         )
-        player = self.teams[new_team_with_possession][0]
-        if not self.court.is_inbounds(player):
-            return False
-        self.ball.jump_ball_won_by(player)
+
+        if self.settings.use_instant_inbounding:
+            player = self.teams[new_team_with_possession][0]
+            if not self.court.is_inbounds(player):
+                return False
+            self.ball.jump_ball_won_by(player)
+            return True
+
+        for team_index, team in enumerate(self.teams):
+            has_possession = team_index == new_team_with_possession
+            inbounding_data = team.reset_on_inbound(has_possession)
+            if has_possession:
+                self.ball.jump_ball_won_by(team[inbounding_data.player_with_ball])
+            half_court = self.court.half_court(team_index)
+            positions = inbounding_data.positions_for_half_court(half_court)
+            base_orientation = 0 if team_index == 0 else -180
+            orientations = [
+                base_orientation + delta for delta in inbounding_data.orientation_deltas
+            ]
+            for player, position, orientation in zip(team, positions, orientations):
+                player.place_at(position, orientation)
         return True
 
     def transfer_possession(self) -> bool:

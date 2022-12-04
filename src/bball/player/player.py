@@ -55,6 +55,10 @@ class Player:
         return self._attributes.physical
 
     @property
+    def skill_attributes(self) -> PlayerAttributes.Skill:
+        return self._attributes.skill
+
+    @property
     def orientation_degrees(self) -> float:
         assert self.is_initialized
         orientation_degrees = self._physics.orientation_degrees
@@ -77,6 +81,7 @@ class Player:
         return self._ball
 
     def place_at(self, position: Point, orientation_degrees: float) -> Player:
+        self._physics.reset_velocity()
         self._physics.position = position
         self._physics.orientation_degrees = orientation_degrees
         return self
@@ -96,14 +101,14 @@ class Player:
         self._move.accelerate(acceleration)
         return self
 
-    def pass_to(self, receiver: Player, pass_velocity: float) -> Player:
+    def pass_to(self, receiver: Player) -> Player:
         assert self.is_initialized
-        self._move.pass_to(self.ball, receiver, pass_velocity)
+        self._move.pass_to(self.ball, receiver, self.skill_attributes.pass_velocity)
         return self
 
-    def shoot_at(self, target: Point, shot_velocity: float) -> Player:
+    def shoot_at(self, target: Point) -> Player:
         assert self.is_initialized
-        self._move.shoot_at(self.ball, target, shot_velocity)
+        self._move.shoot_at(self.ball, target, self.skill_attributes.shot_velocity)
         return self
 
     def _step(self, time_step: float) -> bool:

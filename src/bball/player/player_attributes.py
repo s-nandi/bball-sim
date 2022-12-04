@@ -25,6 +25,8 @@ class PlayerAttributes:
     @dataclass
     class Skill:
         shot_probability: ShotProbability
+        shot_velocity: float
+        pass_velocity: float
 
     physical: Physical
     skill: Skill

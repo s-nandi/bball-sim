@@ -5,12 +5,15 @@ from bball.create.shot_probability import DEFAULT_SHOT_PROBABILITY
 
 # pylint: disable=too-many-arguments
 def create_player_attributes(
+    *,
     mass: float = 1.0,
     size: float = 0,
     max_acceleration: float = 1.0,
     max_turn_degrees: float = 90.0,
     velocity_decay: float = 0.0,
     shot_probability: ShotProbability = DEFAULT_SHOT_PROBABILITY,
+    shot_velocity: float = 10.0,
+    pass_velocity: float = 6.0,
 ) -> PlayerAttributes:
     return PlayerAttributes(
         PlayerAttributes.Physical(
@@ -20,7 +23,11 @@ def create_player_attributes(
             max_turn_degrees=max_turn_degrees,
             velocity_decay=velocity_decay,
         ),
-        PlayerAttributes.Skill(shot_probability),
+        PlayerAttributes.Skill(
+            shot_probability=shot_probability,
+            shot_velocity=shot_velocity,
+            pass_velocity=pass_velocity,
+        ),
     )
 
 

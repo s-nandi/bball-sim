@@ -200,7 +200,7 @@ def test_stay_close_with_composite_strategy():
     time_frame = 1 / 30
     num_steps = math.ceil(duration / time_frame)
     attributes = create_player_attributes(
-        max_acceleration=2, max_turn_degrees=480, velocity_decay=0.001
+        max_acceleration=2, max_turn_degrees=480, velocity_decay=0.01
     )
     width = 20
     height = 15

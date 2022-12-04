@@ -15,7 +15,9 @@ USE_EXPECTED_VALUE = True
 
 
 def two_uniform_players() -> Game:
-    attributes = create_player_attributes(max_acceleration=2.34, max_turn_degrees=360)
+    attributes = create_player_attributes(
+        size=1.0, max_acceleration=2.34, max_turn_degrees=360, velocity_decay=0.01
+    )
     width = 28.65
     height = 15.24
     player_1 = create_initialized_player(
@@ -30,7 +32,9 @@ def two_uniform_players() -> Game:
             teams=create_teams(player_1, player_2),
             court=create_court(width, height, hoop),
             settings=create_game_settings(
-                use_expected_value_for_points=USE_EXPECTED_VALUE
+                use_expected_value_for_points=USE_EXPECTED_VALUE,
+                use_instant_inbounding=False,
+                shot_clock_duration=24.0,
             ),
         )
         .assign_team_strategy(0, create_strategy(0.1))

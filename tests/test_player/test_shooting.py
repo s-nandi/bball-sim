@@ -6,6 +6,7 @@ from bball.create import (
     create_space,
     create_ball,
     create_linear_shot_probability,
+    create_player_attributes,
 )
 
 
@@ -17,12 +18,14 @@ class ShootingTest:
 
 
 def setup_shooting_test(shot_distance, shot_velocity) -> ShootingTest:
-    shooter = create_initialized_player(position=(0, 0))
+    shooter = create_initialized_player(
+        attributes=create_player_attributes(shot_velocity=shot_velocity)
+    )
     ball = create_ball()
     space = create_space().add(shooter, ball)
     ball.jump_ball_won_by(shooter)
     assert shooter.has_ball
-    shooter.shoot_at((shot_distance, 0), shot_velocity=shot_velocity)
+    shooter.shoot_at((shot_distance, 0))
     space.step(0)
     return ShootingTest(space, ball, shooter)
 
