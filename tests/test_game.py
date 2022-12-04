@@ -100,7 +100,7 @@ def test_scoring():
         shot_probability=create_guaranteed_shot_probability(), shot_velocity=0.0001
     )
     player_1 = create_uninitialized_player(attributes=attributes_1)
-    player_2 = create_uninitialized_player(attributes=attributes_1)
+    player_2 = create_uninitialized_player(attributes=attributes_2)
     game = create_game(create_teams(player_1, player_2))
     space = create_space().add(game)
     ball = game.ball
