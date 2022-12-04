@@ -9,7 +9,6 @@ from bball.create import (
     create_three_point_line,
     create_strategy,
 )
-from tests import test_strategy as tests  # pylint: disable=unused-import
 
 USE_EXPECTED_VALUE = True
 
