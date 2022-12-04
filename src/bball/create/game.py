@@ -4,8 +4,11 @@ from bball.court import Court
 from bball.team import Teams
 from bball.game import Game, GameSettings
 from bball.create.teams import create_teams
-from bball.create.aliases import create_ball, create_game_settings
+from bball.create.ball import create_ball
 from bball.create.court import create_court
+
+# Alias for consistency while still enabling type hinting
+create_game_settings = GameSettings  # pylint: disable=invalid-name
 
 
 def create_game(
