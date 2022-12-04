@@ -163,10 +163,10 @@ def setup_eventual_inbounds_with_everyone_initially_out_of_bounds(
     height = 10
     attributes = create_player_attributes(size=1.0)
     player_1 = create_initialized_player(
-        position=(-initial_error, -initial_error), attributes=attributes
+        position=(-initial_error, height + initial_error), attributes=attributes
     )
     player_2 = create_initialized_player(
-        position=(width + initial_error, height + initial_error), attributes=attributes
+        position=(width + initial_error, -initial_error), attributes=attributes
     )
     court = create_court(width, height)
     game = create_game(teams=create_teams(player_1, player_2), court=court)
