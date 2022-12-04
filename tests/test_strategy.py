@@ -257,7 +257,7 @@ def test_eventual_inbounds_with_everyone_initially_out_of_bounds():
 
 
 def setup_consistent_inbounds_despite_collisions(
-    mass_2: float, use_expected_value: bool
+    mass_2: float, use_expected_value: bool, instant_inbounds: bool
 ):
     size = 0.9
     max_acceleration = 2.34
@@ -290,7 +290,9 @@ def setup_consistent_inbounds_despite_collisions(
         teams=create_teams(player_1, player_2),
         court=court,
         settings=create_game_settings(
-            shot_clock_duration=10.0, use_expected_value_for_points=use_expected_value
+            shot_clock_duration=10.0,
+            use_expected_value_for_points=use_expected_value,
+            use_instant_inbounding=instant_inbounds,
         ),
     )
     game.assign_team_strategy(0, create_strategy(1))
@@ -298,11 +300,14 @@ def setup_consistent_inbounds_despite_collisions(
     return game
 
 
-def test_consistent_inbounds_despite_collisions():
+@pytest.mark.parametrize("instant_inbounds", [True, False])
+def test_consistent_inbounds_despite_collisions(instant_inbounds):
     duration = 800
     time_frame = 1 / 5
     num_steps = math.ceil(duration / time_frame)
-    game = setup_consistent_inbounds_despite_collisions(2.0, True)
+    game = setup_consistent_inbounds_despite_collisions(
+        mass_2=2.0, use_expected_value=True, instant_inbounds=instant_inbounds
+    )
     space = create_space(game)
     [player_1], [player_2] = game.teams
     threshold = game.court.width / 5
