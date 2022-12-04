@@ -8,7 +8,7 @@ def main():
         1.0
     )
 
-    monitor = Monitor()
+    monitor = Monitor(1.0)
     run_game(game, fps=60, monitor=lambda: monitor.monitor(game))
     print("max dist", monitor.max_distance)
 
