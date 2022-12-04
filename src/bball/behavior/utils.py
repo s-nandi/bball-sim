@@ -36,7 +36,7 @@ def min_steps_needed(a_max: float, v_curr: float, distance: float, time_frame: f
         return triangle_distance_covered(a_max, v_curr, steps, time_frame)
 
     a_lo = v_curr / (a_max * time_frame)
-    a_hi = a_lo + 1
+    a_hi = max(10**-6, a_lo + 1)
     assert a_hi > 0
     while distance_evaluate(a_hi) < distance:
         a_hi *= 2
