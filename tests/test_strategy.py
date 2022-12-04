@@ -158,21 +158,21 @@ def test_stay_close_with_composite_strategy():
 
 def setup_eventual_inbounds_with_everyone_initially_out_of_bounds():
     width = 20
-    height = 20
-    attributes = create_player_attributes(size=2.0)
+    height = 10
+    attributes = create_player_attributes(size=1.0)
     player_1 = create_initialized_player(position=(0, 0), attributes=attributes)
     player_2 = create_initialized_player(
         position=(width, height), attributes=attributes
     )
     court = create_court(width, height)
     game = create_game(teams=create_teams(player_1, player_2), court=court)
-    game.assign_team_strategy(0, create_strategy(0.01))
-    game.assign_team_strategy(1, create_strategy(0.01))
+    game.assign_team_strategy(0, create_strategy(5))
+    game.assign_team_strategy(1, create_strategy(5))
     return game
 
 
 def test_eventual_inbounds_with_everyone_initially_out_of_bounds():
-    duration = 50
+    duration = 10
     time_frame = 1 / 20
     num_steps = math.ceil(duration / time_frame)
     game = setup_eventual_inbounds_with_everyone_initially_out_of_bounds()
