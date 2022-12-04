@@ -118,14 +118,14 @@ def test_collision_with_use_behavior(
     distance_player_masses: Tuple[float, float, float]
 ):
     time_frame = 0.2
-    distance, mass_1, mass_1 = distance_player_masses
-    game = setup_collision_with_use_behavior(distance, mass_1, mass_1)
+    distance, mass_1, mass_2 = distance_player_masses
+    game = setup_collision_with_use_behavior(distance, mass_1, mass_2)
     space = create_space(game)
     [player_1], [player_2] = game.teams
     steps_to_push_off_court = math.ceil(2 * game.court.width / time_frame)
     for _ in range(steps_to_push_off_court):
         space.step(time_frame)
-    expected_inbounds = approx(mass_1, mass_1)
+    expected_inbounds = approx(mass_1, mass_2)
     assert game.court.is_inbounds(player_1) == expected_inbounds
     assert game.court.is_inbounds(player_2) == expected_inbounds
 
