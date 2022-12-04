@@ -66,6 +66,7 @@ class PhysicsObject:
 
     @orientation_degrees.setter
     def orientation_degrees(self, orientation_degrees: float):
+        orientation_degrees = normalized_angle_degrees(orientation_degrees)
         assert valid_angle_degrees(orientation_degrees)
         self._body.angle = to_radians(orientation_degrees)
         self._has_orientation = True
