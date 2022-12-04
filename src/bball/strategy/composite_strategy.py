@@ -1,6 +1,8 @@
 from dataclasses import dataclass
+from bball.utils import DEFAULT_EPS
+from bball.ball import BallMode
 from bball.strategy.strategy_interface import StrategyInterface
-from bball.behavior.reach_position import ReachPosition
+from bball.behavior import RunPastPosition
 
 
 @dataclass
@@ -22,11 +24,11 @@ class CompositeStrategy(StrategyInterface):
 
     def _drive(self):
         offensive_team_index = self._game.team_with_last_posession
-        if offensive_team_index is None:
+        if self._game.ball.mode == BallMode.DEAD:
             court = self._game.court
             center = (court.width / 2, court.height / 2)
             for player in self._team:
-                ReachPosition(center, self._time_frame).drive(player)
+                RunPastPosition(center, DEFAULT_EPS, self._time_frame).drive(player)
             return
         if offensive_team_index == self._team_index:
             self.offensive_strategy.drive(self._time_frame)
