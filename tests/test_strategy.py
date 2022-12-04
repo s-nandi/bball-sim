@@ -1,9 +1,10 @@
 import math
+from typing import Tuple
 import pytest
 from bball import BallMode, Game
 from bball.behavior import ReachVelocity
 from bball.strategy import RunToBasketAndShoot, StandBetweenBasket, UseBehavior
-from bball.utils import distance_between, close_to, vector_length
+from bball.utils import distance_between, close_to, vector_length, approx
 from bball.create import (
     create_initialized_player,
     create_teams,
@@ -84,6 +85,49 @@ def test_use_behavior():
     for _ in range(num_steps):
         space.step(time_frame)
     assert close_to(player.velocity, target_velocity)
+
+
+def setup_collision_with_use_behavior(
+    distance: float, mass_1: float, mass_2: float
+) -> Game:
+    assert distance > mass_1 + mass_2
+    court = create_court(width=distance + 4)
+    player_1 = create_initialized_player(
+        attributes=create_player_attributes(size=1.0, mass=mass_1),
+        position=(court.width / 2 - distance / 2, court.height / 2),
+    )
+    player_2 = create_initialized_player(
+        attributes=create_player_attributes(size=1.0, mass=mass_2),
+        position=(court.width / 2 + distance / 2, court.height / 2),
+        orientation_degrees=-180,
+    )
+    assert approx(abs(player_1.position[0] - player_2.position[0]), distance)
+    assert approx(abs(player_1.position[1] - player_2.position[1]), 0.0)
+
+    game = create_game(create_teams(player_1, player_2))
+    game.assign_team_strategy(0, UseBehavior(ReachVelocity((1, 0))))
+    game.assign_team_strategy(1, UseBehavior(ReachVelocity((-1, 0))))
+    return game
+
+
+@pytest.mark.parametrize(
+    "distance_player_masses",
+    [(7, 1.0, 2.0), (7, 2.0, 1.0), (7, 1.0, 1.0), (7, 2.0, 2.0)],
+)
+def test_collision_with_use_behavior(
+    distance_player_masses: Tuple[float, float, float]
+):
+    time_frame = 0.2
+    distance, mass_1, mass_1 = distance_player_masses
+    game = setup_collision_with_use_behavior(distance, mass_1, mass_1)
+    space = create_space(game)
+    [player_1], [player_2] = game.teams
+    steps_to_push_off_court = math.ceil(2 * game.court.width / time_frame)
+    for _ in range(steps_to_push_off_court):
+        space.step(time_frame)
+    expected_inbounds = approx(mass_1, mass_1)
+    assert game.court.is_inbounds(player_1) == expected_inbounds
+    assert game.court.is_inbounds(player_2) == expected_inbounds
 
 
 def test_scoring_with_composite_strategy():
