@@ -2,6 +2,7 @@ from .player import (
     create_initialized_player,
     create_uninitialized_player,
     create_player_attributes,
+    copy_player_attributes,
 )
 from .teams import create_team, create_teams
 from .ball import create_ball

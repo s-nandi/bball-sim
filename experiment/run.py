@@ -5,7 +5,7 @@ from experiment import initiate
 
 
 def main():
-    game = initiate.two_uniform_players()
+    game = initiate.multiple_players(2)
 
     monitor = Monitor(float("inf"))
     run_game(game, fps=60, display_scale=0.3, monitor=lambda: monitor.monitor(game))

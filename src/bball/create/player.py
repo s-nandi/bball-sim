@@ -1,4 +1,5 @@
-from typing import Tuple
+from copy import deepcopy
+from typing import Tuple, List
 from bball.player import Player, PlayerAttributes
 from bball.shot_probability import ShotProbability
 from bball.create.shot_probability import DEFAULT_SHOT_PROBABILITY
@@ -29,6 +30,12 @@ def create_player_attributes(
             pass_velocity=pass_velocity,
         ),
     )
+
+
+def copy_player_attributes(
+    attributes: PlayerAttributes, num_copies: int
+) -> List[PlayerAttributes]:
+    return [deepcopy(attributes) for _ in range(num_copies)]
 
 
 DEFAULT_PLAYER_ATTRIBUTES = create_player_attributes()
