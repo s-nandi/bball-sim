@@ -263,29 +263,28 @@ def setup_consistent_inbounds_despite_collisions(
     max_acceleration = 2.34
     max_turn_degrees = 360
     velocity_decay = 0.005
-    attributes_1 = create_player_attributes(
-        size=size,
-        max_acceleration=max_acceleration,
-        max_turn_degrees=max_turn_degrees,
-        velocity_decay=velocity_decay,
-    )
-    attributes_2 = create_player_attributes(
-        mass=mass_2,
-        size=size,
-        max_acceleration=max_acceleration,
-        max_turn_degrees=max_turn_degrees,
-        velocity_decay=velocity_decay,
-    )
     width = 28.65
     height = 15.24
     player_1 = create_initialized_player(
-        position=(4, height / 2), attributes=attributes_1
+        position=(4, height / 2),
+        attributes=create_player_attributes(
+            size=size,
+            max_acceleration=max_acceleration,
+            max_turn_degrees=max_turn_degrees,
+            velocity_decay=velocity_decay,
+        ),
     )
     player_2 = create_initialized_player(
-        position=(8, height / 2), attributes=attributes_2
+        position=(8, height / 2),
+        attributes=create_player_attributes(
+            mass=mass_2,
+            size=size,
+            max_acceleration=max_acceleration,
+            max_turn_degrees=max_turn_degrees,
+            velocity_decay=velocity_decay,
+        ),
     )
-    three_point_line = create_three_point_line(width, height)
-    hoop = create_hoop(width, height, 1.6, three_point_line)
+    hoop = create_hoop(width, height, 1.6, create_three_point_line(width, height))
     court = create_court(width, height, hoop)
     game = create_game(
         teams=create_teams(player_1, player_2),
