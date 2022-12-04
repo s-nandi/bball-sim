@@ -9,6 +9,7 @@ def main():
     monitor = Monitor(1.0)
     run_game(game, fps=60, monitor=lambda: monitor.monitor(game))
     print("max dist", monitor.max_distance)
+    print("duration", monitor.time_since_start)
 
 
 if __name__ == "__main__":
