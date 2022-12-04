@@ -4,9 +4,7 @@ from experiment import initiate
 
 
 def main():
-    game = initiate.tests.setup_test_stay_relatively_on_court_with_composite_strategy(
-        1.0
-    )
+    game = initiate.tests.setup_stay_relatively_on_court_with_composite_strategy(1.0)
 
     monitor = Monitor(1.0)
     run_game(game, fps=60, monitor=lambda: monitor.monitor(game))
