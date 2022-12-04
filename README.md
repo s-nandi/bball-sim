@@ -15,10 +15,10 @@ python -m pip install pygame pymunk pylint mypy pytest black
 ```
 
 ## Linting
-Run `python -m pylint src tests && python -m mypy src tests`
+Run `python -m pylint src experiment tests && python -m mypy src tests experiment`
 
 ## Formatting
-Run `python -m black src tests`
+Run `python -m black src tests experiment`
 
 ## Testing
 Run `python -m pytest`

@@ -15,7 +15,6 @@ def monitor_bounds(game: Game, threshold: float):
 
 
 def monitor_distance(game: Game):
-    global max_distance
     distance = distance_between(game.teams[0][0].position, game.teams[1][0].position)
     return distance
 
