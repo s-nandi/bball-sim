@@ -1,4 +1,4 @@
-from bball.initiate import two_uniform_players
+from bball.initiate import two_uniform_players, players_collision
 from bball.create import create_strategy
 
 from runner import run_game
@@ -6,8 +6,8 @@ from experiment.monitor import Monitor
 
 
 def main():
-    game = two_uniform_players()
-    game.assign_team_strategy(0, create_strategy(0.01))
+    game = players_collision()
+    game.assign_team_strategy(0, create_strategy(0.1))
     game.assign_team_strategy(1, create_strategy(20))
 
     monitor = Monitor()
