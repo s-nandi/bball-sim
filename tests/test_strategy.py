@@ -1,7 +1,7 @@
 import math
 from typing import Tuple
 import pytest
-from bball import BallMode, Game
+from bball import BallMode, Game, Court, Player
 from bball.behavior import ReachVelocity
 from bball.strategy import RunToBasketAndShoot, StandBetweenBasket, UseBehavior
 from bball.utils import distance_between, close_to, vector_length, approx
@@ -15,7 +15,18 @@ from bball.create import (
     create_player_attributes,
     create_strategy,
     create_hoop,
+    create_three_point_line,
+    create_game_settings,
 )
+
+
+def assert_relatively_on_court(court: Court, player: Player, threshold: float):
+    position_x = player.position[0]
+    position_y = player.position[1]
+    assert position_x >= -threshold
+    assert position_x <= court.width + threshold
+    assert position_y >= -threshold
+    assert position_y <= court.height + threshold
 
 
 def test_run_to_basket_strategy():
@@ -177,18 +188,10 @@ def test_stay_relatively_on_court_with_composite_strategy(player_size):
     player_1, player_2 = game.teams[0][0], game.teams[1][0]
     space = create_space().add(game)
 
-    def assert_relatively_on_court(player, threshold: float):
-        position_x = player.position[0]
-        position_y = player.position[1]
-        assert position_x >= -threshold
-        assert position_x <= game.court.width + threshold
-        assert position_y >= -threshold
-        assert position_y <= game.court.height + threshold
-
     threshold = 1
     for _ in range(num_steps):
-        assert_relatively_on_court(player_1, threshold)
-        assert_relatively_on_court(player_2, threshold)
+        assert_relatively_on_court(game.court, player_1, threshold)
+        assert_relatively_on_court(game.court, player_2, threshold)
         space.step(time_frame)
 
 
@@ -249,3 +252,51 @@ def test_eventual_inbounds_with_everyone_initially_out_of_bounds():
     for _ in range(num_steps):
         space.step(time_frame)
     assert game.score[0] > 0 or game.score[1] > 0
+
+
+def setup_consistent_inbounds_despite_collisions(use_expected_value: bool):
+    size = 0.9
+    max_acceleration = 2.34
+    max_turn_degrees = 360
+    attributes_1 = create_player_attributes(
+        size=size, max_acceleration=max_acceleration, max_turn_degrees=max_turn_degrees
+    )
+    attributes_2 = create_player_attributes(
+        mass=2,
+        size=size,
+        max_acceleration=max_acceleration,
+        max_turn_degrees=max_turn_degrees,
+    )
+    width = 28.65
+    height = 15.24
+    player_1 = create_initialized_player(
+        position=(4, height / 2), attributes=attributes_1
+    )
+    player_2 = create_initialized_player(
+        position=(8, height / 2), attributes=attributes_2
+    )
+    three_point_line = create_three_point_line(width, height)
+    hoop = create_hoop(width, height, 1.6, three_point_line)
+    court = create_court(width, height, hoop)
+    game = create_game(
+        teams=create_teams(player_1, player_2),
+        court=court,
+        settings=create_game_settings(use_expected_value),
+    )
+    game.assign_team_strategy(0, create_strategy(0.1))
+    game.assign_team_strategy(1, create_strategy(20))
+    return game
+
+
+def test_consistent_inbounds_despite_collisions():
+    duration = 200
+    time_frame = 1 / 20
+    num_steps = math.ceil(duration / time_frame)
+    game = setup_consistent_inbounds_despite_collisions(True)
+    space = create_space(game)
+    [player_1], [player_2] = game.teams
+    threshold = 200
+    for _ in range(num_steps):
+        assert_relatively_on_court(game.court, player_1, threshold)
+        assert_relatively_on_court(game.court, player_2, threshold)
+        space.step(time_frame)
