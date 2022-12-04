@@ -24,14 +24,14 @@ def two_uniform_players() -> Game:
     player_2 = create_initialized_player(
         position=(4, height / 2 - 2), attributes=attributes
     )
-    three_point_line = create_three_point_line(width, height)
-    hoop = create_hoop(width, height, 1.6, three_point_line)
-    court = create_court(width, height, hoop)
-    game = create_game(
-        teams=create_teams(player_1, player_2),
-        court=court,
-        settings=create_game_settings(USE_EXPECTED_VALUE),
+    hoop = create_hoop(width, height, 1.6, create_three_point_line(width, height))
+    game = (
+        create_game(
+            teams=create_teams(player_1, player_2),
+            court=create_court(width, height, hoop),
+            settings=create_game_settings(USE_EXPECTED_VALUE),
+        )
+        .assign_team_strategy(0, create_strategy(0.1))
+        .assign_team_strategy(1, create_strategy(10))
     )
-    game.assign_team_strategy(0, create_strategy(0.1))
-    game.assign_team_strategy(1, create_strategy(10))
     return game
