@@ -152,7 +152,9 @@ def setup_scoring_test(use_ev: bool) -> ScoringTest:
     court = create_court(width=width)
     player = create_initialized_player()
     game = create_game(
-        teams=create_teams(player), settings=create_game_settings(use_ev), court=court
+        teams=create_teams(player),
+        settings=create_game_settings(use_expected_value_for_points=use_ev),
+        court=court,
     )
     ball = game.ball
     space = create_space().add(game)
