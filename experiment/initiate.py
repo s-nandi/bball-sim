@@ -8,8 +8,8 @@ from bball.create import (
     create_hoop,
     create_three_point_line,
     create_strategy,
-    create_guaranteed_shot_probability,
 )
+from tests import test_strategy as tests  # pylint: disable=unused-import
 
 USE_EXPECTED_VALUE = True
 
@@ -60,22 +60,4 @@ def players_collision() -> Game:
     )
     game.assign_team_strategy(0, create_strategy(0.1))
     game.assign_team_strategy(1, create_strategy(20))
-    return game
-
-
-def test() -> Game:
-    player_size = 1.0
-    width, height = 28, 15
-    attributes = create_player_attributes(
-        shot_probability=create_guaranteed_shot_probability(),
-        max_acceleration=2.5,
-        size=player_size,
-    )
-    player_1 = create_initialized_player(position=(4, 4), attributes=attributes)
-    player_2 = create_initialized_player(position=(7, 7), attributes=attributes)
-    hoop = create_hoop(width, height, 2)
-    court = create_court(width, height, hoop)
-    game = create_game(teams=[Team(player_1), Team(player_2)], court=court)
-    game.assign_team_strategy(0, create_strategy(5))
-    game.assign_team_strategy(1, create_strategy(3))
     return game

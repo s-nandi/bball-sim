@@ -84,12 +84,9 @@ def test_scoring_with_composite_strategy():
     assert game.score[0] > 0 and game.score[1] > 0
 
 
-@pytest.mark.parametrize("player_size", [0.0, 1.0])
-def test_stay_relatively_on_court_with_composite_strategy(player_size):
-    duration = 50
-    time_frame = 1 / 30
-    num_steps = math.ceil(duration / time_frame)
+def setup_test_stay_relatively_on_court_with_composite_strategy(player_size):
     width, height = 28, 15
+    offset_from_left = 2 if player_size == 0 else 2 * player_size + 0.5
     attributes = create_player_attributes(
         shot_probability=create_guaranteed_shot_probability(),
         max_acceleration=2.5,
@@ -97,22 +94,30 @@ def test_stay_relatively_on_court_with_composite_strategy(player_size):
     )
     player_1 = create_initialized_player(position=(4, 4), attributes=attributes)
     player_2 = create_initialized_player(position=(7, 7), attributes=attributes)
-    hoop = create_hoop(width, height, 2)
+    hoop = create_hoop(width, height, offset_from_left=offset_from_left)
     court = create_court(width, height, hoop)
     game = create_game(teams=[Team(player_1), Team(player_2)], court=court)
     game.assign_team_strategy(0, create_strategy(5))
     game.assign_team_strategy(1, create_strategy(3))
+    return game
+
+
+@pytest.mark.parametrize("player_size", [0.0, 0.5, 1.0])
+def test_stay_relatively_on_court_with_composite_strategy(player_size):
+    duration = 50
+    time_frame = 1 / 30
+    num_steps = math.ceil(duration / time_frame)
+    game = setup_test_stay_relatively_on_court_with_composite_strategy(player_size)
+    player_1, player_2 = game.teams[0][0], game.teams[1][0]
     space = create_space().add(game)
 
     def assert_relatively_on_court(player, threshold: float):
         position_x = player.position[0]
         position_y = player.position[1]
-        width = court.width
-        height = court.height
         assert position_x >= -threshold
-        assert position_x <= width + threshold
+        assert position_x <= game.court.width + threshold
         assert position_y >= -threshold
-        assert position_y <= height + threshold
+        assert position_y <= game.court.height + threshold
 
     threshold = 1
     for _ in range(num_steps):
