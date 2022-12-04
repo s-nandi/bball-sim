@@ -46,6 +46,11 @@ class Player:
         return self._physics.velocity
 
     @property
+    def acceleration(self) -> Vector:
+        assert self.is_initialized
+        return self._physics.acceleration
+
+    @property
     def physical_attributes(self) -> PlayerAttributes.Physical:
         return self._attributes.physical
 

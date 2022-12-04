@@ -4,7 +4,7 @@ from bball.game import Game, Score
 from bball.ball import Ball
 from bball.team import Teams
 from bball.court import Court, Hoop, ThreePointLine, RectangleThreePointLine
-from bball.utils import angle_degrees_to_vector, sum_of
+from bball.utils import angle_degrees_to_vector, sum_of, multiply_by
 from bball.draw.draw_interface import DrawInterface, Color
 
 BALL_RADIUS = 0.5
@@ -12,6 +12,7 @@ DEFAULT_PLAYER_RADIUS = 0.9
 PLAYER_ORIENTATION_THICKNESS = 5
 
 BLACK = (0, 0, 0)
+PLAYER_MOVEMENT_COLOR = (200, 0, 0)
 TEAM_COLORS = [(153, 186, 221), (24, 70, 59)]
 BASKETBALL_COLOR = (238, 103, 48)
 COURT_LINE_COLOR = (0, 103, 130)
@@ -30,6 +31,15 @@ def draw_player(draw_object: DrawInterface, player: Player, color: Color):
         player.position,
         sum_of(player.position, delta),
         BLACK,
+        PLAYER_ORIENTATION_THICKNESS,
+    )
+    acceleration_arrow = multiply_by(
+        player.acceleration, radius / player.physical_attributes.max_acceleration
+    )
+    draw_object.draw_line(
+        player.position,
+        sum_of(player.position, acceleration_arrow),
+        PLAYER_MOVEMENT_COLOR,
         PLAYER_ORIENTATION_THICKNESS,
     )
 

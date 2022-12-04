@@ -9,6 +9,7 @@ from bball.utils import (
     Point,
     Vector,
     normalized_angle_degrees,
+    angle_degrees_to_vector,
 )
 from bball.validator import valid_angle_degrees
 
@@ -25,6 +26,7 @@ def velocity_func_with_decay(velocity_decay: float):
 class PhysicsObject:
     _body: pymunk.Body
     _shape: Optional[pymunk.Shape]
+    _last_acceleration: float
     _has_position: bool
     _has_orientation: bool
 
@@ -38,6 +40,8 @@ class PhysicsObject:
             self._body = pymunk.Body(mass, moment)
             self._shape = None
         self._body.velocity_func = velocity_func_with_decay(velocity_decay)
+
+        self._last_acceleration = 0.0
         self._has_position = False
         self._has_orientation = False
 
@@ -71,6 +75,12 @@ class PhysicsObject:
         assert self.is_initialized
         return convert_to_tuple(self._body.velocity)
 
+    @property
+    def acceleration(self) -> Vector:
+        return angle_degrees_to_vector(
+            self.orientation_degrees, self._last_acceleration
+        )
+
     def turn(self, angle: float, time_step: float) -> None:
         assert self.is_initialized
         self.orientation_degrees = normalized_angle_degrees(
@@ -80,6 +90,7 @@ class PhysicsObject:
 
     def accelerate(self, acceleration: float, time_step: float) -> None:
         assert self.is_initialized
+        self._last_acceleration = acceleration
         force = acceleration * self._body.mass * convert_to_vec2d(BASE_DIRECTION)
         impulse = force * time_step
         self._body.apply_impulse_at_local_point(impulse)
