@@ -62,7 +62,7 @@ class PhysicsObject:
     @property
     def orientation_degrees(self):
         assert self.is_initialized
-        return to_degrees(self._body.angle)
+        return normalized_angle_degrees(to_degrees(self._body.angle))
 
     @orientation_degrees.setter
     def orientation_degrees(self, orientation_degrees: float):
