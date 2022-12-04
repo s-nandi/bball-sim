@@ -84,13 +84,16 @@ def test_scoring_with_composite_strategy():
     assert game.score[0] > 0 and game.score[1] > 0
 
 
-def test_stay_relatively_on_court_with_composite_strategy():
+@pytest.mark.parametrize("player_size", [0.0, 1.0])
+def test_stay_relatively_on_court_with_composite_strategy(player_size):
     duration = 50
     time_frame = 1 / 30
     num_steps = math.ceil(duration / time_frame)
     width, height = 28, 15
     attributes = create_player_attributes(
-        shot_probability=create_guaranteed_shot_probability(), max_acceleration=2.5
+        shot_probability=create_guaranteed_shot_probability(),
+        max_acceleration=2.5,
+        size=player_size,
     )
     player_1 = create_initialized_player(position=(4, 4), attributes=attributes)
     player_2 = create_initialized_player(position=(7, 7), attributes=attributes)
