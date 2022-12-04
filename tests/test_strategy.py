@@ -85,7 +85,7 @@ def test_scoring_with_composite_strategy():
     assert game.score[0] > 0 and game.score[1] > 0
 
 
-def setup_test_stay_relatively_on_court_with_composite_strategy(player_size):
+def setup_stay_relatively_on_court_with_composite_strategy(player_size):
     width, height = 28, 15
     offset_from_left = 2 if player_size == 0 else 2 * player_size + 0.5
     attributes = create_player_attributes(
@@ -108,7 +108,7 @@ def test_stay_relatively_on_court_with_composite_strategy(player_size):
     duration = 50
     time_frame = 1 / 30
     num_steps = math.ceil(duration / time_frame)
-    game = setup_test_stay_relatively_on_court_with_composite_strategy(player_size)
+    game = setup_stay_relatively_on_court_with_composite_strategy(player_size)
     player_1, player_2 = game.teams[0][0], game.teams[1][0]
     space = create_space().add(game)
 
