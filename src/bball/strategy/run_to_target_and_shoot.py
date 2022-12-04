@@ -17,8 +17,7 @@ class RunToTargetAndShoot(StrategyInterface):
 
     def update_behaviors(self):
         self._behaviors = [
-            RunPastPosition(position_of(self.target), DEFAULT_EPS, self._time_frame)
-            for _ in self._team
+            RunPastPosition(position_of(self.target), DEFAULT_EPS) for _ in self._team
         ]
 
     def _after_team_set(self):
@@ -35,4 +34,4 @@ class RunToTargetAndShoot(StrategyInterface):
                 target_hoop = self._game.target_hoop(player)
                 player.shoot_at(target_hoop.position, 10)
             else:
-                behavior.drive(player)
+                behavior.drive(player, self._time_frame)

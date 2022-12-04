@@ -12,6 +12,7 @@ from bball.utils import (
     difference_between,
 )
 from bball.player import Player
+from bball.behavior.behavior_interface import BehaviorInterface
 from bball.behavior.reach_orientation import ReachOrientation
 
 
@@ -58,9 +59,8 @@ def ideal_acceleration_multiplier(player: Player, v_target: Vector, time_frame: 
 
 
 @dataclass
-class ReachVelocity:
+class ReachVelocity(BehaviorInterface):
     target_velocity: Vector
-    time_frame: float
     target_angle_degrees: Optional[float] = field(init=False)
 
     def __post_init__(self):
@@ -73,15 +73,15 @@ class ReachVelocity:
         if close_to(player.velocity, self.target_velocity):
             return False
         multiplier = ideal_acceleration_multiplier(
-            player, self.target_velocity, self.time_frame
+            player, self.target_velocity, self._time_frame
         )
         player.accelerate(multiplier)
         return True
 
-    def drive(self, player: Player) -> bool:
+    def _drive(self, player: Player) -> bool:
         if self.target_angle_degrees is not None:
-            orient = ReachOrientation(self.target_angle_degrees, self.time_frame)
-            if orient.drive(player):
+            orient = ReachOrientation(self.target_angle_degrees)
+            if orient.drive(player, self._time_frame):
                 return True
         if self._fix_velocity_magnitude_assuming_alignment(player):
             return True

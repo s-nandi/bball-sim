@@ -28,7 +28,7 @@ class CompositeStrategy(StrategyInterface):
             court = self._game.court
             center = (court.width / 2, court.height / 2)
             for player in self._team:
-                RunPastPosition(center, DEFAULT_EPS, self._time_frame).drive(player)
+                RunPastPosition(center, DEFAULT_EPS).drive(player, self._time_frame)
             return
         if offensive_team_index == self._team_index:
             self.offensive_strategy.drive(self._time_frame)

@@ -20,9 +20,9 @@ def test_steady_velocity_behavior():
     space = create_space().add(player)
     target_velocity = (-2, 2)
     time_frame = 1
-    behavior = ReachVelocity(target_velocity, time_frame)
+    behavior = ReachVelocity(target_velocity)
     for _ in range(steps):
-        if not behavior.drive(player):
+        if not behavior.drive(player, time_frame):
             break
         space.step(time_frame)
     assert close_to(player.velocity, target_velocity)
@@ -43,10 +43,10 @@ def test_steady_velocity_behavior_with_initial_movement(
     rotation_steps = 2 if target_velocity_x < 0 else 0
     acceleration_steps = abs(target_velocity_x)
     target_velocity = (target_velocity_x, 0)
-    behavior = ReachVelocity(target_velocity, time_frame)
+    behavior = ReachVelocity(target_velocity)
     allowed_steps = initial_steps + (rotation_steps + acceleration_steps) / time_frame
     for _ in range(math.ceil(allowed_steps)):
-        if not behavior.drive(team[0]):
+        if not behavior.drive(team[0], time_frame):
             break
         space.step(time_frame)
     assert close_to(team[0].velocity, target_velocity)
@@ -72,10 +72,10 @@ def test_stopping_behavior(_trial_index, initial_steps):
     assert player_1.velocity[0] < 0
     assert player_2.velocity[0] > 0
     time_frame = 1
-    behavior = Stop(time_frame)
+    behavior = Stop()
     for _ in range(initial_steps):
-        moved_1 = behavior.drive(player_1)
-        moved_2 = behavior.drive(player_2)
+        moved_1 = behavior.drive(player_1, time_frame)
+        moved_2 = behavior.drive(player_2, time_frame)
         if not moved_1 and not moved_2:
             break
         space.step(time_frame)
@@ -105,12 +105,12 @@ def test_position_reaching(target_position):
     player = create_initialized_player()
     space = create_space().add(player)
     time_frame = 0.2
-    behavior = ReachPosition(target_position, time_frame)
+    behavior = ReachPosition(target_position)
     turn_steps = 360 / player.physical_attributes.max_turn_degrees / time_frame
     acceleration_steps = math.hypot(target_position[0], target_position[1]) / time_frame
     allowed_steps = turn_steps + acceleration_steps
     for _ in range(math.ceil(allowed_steps)):
-        if not behavior.drive(player):
+        if not behavior.drive(player, time_frame):
             break
         space.step(time_frame)
     assert close_to(player.velocity, (0, 0))
@@ -123,7 +123,7 @@ def test_position_reaching_with_initial_movement(initial_steps, target_position)
     player = create_initialized_player()
     space = create_space().add(player)
     time_frame = 0.2
-    behavior = ReachPosition(target_position, time_frame)
+    behavior = ReachPosition(target_position)
     turn_steps = 360 / player.physical_attributes.max_turn_degrees / time_frame
     acceleration_steps = math.hypot(target_position[0], target_position[1]) / time_frame
     allowed_steps = turn_steps + acceleration_steps + initial_steps
@@ -131,7 +131,7 @@ def test_position_reaching_with_initial_movement(initial_steps, target_position)
         player.turn(uniform(0, 1)).accelerate(uniform(-1, 1))
         space.step(time_frame)
     for _ in range(math.ceil(allowed_steps)):
-        if not behavior.drive(player):
+        if not behavior.drive(player, time_frame):
             break
         space.step(time_frame)
     assert close_to(player.velocity, (0, 0))
@@ -160,10 +160,10 @@ def test_stopping():
         abs(player_2.velocity[1]),
     )
     steps_before_requiring_stop = math.ceil(time_before_requiring_stop / time_frame)
-    behaviors = [Stop(time_frame) for _ in players]
+    behaviors = [Stop() for _ in players]
     for _ in range(steps_before_requiring_stop):
         for behavior, player in zip(behaviors, players):
-            behavior.drive(player)
+            behavior.drive(player, time_frame)
         space.step(time_frame)
     assert close_to(player_1.velocity, (0, 0))
     assert close_to(player_2.velocity, (0, 0))

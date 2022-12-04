@@ -78,7 +78,7 @@ def test_use_behavior():
     distance_covered = velocity_magnitude * num_steps
     court = create_court(width=distance_covered, height=distance_covered)
     game = create_game(teams=create_teams(player), court=court).assign_team_strategy(
-        0, UseBehavior(ReachVelocity(target_velocity, time_frame))
+        0, UseBehavior(ReachVelocity(target_velocity))
     )
     space = create_space().add(game)
     for _ in range(num_steps):

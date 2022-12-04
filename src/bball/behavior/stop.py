@@ -1,11 +1,8 @@
-from dataclasses import dataclass
 from bball.player import Player
+from bball.behavior.behavior_interface import BehaviorInterface
 from bball.behavior.reach_velocity import ReachVelocity
 
 
-@dataclass
-class Stop:
-    time_frame: float
-
-    def drive(self, player: Player) -> bool:
-        return ReachVelocity((0, 0), self.time_frame).drive(player)
+class Stop(BehaviorInterface):
+    def _drive(self, player: Player) -> bool:
+        return ReachVelocity((0, 0)).drive(player, self._time_frame)

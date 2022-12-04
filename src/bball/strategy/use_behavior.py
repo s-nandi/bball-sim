@@ -5,7 +5,7 @@ from bball.strategy.strategy_interface import StrategyInterface
 
 
 class SupportsDrive(Protocol):
-    def drive(self, player: Player) -> bool:
+    def drive(self, player: Player, time_frame: float) -> bool:
         pass
 
 
@@ -18,4 +18,4 @@ class UseBehavior(StrategyInterface):
 
     def _drive(self):
         for player in self._team:
-            self.behavior.drive(player)
+            self.behavior.drive(player, self._time_frame)
