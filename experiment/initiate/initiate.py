@@ -29,7 +29,9 @@ def two_uniform_players() -> Game:
         create_game(
             teams=create_teams(player_1, player_2),
             court=create_court(width, height, hoop),
-            settings=create_game_settings(USE_EXPECTED_VALUE),
+            settings=create_game_settings(
+                use_expected_value_for_points=USE_EXPECTED_VALUE
+            ),
         )
         .assign_team_strategy(0, create_strategy(0.1))
         .assign_team_strategy(1, create_strategy(10))

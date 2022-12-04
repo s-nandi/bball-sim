@@ -289,7 +289,7 @@ def setup_consistent_inbounds_despite_collisions(
     game = create_game(
         teams=create_teams(player_1, player_2),
         court=court,
-        settings=create_game_settings(use_expected_value),
+        settings=create_game_settings(use_expected_value_for_points=use_expected_value),
     )
     game.assign_team_strategy(0, create_strategy(1))
     game.assign_team_strategy(1, create_strategy(20))
