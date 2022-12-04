@@ -1,16 +1,12 @@
 import math
 from random import uniform, seed
 import pytest
-from bball import (
-    Team,
-    Teams,
-    ReachVelocity,
-    Stop,
-    ReachPosition,
-)
+from bball import ReachVelocity, Stop, ReachPosition
 from bball.utils import close_to, approx
 from bball.create import (
     create_initialized_player,
+    create_team,
+    create_teams,
     create_player_attributes,
     create_space,
 )
@@ -38,7 +34,7 @@ def test_steady_velocity_behavior():
 def test_steady_velocity_behavior_with_initial_movement(
     _trial_index, initial_steps, target_velocity_x
 ):
-    team = Team(create_initialized_player())
+    team = create_team(create_initialized_player())
     space = create_space().add(team)
     time_frame = 0.2
     for _ in range(initial_steps):
@@ -59,9 +55,9 @@ def test_steady_velocity_behavior_with_initial_movement(
 @pytest.mark.parametrize("_trial_index", range(20))
 @pytest.mark.parametrize("initial_steps", (2, 10, 50))
 def test_stopping_behavior(_trial_index, initial_steps):
-    teams = Teams(
-        Team(create_initialized_player(position=(0, 0))),
-        Team(create_initialized_player(position=(0, 5))),
+    teams = create_teams(
+        create_initialized_player(position=(0, 0)),
+        create_initialized_player(position=(0, 5)),
     )
     space = create_space().add(teams)
     player_1 = teams[0][0]

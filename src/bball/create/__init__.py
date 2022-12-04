@@ -3,6 +3,7 @@ from .player import (
     create_uninitialized_player,
     create_player_attributes,
 )
+from .teams import create_team, create_teams
 from .aliases import create_space, create_ball
 from .court import create_court, create_three_point_line, create_hoop
 from .game import create_game_settings, create_game

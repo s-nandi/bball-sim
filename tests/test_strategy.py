@@ -1,10 +1,11 @@
 import math
 import pytest
-from bball import Team, BallMode
+from bball import BallMode
 from bball.strategy import RunToBasketAndShoot, StandBetweenBasket
 from bball.utils import distance_between, close_to
 from bball.create import (
     create_initialized_player,
+    create_teams,
     create_space,
     create_game,
     create_court,
@@ -17,7 +18,7 @@ from bball.create import (
 
 def test_run_to_basket_strategy():
     player = create_initialized_player()
-    game = create_game(teams=[Team(player)])
+    game = create_game(teams=create_teams(player))
     space = create_space().add(player)
     ball = game.ball
     ball.jump_ball_won_by(player)
@@ -49,7 +50,7 @@ def test_stand_between_player_and_basket(attacker_accel):
     player_1 = create_initialized_player(position=(0, height / 2))
     player_2 = create_initialized_player(position=(initial_padding, height / 2))
     court = create_court(width, height)
-    game = create_game(teams=[Team(player_1), Team(player_2)], court=court)
+    game = create_game(teams=create_teams(player_1, player_2), court=court)
     space = create_space().add(game)
     ball = game.ball
     ball.jump_ball_won_by(player_1)
@@ -74,7 +75,7 @@ def test_scoring_with_composite_strategy():
     player_2 = create_initialized_player(position=(7, 7), attributes=attributes)
     hoop = create_hoop(offset_from_left=0.2)
     court = create_court(hoop=hoop)
-    game = create_game(teams=[Team(player_1), Team(player_2)], court=court)
+    game = create_game(teams=create_teams(player_1, player_2), court=court)
     space = create_space().add(game)
     for team_index in range(2):
         game.assign_team_strategy(team_index, create_strategy(0.1))
@@ -96,7 +97,7 @@ def setup_test_stay_relatively_on_court_with_composite_strategy(player_size):
     player_2 = create_initialized_player(position=(7, 7), attributes=attributes)
     hoop = create_hoop(width, height, offset_from_left=offset_from_left)
     court = create_court(width, height, hoop)
-    game = create_game(teams=[Team(player_1), Team(player_2)], court=court)
+    game = create_game(teams=create_teams(player_1, [player_2]), court=court)
     game.assign_team_strategy(0, create_strategy(5))
     game.assign_team_strategy(1, create_strategy(3))
     return game
@@ -141,7 +142,7 @@ def test_stay_close_with_composite_strategy():
     )
     hoop = create_hoop(width, height, offset_from_left=2)
     court = create_court(width, height, hoop)
-    game = create_game(teams=[Team(player_1), Team(player_2)], court=court)
+    game = create_game(teams=create_teams([player_1], player_2), court=court)
     game.assign_team_strategy(0, create_strategy(0.01))
     game.assign_team_strategy(1, create_strategy(0.01))
     space = create_space().add(game)
