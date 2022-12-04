@@ -1,6 +1,6 @@
 import math
 import pytest
-from bball import BallMode
+from bball import BallMode, Game
 from bball.strategy import RunToBasketAndShoot, StandBetweenBasket
 from bball.utils import distance_between, close_to
 from bball.create import (
@@ -85,7 +85,7 @@ def test_scoring_with_composite_strategy():
     assert game.score[0] > 0 and game.score[1] > 0
 
 
-def setup_stay_relatively_on_court_with_composite_strategy(player_size):
+def setup_stay_relatively_on_court_with_composite_strategy(player_size) -> Game:
     width, height = 28, 15
     offset_from_left = 2 if player_size == 0 else 2 * player_size + 0.5
     attributes = create_player_attributes(
@@ -156,11 +156,12 @@ def test_stay_close_with_composite_strategy():
         space.step(time_frame)
 
 
-def setup_eventual_inbounds_with_everyone_initially_out_of_bounds():
+def setup_eventual_inbounds_with_everyone_initially_out_of_bounds(
+    initial_error: float,
+) -> Game:
     width = 20
     height = 10
     attributes = create_player_attributes(size=1.0)
-    initial_error = 2
     player_1 = create_initialized_player(
         position=(-initial_error, -initial_error), attributes=attributes
     )
@@ -178,7 +179,7 @@ def test_eventual_inbounds_with_everyone_initially_out_of_bounds():
     duration = 10
     time_frame = 1 / 20
     num_steps = math.ceil(duration / time_frame)
-    game = setup_eventual_inbounds_with_everyone_initially_out_of_bounds()
+    game = setup_eventual_inbounds_with_everyone_initially_out_of_bounds(2.0)
     space = create_space().add(game)
     for _ in range(num_steps):
         space.step(time_frame)
