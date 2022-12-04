@@ -38,8 +38,7 @@ def two_uniform_players() -> Game:
 
 
 def players_collision() -> Game:
-    # TODO: Change size once behaviors are robust to collisions
-    size = 0
+    size = 0.9
     max_acceleration = 2.34
     max_turn_degrees = 360
     attributes_1 = create_player_attributes(
