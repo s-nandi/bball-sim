@@ -96,17 +96,23 @@ def draw_ball(draw_object: DrawInterface, ball: Ball):
     draw_object.draw_filled_circle(ball.position, BALL_RADIUS, BASKETBALL_COLOR)
 
 
-def draw_score(draw_object: DrawInterface, score: Score):
+def draw_score(
+    draw_object: DrawInterface, score: Score, dimensions: Tuple[float, float]
+):
     def format_score(val: float):
         return str(round(val, 2))
 
+    font_size = 80
+    padding_for_font_size = 0.001 * font_size
+    offset = (dimensions[0] / 2, dimensions[1] * (1 + padding_for_font_size))
     score_0 = format_score(score[0])
     score_1 = format_score(score[1])
-    draw_object.write_text((40, 25), TEXT_COLOR, f"{score_0}  -  {score_1}", 35)
+    score_string = f"{score_0}  -  {score_1}"
+    draw_object.write_text(offset, TEXT_COLOR, score_string, font_size)
 
 
 def draw_game(draw_object: DrawInterface, game: Game):
     draw_teams(draw_object, game.teams)
     draw_court(draw_object, game.court)
     draw_ball(draw_object, game.ball)
-    draw_score(draw_object, game.score)
+    draw_score(draw_object, game.score, game.court.dimensions)
