@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import List, Callable, Optional
 from dataclasses import dataclass, field
 from random import random
@@ -25,9 +26,12 @@ class Game:
     settings: GameSettings = field(default_factory=GameSettings)
     _scoreboard: Scoreboard = field(init=False, default_factory=Scoreboard)
 
-    def assign_team_strategy(self, team_index: int, strategy: StrategyInterface):
+    def assign_team_strategy(
+        self, team_index: int, strategy: StrategyInterface
+    ) -> Game:
         strategy.for_team_index_in_game(team_index, self)
         self.teams[team_index]._strategy = strategy
+        return self
 
     @property
     def _checks(self) -> List[MonitoringFunction]:

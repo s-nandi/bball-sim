@@ -1,8 +1,9 @@
 import math
 import pytest
 from bball import BallMode, Game
-from bball.strategy import RunToBasketAndShoot, StandBetweenBasket
-from bball.utils import distance_between, close_to
+from bball.behavior import ReachVelocity
+from bball.strategy import RunToBasketAndShoot, StandBetweenBasket, UseBehavior
+from bball.utils import distance_between, close_to, vector_length
 from bball.create import (
     create_initialized_player,
     create_teams,
@@ -63,6 +64,26 @@ def test_stand_between_player_and_basket(attacker_accel):
         assert player_1.position[0] <= player_2.position[0] <= target_hoop.position[0]
         strategy.drive(time_frame)
         space.step(time_frame)
+
+
+def test_use_behavior():
+    time_frame = 0.2
+    player = create_initialized_player()
+    target_velocity = (5.0, 5.0)
+    max_turn_degrees = player.physical_attributes.max_turn_degrees
+    orientation_steps = math.ceil(360 / max_turn_degrees / time_frame)
+    velocity_magnitude = vector_length(target_velocity)
+    steps_till_velocity_expected = math.ceil(velocity_magnitude / time_frame)
+    num_steps = orientation_steps + steps_till_velocity_expected
+    distance_covered = velocity_magnitude * num_steps
+    court = create_court(width=distance_covered, height=distance_covered)
+    game = create_game(teams=create_teams(player), court=court).assign_team_strategy(
+        0, UseBehavior(ReachVelocity(target_velocity, time_frame))
+    )
+    space = create_space().add(game)
+    for _ in range(num_steps):
+        space.step(time_frame)
+    assert close_to(player.velocity, target_velocity)
 
 
 def test_scoring_with_composite_strategy():
