@@ -4,5 +4,5 @@ from typing import Tuple
 
 @dataclass
 class RenderSettings:
-    resolution: Tuple[int, int]
+    resolution: Tuple[float, float]
     frame_rate: int

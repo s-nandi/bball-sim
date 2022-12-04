@@ -8,7 +8,7 @@ class Engine:
     clock: pygame.time.Clock
     render_settings: RenderSettings
 
-    def __init__(self, resolution: Tuple[int, int], frame_rate: int):
+    def __init__(self, resolution: Tuple[float, float], frame_rate: int):
         pygame.init()
         self.surface = pygame.display.set_mode(resolution)
         self.clock = pygame.time.Clock()
