@@ -47,7 +47,7 @@ def multiple_players(num_players_per_team: int) -> Game:
                 shot_clock_duration=24.0,
             ),
         )
-        .assign_team_strategy(0, create_strategy(0.1))
+        .assign_team_strategy(0, create_strategy(2))
         .assign_team_strategy(1, create_strategy(10))
     )
     return game
