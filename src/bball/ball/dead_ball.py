@@ -5,7 +5,7 @@ from bball.ball.ball_mode import BallMode
 
 @dataclass
 class DeadBall(BallState):
-    _should_flip_posession: bool
+    _should_flip_possession: bool
 
     @staticmethod
     def mode() -> BallMode:

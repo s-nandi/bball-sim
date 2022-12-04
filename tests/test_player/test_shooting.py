@@ -27,7 +27,7 @@ def setup_shooting_test(shot_distance, shot_velocity) -> ShootingTest:
     return ShootingTest(space, ball, shooter)
 
 
-def test_posession_ends_after_shooting():
+def test_possession_ends_after_shooting():
     test = setup_shooting_test(1, 2)
     test.space.step(1)
     assert not test.shooter.has_ball

@@ -48,8 +48,8 @@ class Ball:
         return self._last_belonged_to
 
     @property
-    def should_flip_posession(self) -> bool:
-        return checked_type(self._state, DeadBall)._should_flip_posession
+    def should_flip_possession(self) -> bool:
+        return checked_type(self._state, DeadBall)._should_flip_possession
 
     @property
     def shot_parameters(self) -> ShotParameters:

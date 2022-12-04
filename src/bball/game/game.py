@@ -70,7 +70,7 @@ class Game:
         return [
             self.check_out_of_bounds,
             self.arbitrary_inbound,
-            self.transfer_posession,
+            self.transfer_possession,
             self.potentially_make_basket,
         ]
 
@@ -103,7 +103,7 @@ class Game:
         return self._scoreboard.score
 
     @property
-    def team_with_last_posession(self) -> Optional[int]:
+    def team_with_last_possession(self) -> Optional[int]:
         last_ball_handler = self.ball.last_belonged_to
         if last_ball_handler is None:
             return None
@@ -117,9 +117,9 @@ class Game:
         if self.ball.mode in [BallMode.DEAD, BallMode.MIDSHOT, BallMode.REACHEDSHOT]:
             self._clock.possession_ended()
         if self.ball.mode == BallMode.HELD:
-            team_with_posession = self.team_with_last_posession
-            assert team_with_posession is not None
-            self._clock.possession_started(team_with_posession)
+            team_with_possession = self.team_with_last_possession
+            assert team_with_possession is not None
+            self._clock.possession_started(team_with_possession)
         if self._clock.did_expire_after_step(time_frame):
             self.ball.shot_clock_expired()
             return True
@@ -136,23 +136,23 @@ class Game:
     def arbitrary_inbound(self) -> bool:
         if self.ball.mode != BallMode.DEAD:
             return False
-        team_with_posession = (
-            self.team_with_last_posession
-            if self.team_with_last_posession is not None
+        team_with_possession = (
+            self.team_with_last_possession
+            if self.team_with_last_possession is not None
             else 0
         )
-        new_team_with_posession = (
-            team_with_posession
-            if not self.ball.should_flip_posession
-            else other_team_index(team_with_posession)
+        new_team_with_possession = (
+            team_with_possession
+            if not self.ball.should_flip_possession
+            else other_team_index(team_with_possession)
         )
-        player = self.teams[new_team_with_posession][0]
+        player = self.teams[new_team_with_possession][0]
         if not self.court.is_inbounds(player):
             return False
         self.ball.jump_ball_won_by(player)
         return True
 
-    def transfer_posession(self) -> bool:
+    def transfer_possession(self) -> bool:
         if self.ball.mode != BallMode.RECEIVEDPASS:
             return False
         self.ball.successful_pass(self.ball.passed_to)

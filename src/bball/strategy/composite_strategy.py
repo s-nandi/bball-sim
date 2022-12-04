@@ -23,7 +23,7 @@ class CompositeStrategy(StrategyInterface):
         self.defensive_strategy.for_team_index_in_game(self._team_index, self._game)
 
     def _drive(self):
-        offensive_team_index = self._game.team_with_last_posession
+        offensive_team_index = self._game.team_with_last_possession
         if self._game.ball.mode == BallMode.DEAD:
             court = self._game.court
             center = (court.width / 2, court.height / 2)
