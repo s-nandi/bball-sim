@@ -96,19 +96,34 @@ def draw_ball(draw_object: DrawInterface, ball: Ball):
     draw_object.draw_filled_circle(ball.position, BALL_RADIUS, BASKETBALL_COLOR)
 
 
+def format_float(val: float):
+    return str(round(val, 2))
+
+
 def draw_score(
     draw_object: DrawInterface, score: Score, dimensions: Tuple[float, float]
 ):
-    def format_score(val: float):
-        return str(round(val, 2))
-
     font_size = 80
     padding_for_font_size = 0.001 * font_size
     offset = (dimensions[0] / 2, dimensions[1] * (1 + padding_for_font_size))
-    score_0 = format_score(score[0])
-    score_1 = format_score(score[1])
+    score_0 = format_float(score[0])
+    score_1 = format_float(score[1])
     score_string = f"{score_0}  -  {score_1}"
     draw_object.write_text(offset, TEXT_COLOR, score_string, font_size)
+
+
+def draw_shot_clock(
+    draw_object: DrawInterface,
+    shot_clock: float,
+    dimensions: Tuple[float, float],
+):
+    if shot_clock == float("inf"):
+        return
+    font_size = 30
+    padding_for_font_size = 0.001 * font_size
+    offset = (dimensions[0] / 2, -dimensions[1] * padding_for_font_size)
+    shot_clock_string = f"{int(shot_clock)}s"
+    draw_object.write_text(offset, TEXT_COLOR, shot_clock_string, font_size)
 
 
 def draw_game(draw_object: DrawInterface, game: Game):
@@ -116,3 +131,4 @@ def draw_game(draw_object: DrawInterface, game: Game):
     draw_court(draw_object, game.court)
     draw_ball(draw_object, game.ball)
     draw_score(draw_object, game.score, game.court.dimensions)
+    draw_shot_clock(draw_object, game.shot_clock, game.court.dimensions)

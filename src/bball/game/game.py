@@ -11,11 +11,39 @@ from bball.team import Team, Teams, other_team_index
 from bball.strategy import StrategyInterface
 
 MonitoringFunction = Callable[[], bool]
+TimedMonitoringFunction = Callable[[float], bool]
 
 
 @dataclass
 class GameSettings:
+    shot_clock_duration: Optional[float] = None
     use_expected_value_for_points: bool = False
+
+    def __post_init__(self):
+        if self.shot_clock_duration is None:
+            self.shot_clock_duration = float("inf")
+
+
+@dataclass
+class ShotClock:
+    shot_clock_duration: float
+    possession_time: float = field(init=False, default=0.0)
+    active_possession: Optional[int] = field(init=False, default=None)
+
+    def did_expire_after_step(self, time_frame: float) -> bool:
+        self.possession_time -= time_frame
+        self.possession_time = max(0, self.possession_time)
+        if self.active_possession is None:
+            return False
+        return self.possession_time <= 0.0
+
+    def possession_ended(self):
+        self.active_possession = None
+
+    def possession_started(self, team_index: int):
+        if self.active_possession != team_index:
+            self.possession_time = self.shot_clock_duration
+            self.active_possession = team_index
 
 
 @dataclass
@@ -25,6 +53,10 @@ class Game:
     court: Court
     settings: GameSettings = field(default_factory=GameSettings)
     _scoreboard: Scoreboard = field(init=False, default_factory=Scoreboard)
+    _clock: ShotClock = field(init=False)
+
+    def __post_init__(self):
+        self._clock = ShotClock(self.settings.shot_clock_duration)
 
     def assign_team_strategy(
         self, team_index: int, strategy: StrategyInterface
@@ -42,7 +74,14 @@ class Game:
             self.potentially_make_basket,
         ]
 
-    def _step(self, _time_frame: float) -> bool:
+    @property
+    def _timed_checks(self) -> List[TimedMonitoringFunction]:
+        return [self.check_shot_clock]
+
+    def _step(self, time_frame: float) -> bool:
+        for timed_check in self._timed_checks:
+            if timed_check(time_frame):
+                return True
         for check in self._checks:
             if check():
                 return True
@@ -54,6 +93,10 @@ class Game:
             if player in team:
                 return team_index
         assert False, f"Player {player} does not exist in game"
+
+    @property
+    def shot_clock(self) -> float:
+        return self._clock.possession_time
 
     @property
     def score(self) -> Score:
@@ -69,6 +112,18 @@ class Game:
     def target_hoop(self, player: Player) -> Hoop:
         team_index = self.team_index_of(player)
         return self.court._hoops[other_team_index(team_index)]
+
+    def check_shot_clock(self, time_frame: float) -> bool:
+        if self.ball.mode in [BallMode.DEAD, BallMode.MIDSHOT, BallMode.REACHEDSHOT]:
+            self._clock.possession_ended()
+        if self.ball.mode == BallMode.HELD:
+            team_with_posession = self.team_with_last_posession
+            assert team_with_posession is not None
+            self._clock.possession_started(team_with_posession)
+        if self._clock.did_expire_after_step(time_frame):
+            self.ball.shot_clock_expired()
+            return True
+        return False
 
     def check_out_of_bounds(self) -> bool:
         if self.ball.mode != BallMode.HELD:

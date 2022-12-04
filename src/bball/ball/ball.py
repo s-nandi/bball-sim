@@ -71,8 +71,14 @@ class Ball:
         self._state = state
         return self
 
-    def held_out_of_bounds(self):
+    def turnover(self) -> Ball:
         return self._transition(HeldBall, DeadBall(True))
+
+    def held_out_of_bounds(self) -> Ball:
+        return self.turnover()
+
+    def shot_clock_expired(self) -> Ball:
+        return self.turnover()
 
     def pass_to(self, receiver: Player, pass_velocity: float) -> Ball:
         return self._transition(HeldBall, MidPass(self, receiver, pass_velocity))
