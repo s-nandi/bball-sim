@@ -1,3 +1,4 @@
+from pprint import pprint
 from runner import run_game
 from experiment.monitor import Monitor
 from experiment import initiate
@@ -8,8 +9,7 @@ def main():
 
     monitor = Monitor(float("inf"))
     run_game(game, fps=60, monitor=lambda: monitor.monitor(game))
-    print("max dist", monitor.max_distance)
-    print("duration", monitor.time_since_start)
+    pprint(monitor.stats())
 
 
 if __name__ == "__main__":
