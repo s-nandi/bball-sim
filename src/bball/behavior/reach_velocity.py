@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import Optional
 from bball.utils import (
     Vector,
     close_to,
@@ -18,11 +19,13 @@ from bball.behavior.reach_orientation import ReachOrientation
 class ReachVelocity:
     target_velocity: Vector
     time_frame: float
-    target_angle_degrees: float = field(init=False)
+    target_angle_degrees: Optional[float] = field(init=False)
 
     def __post_init__(self):
-        assert not close_to(self.target_velocity, ZERO_VECTOR)
-        self.target_angle_degrees = vector_angle_degrees(self.target_velocity)
+        if close_to(self.target_velocity, ZERO_VECTOR):
+            self.target_angle_degrees = None
+        else:
+            self.target_angle_degrees = vector_angle_degrees(self.target_velocity)
 
     def _fix_velocity_magnitude_assuming_alignment(self, player: Player) -> bool:
         if close_to(player.velocity, self.target_velocity):
@@ -39,8 +42,10 @@ class ReachVelocity:
         return True
 
     def drive(self, player: Player) -> bool:
-        if ReachOrientation(self.target_angle_degrees, self.time_frame).drive(player):
-            return True
+        if self.target_angle_degrees is not None:
+            orient = ReachOrientation(self.target_angle_degrees, self.time_frame)
+            if orient.drive(player):
+                return True
         if self._fix_velocity_magnitude_assuming_alignment(player):
             return True
         return False
