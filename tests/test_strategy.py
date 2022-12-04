@@ -166,6 +166,8 @@ def setup_eventual_inbounds_with_everyone_initially_out_of_bounds():
     )
     court = create_court(width, height)
     game = create_game(teams=create_teams(player_1, player_2), court=court)
+    game.assign_team_strategy(0, create_strategy(0.01))
+    game.assign_team_strategy(1, create_strategy(0.01))
     return game
 
 
