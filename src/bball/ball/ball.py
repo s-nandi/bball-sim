@@ -72,10 +72,18 @@ class Ball:
         return self
 
     def turnover(self) -> Ball:
-        return self._transition(HeldBall, DeadBall(True))
+        # Might not be held-ball, could be mid pass or shot for example
+        valid_start_states = [MidPass, ReceivedPass, HeldBall]
+        for start_state in valid_start_states:
+            try:
+                self._transition(start_state, DeadBall(True))
+                return self
+            except AssertionError:
+                pass
+        assert False, f"Invalid start state {self._state}"
 
     def held_out_of_bounds(self) -> Ball:
-        return self.turnover()
+        return self._transition(HeldBall, DeadBall(True))
 
     def shot_clock_expired(self) -> Ball:
         return self.turnover()
