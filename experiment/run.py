@@ -1,28 +1,28 @@
-from experiment import initiate, compare, visualize
+from pprint import pprint
+from runner import run, run_headless
+from experiment.monitor import Monitor
 from bball import Game
-from bball.create import created_spaced_strategy, create_strategy
 
 
-def visualize_game(game: Game):
-    visualize.visualize(game, fps=90, speed_scale=5.0, display_scale=0.3)
+def visualize(game: Game, fps: int, speed_scale: float, display_scale: float):
+    monitor = Monitor(float("inf"))
+    run(
+        game,
+        fps=fps,
+        speed_scale=speed_scale,
+        display_scale=display_scale,
+        monitor=lambda: monitor.monitor(game),
+    )
+    pprint(monitor.stats())
 
 
-def compare_strategies(game: Game):
-    comparison = compare.compare(game, duration=300.0, time_frame=1 / 90)
-    return comparison
-
-
-def main():
-    do_visualize = 0
-    game = initiate.canonical_game(2)
-    game.assign_team_strategy(0, created_spaced_strategy(4, 3.0, 1.0, True, 0.5))
-    game.assign_team_strategy(1, create_strategy(10, 0.5))
-
-    if do_visualize:
-        visualize_game(game)
-    else:
-        print(compare_strategies(game))
-
-
-if __name__ == "__main__":
-    main()
+def headless(game: Game, fps: int, speed_scale: float, duration: float):
+    monitor = Monitor(float("inf"))
+    run_headless(
+        game,
+        fps=fps,
+        speed_scale=speed_scale,
+        duration=duration,
+        monitor=lambda: monitor.monitor(game),
+    )
+    pprint(monitor.stats())
