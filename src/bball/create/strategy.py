@@ -1,4 +1,3 @@
-from typing import Optional
 from bball.strategy import (
     CompositeStrategy,
     RunToBasketAndShoot,
@@ -15,13 +14,14 @@ def create_strategy(shooting_distance: float = 5.0):
 
 
 def created_spaced_strategy(
-    shooting_distance: float = 5.0,
-    spacing_distance: Optional[float] = None,
-    make_passes: bool = False,
+    spacing_distance: float = 5.0,
+    shot_quality_threshold: float = 1.0,
+    pass_probability: float = 0.5,
+    dive_to_basket: bool = False,
 ):
-    if spacing_distance is None:
-        spacing_distance = shooting_distance
     return CompositeStrategy(
-        SpacePassShoot(shooting_distance, spacing_distance, make_passes),
+        SpacePassShoot(
+            spacing_distance, shot_quality_threshold, pass_probability, dive_to_basket
+        ),
         StandBetweenBasket(),
     )

@@ -1,10 +1,9 @@
 from __future__ import annotations
-from random import choices
+from random import choices, random
 from dataclasses import dataclass, field
 from typing import List, TYPE_CHECKING
 from bball.behavior import RunPastPosition
 from bball.utils import (
-    distance_between,
     position_of,
     sum_of,
     DEFAULT_EPS,
@@ -20,17 +19,17 @@ if TYPE_CHECKING:
 
 @dataclass
 class SpacePassShoot(StrategyInterface):
-    shooting_distance: float
     spacing_distance: float
-    make_passes: bool
+    shot_quality_threshold: float
+    pass_probability: float
+    dive_to_basket: bool
     _behaviors: List[RunPastPosition] = field(init=False)
     _shot_quality_metric: List[float] = field(init=False)
 
     def _target_position_and_distance_for(self, player: Player, player_index: int):
         target_hoop = self._game.target_hoop(player)
         position = position_of(target_hoop)
-        last_ball_handler = self._game.ball.last_belonged_to == player
-        if last_ball_handler:
+        if player == self._game.ball.last_belonged_to and self.dive_to_basket:
             return (position, DEFAULT_EPS)
 
         team_size = len(self._team)
@@ -48,18 +47,18 @@ class SpacePassShoot(StrategyInterface):
         )
         return (half_court.multiplier_to_position(clamped_coefficients), DEFAULT_EPS)
 
+    def _shot_clock_coeff(self) -> float:
+        total_shot_clock = self._game.settings.shot_clock_duration
+        if total_shot_clock == float("inf"):
+            return 1.0
+        proportion = self._game.shot_clock / total_shot_clock
+        shot_clock_coeff = proportion**2
+        assert in_range(shot_clock_coeff, 0.0, 1.0)
+        return shot_clock_coeff
+
     def _shot_quality_for(self, player: Player):
         target_hoop = self._game.target_hoop(player)
         expected_value = target_hoop.expected_value_of_shot_by(player)
-
-        total_shot_clock = self._game.settings.shot_clock_duration
-        if total_shot_clock != float("inf"):
-            proportion = self._game.shot_clock / total_shot_clock
-            shot_clock_coeff = proportion**10
-            if player.has_ball:
-                shot_clock_coeff = 1.0
-            assert in_range(shot_clock_coeff, 0.0, 1.0)
-            expected_value *= shot_clock_coeff
         return expected_value
 
     def update(self):
@@ -67,10 +66,9 @@ class SpacePassShoot(StrategyInterface):
             RunPastPosition(*self._target_position_and_distance_for(player, index))
             for index, player in enumerate(self._team)
         ]
-        if self.make_passes:
-            self._shot_quality_metric = [
-                self._shot_quality_for(player) for player in self._team
-            ]
+        self._shot_quality_metric = [
+            self._shot_quality_for(player) for player in self._team
+        ]
 
     def _after_team_set(self):
         self.update()
@@ -79,16 +77,19 @@ class SpacePassShoot(StrategyInterface):
         self.update()
         for behavior, player in zip(self._behaviors, self._team):
             target_hoop = self._game.target_hoop(player)
-            distance = distance_between(player.position, position_of(target_hoop))
-            close_enough = distance <= self.shooting_distance
             if player.has_ball:
-                if self.make_passes:
+                coeff = self._shot_clock_coeff()
+                shot_quality = self._shot_quality_for(player)
+                threshold = self.shot_quality_threshold * coeff
+                good_shot = shot_quality > threshold
+                low_time = self._game.shot_clock < 1.0
+                if good_shot or low_time:
+                    player.shoot_at(target_hoop.position)
+                    return
+                if random() < self.pass_probability:
+
                     receiver = choices(self._team, self._shot_quality_metric)[0]
                     if receiver != player:
                         player.pass_to(receiver)
                         return
-                if close_enough:
-                    target_hoop = self._game.target_hoop(player)
-                    player.shoot_at(target_hoop.position)
-                    return
             behavior.drive(player, self._time_frame)

@@ -11,6 +11,7 @@ from bball.create import (
     create_hoop,
     create_three_point_line,
     created_spaced_strategy,
+    create_linear_shot_probability,
 )
 
 USE_EXPECTED_VALUE = True
@@ -26,18 +27,42 @@ def multiple_players(num_players_per_team: int) -> Game:
     height = 15.24
 
     teams: List[List[Player]] = [[], []]
-    for player_index, attributes in enumerate(attributes_list):
+    for player_index, attributes in enumerate(attributes_list, start=1):
+        attributes_1, attributes_2 = copy_player_attributes(attributes, 2)
+
+        attributes_1.physical.size += 0.2 * player_index
+        attributes_2.physical.size += 0.4
+        attributes_1.physical.mass += player_index
+        attributes_2.physical.mass += 5
+        attributes_1.physical.max_acceleration -= 0.5 * player_index
+        attributes_2.physical.max_acceleration -= 0.8
+        attributes_1.skill.shot_probability = create_linear_shot_probability(
+            0.8, 0, 0.1 * player_index, width / 2
+        )
+        attributes_2.skill.shot_probability = create_linear_shot_probability(
+            0.8, 0, 0.3 * player_index, 4.0
+        )
+
         offset = 2 * (player_index + 1) * size
         player_1 = create_initialized_player(
-            position=(4, height / 2 + offset), attributes=attributes
+            position=(4, height / 2 + offset), attributes=attributes_1
         )
         player_2 = create_initialized_player(
-            position=(4, height / 2 - offset), attributes=attributes
+            position=(4, height / 2 - offset), attributes=attributes_2
         )
         teams[0].append(player_1)
         teams[1].append(player_2)
 
     hoop = create_hoop(width, height, 1.6, create_three_point_line(width, height))
+    strategy_1 = created_spaced_strategy(
+        spacing_distance=6.5, pass_probability=0.03, shot_quality_threshold=2.0
+    )
+    strategy_2 = created_spaced_strategy(
+        spacing_distance=3,
+        pass_probability=1.0,
+        shot_quality_threshold=2.5,
+        dive_to_basket=True,
+    )
     game = (
         create_game(
             teams=create_teams(teams[0], teams[1]),
@@ -48,17 +73,7 @@ def multiple_players(num_players_per_team: int) -> Game:
                 shot_clock_duration=24.0,
             ),
         )
-        .assign_team_strategy(
-            0,
-            created_spaced_strategy(
-                shooting_distance=2, spacing_distance=5, make_passes=True
-            ),
-        )
-        .assign_team_strategy(
-            1,
-            created_spaced_strategy(
-                shooting_distance=5, spacing_distance=13, make_passes=True
-            ),
-        )
+        .assign_team_strategy(0, strategy_1)
+        .assign_team_strategy(1, strategy_2)
     )
     return game
