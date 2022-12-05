@@ -18,7 +18,6 @@ USE_EXPECTED_VALUE = True
 
 
 def multiple_players(num_players_per_team: int) -> Game:
-    size = 1.0
     attributes = create_player_attributes(
         size=1.0, max_acceleration=2.34, max_turn_degrees=360, velocity_decay=0.01
     )
@@ -43,7 +42,7 @@ def multiple_players(num_players_per_team: int) -> Game:
             0.8, 0, 0.3 * player_index, 4.0
         )
 
-        offset = 2 * (player_index + 1) * size
+        offset = 2 * (player_index + 1)
         player_1 = create_initialized_player(
             position=(4, height / 2 + offset), attributes=attributes_1
         )
@@ -54,15 +53,6 @@ def multiple_players(num_players_per_team: int) -> Game:
         teams[1].append(player_2)
 
     hoop = create_hoop(width, height, 1.6, create_three_point_line(width, height))
-    strategy_1 = created_spaced_strategy(
-        spacing_distance=6.5, pass_probability=0.03, shot_quality_threshold=2.0
-    )
-    strategy_2 = created_spaced_strategy(
-        spacing_distance=3,
-        pass_probability=1.0,
-        shot_quality_threshold=2.5,
-        dive_to_basket=True,
-    )
     game = (
         create_game(
             teams=create_teams(teams[0], teams[1]),
@@ -73,7 +63,20 @@ def multiple_players(num_players_per_team: int) -> Game:
                 shot_clock_duration=24.0,
             ),
         )
-        .assign_team_strategy(0, strategy_1)
-        .assign_team_strategy(1, strategy_2)
+        .assign_team_strategy(
+            0,
+            created_spaced_strategy(
+                spacing_distance=6.5, pass_probability=0.03, shot_quality_threshold=2.0
+            ),
+        )
+        .assign_team_strategy(
+            1,
+            created_spaced_strategy(
+                spacing_distance=3,
+                pass_probability=1.0,
+                shot_quality_threshold=2.5,
+                dive_to_basket=True,
+            ),
+        )
     )
     return game
