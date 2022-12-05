@@ -16,13 +16,9 @@ TimedMonitoringFunction = Callable[[float], bool]
 
 @dataclass
 class GameSettings:
-    shot_clock_duration: Optional[float] = None
+    shot_clock_duration: float = float("inf")
     use_expected_value_for_points: bool = False
     use_instant_inbounding: bool = True
-
-    def __post_init__(self):
-        if self.shot_clock_duration is None:
-            self.shot_clock_duration = float("inf")
 
 
 @dataclass
