@@ -71,7 +71,7 @@ def test_stand_between_player_and_basket(attacker_accel):
     ball.jump_ball_won_by(player_1)
     player_1.accelerate(attacker_accel)
     time_frame = 0.1
-    strategy = StandBetweenBasket().for_team_index_in_game(1, game)
+    strategy = StandBetweenBasket(0.5).for_team_index_in_game(1, game)
     target_hoop = game.target_hoop(player_1)
     for _ in range(width - initial_padding - 1):
         assert player_1.position[0] <= target_hoop.position[0]
