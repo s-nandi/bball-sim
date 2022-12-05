@@ -99,6 +99,14 @@ def turn_degrees_required(degrees: float, target_degrees: float) -> float:
 DEFAULT_EPS = 10**-6
 
 
+def in_range(
+    value: float, extreme_1: float, extreme_2: float, eps: float = DEFAULT_EPS
+) -> bool:
+    if extreme_1 > extreme_2:
+        extreme_1, extreme_2 = extreme_2, extreme_1
+    return extreme_1 - eps <= value <= extreme_2 + eps
+
+
 def approx(value_1: float, value_2: float, eps: float = DEFAULT_EPS):
     return abs(value_1 - value_2) < eps
 
