@@ -6,7 +6,7 @@ from bball.ball import BallMode, Ball
 from bball.court import Court, Hoop, HalfCourt
 from bball.player import Player
 from bball.utils import close_to
-from bball.game.scoreboard import Score, Scoreboard
+from bball.game.scoreboard import Scoreboard, Score, Possessions
 from bball.team import Team, Teams, other_team_index
 from bball.strategy import StrategyInterface
 
@@ -106,8 +106,8 @@ class Game:
         return self._scoreboard.score
 
     @property
-    def possessions(self) -> Tuple[int, int]:
-        return (self._scoreboard._posessions_1, self._scoreboard._posessions_2)
+    def possessions(self) -> Possessions:
+        return self._scoreboard.possessions
 
     @property
     def team_with_last_possession(self) -> Optional[int]:

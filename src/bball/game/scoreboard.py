@@ -3,6 +3,7 @@ from typing import Tuple
 from bball.validator import valid_shot_value
 
 Score = Tuple[float, float]
+Possessions = Tuple[int, int]
 
 
 def error_message(team_index: int) -> str:
@@ -19,6 +20,10 @@ class Scoreboard:
     @property
     def score(self) -> Score:
         return (self._score_1, self._score_2)
+
+    @property
+    def possessions(self) -> Possessions:
+        return (self._posessions_1, self._posessions_2)
 
     def increment_score(self, team_index: int, value: float):
         assert valid_shot_value(value)

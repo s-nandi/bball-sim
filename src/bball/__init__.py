@@ -7,7 +7,7 @@ from .shot_probability import (
     LinearShotProbability,
     GuaranteedShotProbability,
 )
-from .game import Game, GameSettings, Scoreboard, Score
+from .game import Game, GameSettings, Scoreboard, Score, Possessions
 from .team import Team, Teams
 from .behavior import ReachVelocity, Stop, ReachPosition
 from .draw import draw_game, DrawInterface, Color, Corners
