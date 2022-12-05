@@ -3,7 +3,7 @@ from typing import List, Callable, Optional
 from dataclasses import dataclass, field
 from random import random
 from bball.ball import BallMode, Ball
-from bball.court import Court, Hoop
+from bball.court import Court, Hoop, HalfCourt
 from bball.player import Player
 from bball.utils import close_to
 from bball.game.scoreboard import Score, Scoreboard
@@ -110,10 +110,14 @@ class Game:
         team_index = self.team_index_of(player)
         return self.court._hoops[other_team_index(team_index)]
 
+    def target_half_court(self, player: Player) -> HalfCourt:
+        team_index = self.team_index_of(player)
+        return self.court.half_court(other_team_index(team_index))
+
     def check_shot_clock(self, time_frame: float) -> bool:
         if self.ball.mode in [BallMode.DEAD, BallMode.MIDSHOT, BallMode.REACHEDSHOT]:
             self._clock.possession_ended()
-        if self.ball.mode == BallMode.HELD:
+        else:
             team_with_possession = self.team_with_last_possession
             assert team_with_possession is not None
             self._clock.possession_started(team_with_possession)
@@ -158,6 +162,8 @@ class Game:
                 self.ball.jump_ball_won_by(team[inbounding_data.player_with_ball])
             half_court = self.court.half_court(team_index)
             positions = inbounding_data.positions_for_half_court(half_court)
+            if team_index == 1:
+                positions = reversed(positions)
             base_orientation = 0 if team_index == 0 else -180
             orientations = [
                 base_orientation + delta for delta in inbounding_data.orientation_deltas

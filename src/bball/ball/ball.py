@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Optional, TYPE_CHECKING, Type, TypeVar
+from typing import Optional, TYPE_CHECKING, Type, TypeVar, List
 from bball.utils import coords_to_string, Point
 from bball.ball.ball_mode import BallMode
 from bball.ball.state import BallState
@@ -73,7 +73,7 @@ class Ball:
 
     def turnover(self) -> Ball:
         # Might not be held-ball, could be mid pass or shot for example
-        valid_start_states = [MidPass, ReceivedPass, HeldBall]
+        valid_start_states: List[Type[BallState]] = [MidPass, ReceivedPass, HeldBall]
         for start_state in valid_start_states:
             try:
                 self._transition(start_state, DeadBall(True))

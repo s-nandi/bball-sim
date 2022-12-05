@@ -39,8 +39,7 @@ def test_run_to_basket_strategy():
     time_frame = 1
     steps = 20
     shooting_threshold = 5
-    spacing_threshold = shooting_threshold
-    strategy = RunToBasketAndShoot(shooting_threshold, spacing_threshold, False)
+    strategy = RunToBasketAndShoot(shooting_threshold)
     strategy.for_team_index_in_game(0, game)
     target_hoop = game.target_hoop(player)
     did_shoot = False

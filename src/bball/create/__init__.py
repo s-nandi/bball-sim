@@ -13,4 +13,4 @@ from .shot_probability import (
     create_guaranteed_shot_probability,
     create_linear_shot_probability,
 )
-from .strategy import create_strategy
+from .strategy import create_strategy, created_spaced_strategy

@@ -10,7 +10,7 @@ from bball.create import (
     copy_player_attributes,
     create_hoop,
     create_three_point_line,
-    create_strategy,
+    created_spaced_strategy,
 )
 
 USE_EXPECTED_VALUE = True
@@ -48,7 +48,17 @@ def multiple_players(num_players_per_team: int) -> Game:
                 shot_clock_duration=24.0,
             ),
         )
-        .assign_team_strategy(0, create_strategy(2))
-        .assign_team_strategy(1, create_strategy(10))
+        .assign_team_strategy(
+            0,
+            created_spaced_strategy(
+                shooting_distance=2, spacing_distance=5, make_passes=True
+            ),
+        )
+        .assign_team_strategy(
+            1,
+            created_spaced_strategy(
+                shooting_distance=5, spacing_distance=13, make_passes=True
+            ),
+        )
     )
     return game

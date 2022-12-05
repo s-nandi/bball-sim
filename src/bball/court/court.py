@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Tuple, TYPE_CHECKING
-from bball.utils import position_of, interpolate
+from bball.utils import position_of, interpolate, interpolation_coefficient, close_to
 
 if TYPE_CHECKING:
     from bball.court.hoop import Hoop
@@ -15,7 +15,22 @@ class HalfCourt:
     left: float
     right: float
 
-    def multiplier_to_position(self, multiplier: Point) -> Point:
+    @property
+    def width(self) -> float:
+        return abs(self.back - self.front)
+
+    @property
+    def height(self) -> float:
+        return abs(self.left - self.right)
+
+    def position_to_multiplier(self, point: Point) -> Tuple[float, float]:
+        x_coeff = interpolation_coefficient(point[0], self.back, self.front)
+        y_coeff = interpolation_coefficient(point[1], self.left, self.right)
+        multiplier = (x_coeff, y_coeff)
+        assert close_to(self.multiplier_to_position(multiplier), point)
+        return multiplier
+
+    def multiplier_to_position(self, multiplier: Tuple[float, float]) -> Point:
         x_position = interpolate(self.back, self.front, multiplier[0])
         y_position = interpolate(self.left, self.right, multiplier[1])
         return (x_position, y_position)
