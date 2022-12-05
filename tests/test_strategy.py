@@ -38,13 +38,16 @@ def test_run_to_basket_strategy():
 
     time_frame = 1
     steps = 20
-    threshold = 5
-    strategy = RunToBasketAndShoot(threshold).for_team_index_in_game(0, game)
+    shooting_threshold = 5
+    spacing_threshold = shooting_threshold
+    strategy = RunToBasketAndShoot(shooting_threshold, spacing_threshold, False)
+    strategy.for_team_index_in_game(0, game)
     target_hoop = game.target_hoop(player)
     did_shoot = False
     for _ in range(steps):
         is_close_enough = (
-            distance_between(player.position, target_hoop.position) <= threshold
+            distance_between(player.position, target_hoop.position)
+            <= shooting_threshold
         )
         strategy.drive(time_frame)
         space.step(time_frame)
