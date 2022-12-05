@@ -27,6 +27,9 @@ class ShotClock:
     possession_time: float = field(init=False, default=0.0)
     active_possession: Optional[int] = field(init=False, default=None)
 
+    def __post_init__(self):
+        self.possession_ended()
+
     def did_expire_after_step(self, time_frame: float) -> bool:
         self.possession_time -= time_frame
         self.possession_time = max(0, self.possession_time)
@@ -35,6 +38,7 @@ class ShotClock:
         return self.possession_time <= 0.0
 
     def possession_ended(self):
+        self.possession_time = self.shot_clock_duration
         self.active_possession = None
 
     def possession_started(self, team_index: int):
