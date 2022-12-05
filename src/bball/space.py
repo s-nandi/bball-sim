@@ -1,4 +1,5 @@
 from __future__ import annotations
+import math
 from typing import List, Union, Sequence, Set
 import pymunk
 from bball.ball import Ball
@@ -81,8 +82,12 @@ class Space:
         self.add(game.ball)
         return self
 
-    def step(self, time_frame: float) -> Space:
-        substeps_per_unit_time = 1
+    def step(self, time_frame: float, max_substep_length=None) -> Space:
+        substeps_per_unit_time = (
+            1
+            if max_substep_length is None
+            else math.ceil(time_frame / max_substep_length)
+        )
         time_per_substep = time_frame / substeps_per_unit_time
         for _ in range(substeps_per_unit_time):
             self._substep(time_per_substep)

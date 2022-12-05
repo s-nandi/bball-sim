@@ -5,6 +5,8 @@ from runner.draw import Drawer, resolution_for, padded_resolution_for
 GRAYSCALE = 230
 BACKGROUND_COLOR = (GRAYSCALE, GRAYSCALE, GRAYSCALE)
 
+MAX_SUBSTEP_LENGTH = 0.01
+
 
 def loop(game: Game, engine: Engine, drawer: Drawer, time_step: float):
     space = Space().add(game)
@@ -17,12 +19,14 @@ def loop(game: Game, engine: Engine, drawer: Drawer, time_step: float):
         source_rectangle = drawer.surface.get_rect(center=target_rectangle.center)
         engine.surface.blit(drawer.surface, source_rectangle)
 
-        space.step(time_step)
+        space.step(time_step, MAX_SUBSTEP_LENGTH)
 
     return _loop
 
 
-def run_game(game: Game, fps: int, display_scale: float, monitor=None):
+def run_game(
+    game: Game, fps: int, speed_scale: float, display_scale: float, monitor=None
+):
     resolution = resolution_for(game, display_scale)
     padded_resolution = padded_resolution_for(game, display_scale, display_scale)
     scale = resolution[0] / game.court.dimensions[0]
@@ -30,7 +34,7 @@ def run_game(game: Game, fps: int, display_scale: float, monitor=None):
 
     drawer = Drawer(padded_resolution, scale, (padding, padding))
     engine = Engine(padded_resolution, fps)
-    main_loop = loop(game, engine, drawer, 1 / fps)
+    main_loop = loop(game, engine, drawer, speed_scale / fps)
 
     def game_loop():
         if monitor is not None:

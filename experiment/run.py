@@ -8,7 +8,13 @@ def main():
     game = initiate.multiple_players(2)
 
     monitor = Monitor(float("inf"))
-    run_game(game, fps=60, display_scale=0.3, monitor=lambda: monitor.monitor(game))
+    run_game(
+        game,
+        fps=90,
+        speed_scale=5.0,
+        display_scale=0.3,
+        monitor=lambda: monitor.monitor(game),
+    )
     pprint(monitor.stats())
 
 
