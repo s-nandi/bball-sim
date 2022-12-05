@@ -160,7 +160,7 @@ def test_scoring_with_composite_strategy():
     num_steps = math.ceil(duration / time_frame)
     for _ in range(num_steps):
         space.step(time_frame)
-    assert game.score[0] > 0 and game.score[1] > 0
+    assert game.scoreboard.score[0] > 0 and game.scoreboard.score[1] > 0
 
 
 def setup_stay_relatively_on_court_with_composite_strategy(player_size) -> Game:
@@ -255,7 +255,7 @@ def test_eventual_inbounds_with_everyone_initially_out_of_bounds():
     space = create_space().add(game)
     for _ in range(num_steps):
         space.step(time_frame)
-    assert game.score[0] > 0 or game.score[1] > 0
+    assert game.scoreboard.score[0] > 0 or game.scoreboard.score[1] > 0
 
 
 def setup_consistent_inbounds_despite_collisions(
@@ -317,4 +317,4 @@ def test_consistent_inbounds_despite_collisions(instant_inbounds):
         assert_relatively_on_court(game.court, player_1, threshold)
         assert_relatively_on_court(game.court, player_2, threshold)
         space.step(time_frame)
-    assert game.score[0] > 0 and game.score[1] > 0
+    assert game.scoreboard.score[0] > 0 and game.scoreboard.score[1] > 0

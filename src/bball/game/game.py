@@ -102,12 +102,8 @@ class Game:
         return self._clock.possession_time
 
     @property
-    def score(self) -> Score:
-        return self._scoreboard.score
-
-    @property
-    def possessions(self) -> Possessions:
-        return self._scoreboard.possessions
+    def scoreboard(self) -> Scoreboard:
+        return self._scoreboard
 
     @property
     def team_with_last_possession(self) -> Optional[int]:

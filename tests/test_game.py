@@ -122,7 +122,7 @@ def test_scoring():
     assert ball.mode == BallMode.HELD
     assert not player_1.has_ball
     assert player_2.has_ball
-    assert game.score == (3, 0)
+    assert game.scoreboard.score == (3, 0)
     player_2.accelerate(-1)
     for _ in range(court.width):
         space.step(1)
@@ -133,7 +133,7 @@ def test_scoring():
     assert ball.mode == BallMode.REACHEDSHOT
     space.step(0)
     assert ball.mode == BallMode.DEAD
-    assert game.score == (3, 2)
+    assert game.scoreboard.score == (3, 2)
 
 
 @dataclass
@@ -183,7 +183,7 @@ def setup_scoring_test(use_ev: bool) -> ScoringTest:
         space.step(1)
     assert ball.mode == BallMode.REACHEDSHOT
     space.step(0)
-    return ScoringTest(game.score, concrete_value, expected_value)
+    return ScoringTest(game.scoreboard.score, concrete_value, expected_value)
 
 
 def test_expected_value_scoring():

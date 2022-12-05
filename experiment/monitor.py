@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Optional, Dict, Any, Tuple
 from time import monotonic
-from bball.game import Game
+from bball.game import Game, Scoreboard
 from bball.player import Player
 from bball.utils import distance_between
 
@@ -26,8 +26,7 @@ class Monitor:
     allowed_distance_off_court: float = 1.0
     _max_distance: float = field(init=False, default=0.0)
     _start_time: Optional[float] = field(init=False, default=None)
-    _last_score: Tuple[float, float] = field(init=False, default=(0.0, 0.0))
-    _last_possessions: Tuple[int, int] = field(init=False, default=(0, 0))
+    _last_scoreboard: Scoreboard = field(init=False, default=Scoreboard)
 
     @property
     def duration(self) -> float:
@@ -48,10 +47,10 @@ class Monitor:
             "max_distance": format_float(self.max_distance),
             "duration": format_float(self.duration),
             "score": (
-                format_float(self._last_score[0]),
-                format_float(self._last_score[1]),
+                format_float(self._last_scoreboard.score[0]),
+                format_float(self._last_scoreboard.score[1]),
             ),
-            "possessions": self._last_possessions,
+            "possessions": self._last_scoreboard.possessions,
         }
 
     def monitor(self, game: Game):
@@ -60,5 +59,4 @@ class Monitor:
         monitor_bounds(game, self.allowed_distance_off_court)
         distance = monitor_distance(game)
         self._max_distance = max(self._max_distance, distance)
-        self._last_score = game.score
-        self._last_possessions = game.possessions
+        self._last_scoreboard = game.scoreboard

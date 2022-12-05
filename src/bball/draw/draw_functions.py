@@ -1,6 +1,6 @@
 from typing import Tuple
 from bball.player import Player
-from bball.game import Game, Score
+from bball.game import Game, Scoreboard
 from bball.ball import Ball
 from bball.team import Teams
 from bball.court import Court, Hoop, ThreePointLine, RectangleThreePointLine
@@ -102,10 +102,12 @@ def format_float(val: float):
 
 def draw_score(
     draw_object: DrawInterface,
-    score: Score,
-    possessions: Tuple[int, int],
+    scoreboard: Scoreboard,
     dimensions: Tuple[float, float],
 ):
+    score = scoreboard.score
+    possessions = scoreboard.possessions
+
     font_size = 80
     padding_for_font_size = 0.001 * font_size
     offset_1 = (dimensions[0] / 2, dimensions[1] * (1 + padding_for_font_size))
@@ -136,5 +138,9 @@ def draw_game(draw_object: DrawInterface, game: Game):
     draw_teams(draw_object, game.teams)
     draw_court(draw_object, game.court)
     draw_ball(draw_object, game.ball)
-    draw_score(draw_object, game.score, game.possessions, game.court.dimensions)
+    draw_score(
+        draw_object,
+        game.scoreboard,
+        game.court.dimensions,
+    )
     draw_shot_clock(draw_object, game.shot_clock, game.court.dimensions)
