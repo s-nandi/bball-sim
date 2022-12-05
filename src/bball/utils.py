@@ -18,6 +18,18 @@ BASE_DIRECTION = (1, 0)
 ROUND_DIGITS = 4
 
 
+def polar_to_cartesian(angle_degrees: float, length: float):
+    angle_degrees = normalized_angle_degrees(angle_degrees)
+    angle = to_radians(angle_degrees)
+    x_unit = math.cos(angle)
+    y_unit = math.sin(angle)
+    return (x_unit * length, y_unit * length)
+
+
+def interpolation_coefficient(value: float, extreme_1: float, extreme_2: float):
+    return (value - extreme_1) / (extreme_2 - extreme_1)
+
+
 def interpolate(value_1: float, value_2: float, interp: float) -> float:
     return value_1 * (1 - interp) + value_2 * interp
 
