@@ -38,6 +38,9 @@ class Team:
     def __iter__(self):
         return iter(self._players)
 
+    def __len__(self):
+        return len(self._players)
+
     def __contains__(self, player: Player):
         return player in self._players
 
