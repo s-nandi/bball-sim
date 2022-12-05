@@ -1,4 +1,5 @@
-from bball import Game
+from typing import List
+from bball import Game, Player
 from bball.create import (
     create_teams,
     create_game,
@@ -24,7 +25,7 @@ def multiple_players(num_players_per_team: int) -> Game:
     width = 28.65
     height = 15.24
 
-    teams = [[], []]
+    teams: List[List[Player]] = [[], []]
     for player_index, attributes in enumerate(attributes_list):
         offset = 2 * (player_index + 1) * size
         player_1 = create_initialized_player(
