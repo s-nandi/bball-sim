@@ -4,7 +4,7 @@ from experiment.monitor import Monitor
 from bball import Game
 
 
-def visualize(game: Game, fps: float, speed_scale: float, display_scale: float):
+def visualize(game: Game, fps: int, speed_scale: float, display_scale: float):
     monitor = Monitor(float("inf"))
     run_game(
         game,

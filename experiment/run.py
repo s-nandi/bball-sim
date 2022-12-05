@@ -3,7 +3,7 @@ from bball import Game
 
 
 def visualize_game(game: Game):
-    visualize.visualize(game, fps=90.0, speed_scale=5.0, display_scale=0.3)
+    visualize.visualize(game, fps=90, speed_scale=5.0, display_scale=0.3)
 
 
 def compare_strategies(game: Game):
@@ -12,10 +12,13 @@ def compare_strategies(game: Game):
 
 
 def main():
+    do_visualize = 1
     game = initiate.multiple_players(2)
 
-    # visualize_game(game)
-    print(compare_strategies(game))
+    if do_visualize:
+        visualize_game(game)
+    else:
+        print(compare_strategies(game))
 
 
 if __name__ == "__main__":
