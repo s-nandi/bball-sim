@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Optional, Dict, Any, Tuple
+from typing import Optional, Dict, Any
 from time import monotonic
 from bball.game import Game, Scoreboard
 from bball.player import Player
@@ -26,7 +26,7 @@ class Monitor:
     allowed_distance_off_court: float = 1.0
     _max_distance: float = field(init=False, default=0.0)
     _start_time: Optional[float] = field(init=False, default=None)
-    _last_scoreboard: Scoreboard = field(init=False, default=Scoreboard)
+    _last_scoreboard: Scoreboard = field(init=False, default_factory=Scoreboard)
 
     @property
     def duration(self) -> float:
@@ -43,12 +43,13 @@ class Monitor:
         def format_float(value: float) -> float:
             return round(value, 2)
 
+        score = self._last_scoreboard.score
         return {
             "max_distance": format_float(self.max_distance),
             "duration": format_float(self.duration),
             "score": (
-                format_float(self._last_scoreboard.score[0]),
-                format_float(self._last_scoreboard.score[1]),
+                format_float(score[0]),
+                format_float(score[1]),
             ),
             "possessions": self._last_scoreboard.possessions,
         }

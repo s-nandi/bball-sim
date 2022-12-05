@@ -1,12 +1,12 @@
 from __future__ import annotations
-from typing import List, Callable, Optional, Tuple
+from typing import List, Callable, Optional
 from dataclasses import dataclass, field
 from random import random
 from bball.ball import BallMode, Ball
 from bball.court import Court, Hoop, HalfCourt
 from bball.player import Player
 from bball.utils import close_to
-from bball.game.scoreboard import Scoreboard, Score, Possessions
+from bball.game.scoreboard import Scoreboard
 from bball.team import Team, Teams, other_team_index
 from bball.strategy import StrategyInterface
 
