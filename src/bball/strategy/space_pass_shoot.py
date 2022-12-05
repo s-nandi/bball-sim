@@ -36,7 +36,8 @@ class SpacePassShoot(StrategyInterface):
         assert team_size > 0
         half_court = self._game.target_half_court(player)
 
-        angle = (player_index) * (180.0 / (team_size - 1)) - 90
+        angle = (player_index) * (180.0 / team_size) - 90
+
         offset = polar_to_cartesian(angle, self.spacing_distance)
         offset_position = sum_of(position, offset)
 
