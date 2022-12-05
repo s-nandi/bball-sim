@@ -33,6 +33,8 @@ class LinearShotProbability(ShotProbability):
         assert self.min_shot_distance <= self.max_shot_distance
 
     def _probability(self, shot_distance: float) -> float:
+        if shot_distance > self.max_shot_distance:
+            return 0.0
         clamped_distance = clamp(
             shot_distance, self.min_shot_distance, self.max_shot_distance
         )
