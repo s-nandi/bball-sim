@@ -5,7 +5,6 @@ SPEED_SCALE = 5.0
 
 
 def simulate(args):
-    print(args)
     game = initiate.canonical_game(2)
     if args.duration is not None:
         run.headless(

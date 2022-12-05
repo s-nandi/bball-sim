@@ -15,7 +15,7 @@ def _create_parser() -> argparse.ArgumentParser:
     simulation_parser = subparsers.add_parser(SIMULATE)
     simulation_parser.add_argument("fps", type=int)
     simulation_parser.add_argument("speed_scale", type=float)
-    simulation_parser.add_argument(DURATION_SHORT, DURATION_LONG, type=int)
+    simulation_parser.add_argument(DURATION_SHORT, DURATION_LONG, type=float)
     simulation_parser.add_argument(DISPLAY_SCALE_SHORT, DISPLAY_SCALE_LONG, type=float)
     return parser
 
