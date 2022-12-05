@@ -5,24 +5,24 @@ from bball import Game
 
 
 def visualize(game: Game, fps: int, speed_scale: float, display_scale: float):
-    monitor = Monitor(float("inf"))
+    monitor = Monitor()
     run(
         game,
         fps=fps,
         speed_scale=speed_scale,
         display_scale=display_scale,
-        monitor=lambda: monitor.monitor(game),
+        monitor=lambda time_frame: monitor.monitor(game, time_frame),
     )
     pprint(monitor.stats())
 
 
 def headless(game: Game, fps: int, speed_scale: float, duration: float):
-    monitor = Monitor(float("inf"))
+    monitor = Monitor()
     run_headless(
         game,
         fps=fps,
         speed_scale=speed_scale,
         duration=duration,
-        monitor=lambda: monitor.monitor(game),
+        monitor=lambda time_frame: monitor.monitor(game, time_frame),
     )
     pprint(monitor.stats())

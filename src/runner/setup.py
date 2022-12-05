@@ -40,11 +40,13 @@ def run(game: Game, fps: int, speed_scale: float, display_scale: float, monitor=
 
     drawer = Drawer(padded_resolution, scale, (padding, padding))
     engine = Engine(padded_resolution, fps)
-    main_loop = loop(game, engine, drawer, time_frame_for(fps, speed_scale))
+
+    time_frame = time_frame_for(fps, speed_scale)
+    main_loop = loop(game, engine, drawer, time_frame)
 
     def game_loop():
         if monitor is not None:
-            monitor()
+            monitor(time_frame)
         main_loop()
 
     engine.run(game_loop)
@@ -59,7 +61,7 @@ def run_headless(
 
     def game_loop():
         if monitor is not None:
-            monitor()
+            monitor(time_frame)
         step_space(space, time_frame)
 
     for _ in range(num_steps):
