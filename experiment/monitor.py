@@ -27,6 +27,7 @@ class Monitor:
     _max_distance: float = field(init=False, default=0.0)
     _start_time: Optional[float] = field(init=False, default=None)
     _last_score: Tuple[float, float] = field(init=False, default=(0.0, 0.0))
+    _last_possessions: Tuple[int, int] = field(init=False, default=(0, 0))
 
     @property
     def duration(self) -> float:
@@ -50,6 +51,7 @@ class Monitor:
                 format_float(self._last_score[0]),
                 format_float(self._last_score[1]),
             ),
+            "possessions": self._last_possessions,
         }
 
     def monitor(self, game: Game):
@@ -59,3 +61,4 @@ class Monitor:
         distance = monitor_distance(game)
         self._max_distance = max(self._max_distance, distance)
         self._last_score = game.score
+        self._last_possessions = game.possessions

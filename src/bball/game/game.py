@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, Callable, Optional
+from typing import List, Callable, Optional, Tuple
 from dataclasses import dataclass, field
 from random import random
 from bball.ball import BallMode, Ball
@@ -41,10 +41,12 @@ class ShotClock:
         self.possession_time = self.shot_clock_duration
         self.active_possession = None
 
-    def possession_started(self, team_index: int):
+    def possession_started(self, team_index: int) -> bool:
         if self.active_possession != team_index:
             self.possession_time = self.shot_clock_duration
             self.active_possession = team_index
+            return True
+        return False
 
 
 @dataclass
@@ -104,6 +106,10 @@ class Game:
         return self._scoreboard.score
 
     @property
+    def possessions(self) -> Tuple[int, int]:
+        return (self._scoreboard._posessions_1, self._scoreboard._posessions_2)
+
+    @property
     def team_with_last_possession(self) -> Optional[int]:
         last_ball_handler = self.ball.last_belonged_to
         if last_ball_handler is None:
@@ -124,7 +130,8 @@ class Game:
         else:
             team_with_possession = self.team_with_last_possession
             assert team_with_possession is not None
-            self._clock.possession_started(team_with_possession)
+            if self._clock.possession_started(team_with_possession):
+                self._scoreboard.increment_possessions(team_with_possession)
         if self._clock.did_expire_after_step(time_frame):
             self.ball.shot_clock_expired()
             return True
@@ -191,11 +198,11 @@ class Game:
         assert close_to(shot.target, target_hoop.position)
         value = target_hoop.value_of_shot_from(shot.location)
         if self.settings.use_expected_value_for_points:
-            self._scoreboard.increment(team, shot.probability * value)
+            self._scoreboard.increment_score(team, shot.probability * value)
             return True
         made_shot = random() < shot.probability
         if made_shot:
-            self._scoreboard.increment(team, value)
+            self._scoreboard.increment_score(team, value)
         return made_shot
 
     def potentially_make_basket(self) -> bool:

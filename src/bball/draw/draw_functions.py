@@ -101,15 +101,21 @@ def format_float(val: float):
 
 
 def draw_score(
-    draw_object: DrawInterface, score: Score, dimensions: Tuple[float, float]
+    draw_object: DrawInterface,
+    score: Score,
+    possessions: Tuple[int, int],
+    dimensions: Tuple[float, float],
 ):
     font_size = 80
     padding_for_font_size = 0.001 * font_size
-    offset = (dimensions[0] / 2, dimensions[1] * (1 + padding_for_font_size))
+    offset_1 = (dimensions[0] / 2, dimensions[1] * (1 + padding_for_font_size))
     score_0 = format_float(score[0])
     score_1 = format_float(score[1])
     score_string = f"{score_0}  -  {score_1}"
-    draw_object.write_text(offset, TEXT_COLOR, score_string, font_size)
+    draw_object.write_text(offset_1, TEXT_COLOR, score_string, font_size)
+    possessions_string = f"({possessions[0]} - {possessions[1]})"
+    offset_2 = (dimensions[0] / 2, dimensions[1] * (1 + 3 * padding_for_font_size))
+    draw_object.write_text(offset_2, TEXT_COLOR, possessions_string, font_size)
 
 
 def draw_shot_clock(
@@ -130,5 +136,5 @@ def draw_game(draw_object: DrawInterface, game: Game):
     draw_teams(draw_object, game.teams)
     draw_court(draw_object, game.court)
     draw_ball(draw_object, game.ball)
-    draw_score(draw_object, game.score, game.court.dimensions)
+    draw_score(draw_object, game.score, game.possessions, game.court.dimensions)
     draw_shot_clock(draw_object, game.shot_clock, game.court.dimensions)
