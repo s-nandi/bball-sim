@@ -1,5 +1,6 @@
+from __future__ import annotations
 from dataclasses import dataclass, asdict, field
-from typing import Sequence, Optional
+from typing import Sequence, Optional, Tuple
 from pathlib import Path
 import json
 from tqdm import tqdm
@@ -29,7 +30,22 @@ def metadata_file_name():
     return "metadata.json"
 
 
+def file_name_with_index(file_name: str, index: int) -> str:
+    pos = file_name.find("(")
+    if pos == -1:
+        prefix = file_name
+    else:
+        prefix = file_name[:pos]
+    return f"{prefix}({index})"
+
+
 def _write_json(file_path: Path, obj, *, log=False):
+    safe_index = 0
+    while file_path.exists():
+        indexed_name = file_name_with_index(file_path.name, safe_index)
+        file_path = file_path.with_name(indexed_name).with_suffix(file_path.suffix)
+        safe_index += 1
+
     if log:
         tqdm.write(f"writing {file_path}")
     json_obj = json.dumps(obj)
@@ -46,22 +62,33 @@ def _read_json(file_path: Path, *, log=False):
 
 @dataclass
 class ParametersSerializer:
-    identifier: str
     folder: str
-    serialize_frequency: int
+    identifier: Optional[str] = None
+    serialize_gap: int = 0
     _basepath: Path = field(init=False)
     _generation_number: int = field(init=False, default=0)
     _last_serialized_generation: int = field(init=False, default=0)
 
     def __post_init__(self):
-        print(self.identifier)
-        self._basepath = Path(self.folder).joinpath(self.identifier)
-        self._basepath.mkdir(exist_ok=False, parents=False)
+        if self.identifier is not None:
+            print(self.identifier)
+        self._basepath = (
+            Path(self.folder).joinpath(self.identifier)
+            if self.identifier is not None
+            else Path(self.folder)
+        )
+        self._basepath.mkdir(exist_ok=True, parents=False)
 
     def _should_serialize(self):
         is_first = self._generation_number == 0
         gap = self._generation_number - self._last_serialized_generation
-        return is_first or gap >= self.serialize_frequency
+        always_serialize = self.serialize_gap == 0
+        return is_first or gap >= self.serialize_gap or always_serialize
+
+    def jump_to_generation(self, generation_number: int) -> ParametersSerializer:
+        assert generation_number >= self._generation_number
+        self._generation_number = generation_number
+        return self
 
     def serialize_parameters(
         self, parameters_list: Sequence[Parameters], force: bool = False
@@ -128,7 +155,7 @@ class ParametersDeserializer:
 
     def deserialize_parameters(
         self, generation_number: Optional[int]
-    ) -> Sequence[Parameters]:
+    ) -> Tuple[int, Sequence[Parameters]]:
         if generation_number is None:
             generation_number = self._find_max_generation_in_folder()
         else:
@@ -142,7 +169,7 @@ class ParametersDeserializer:
         parameters_list = []
         for parameters_obj in parameters_objs:
             parameters_list.append(to_parameters(parameters_obj))
-        return parameters_list
+        return generation_number, parameters_list
 
     def deserialize_metadata(self) -> Metadata:
         file_name = metadata_file_name()

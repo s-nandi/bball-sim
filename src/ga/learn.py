@@ -51,7 +51,7 @@ def genalgo(
 ):
     serializer = None
     if output_folder is not None:
-        serializer = ParametersSerializer(gen_id, output_folder, output_frequency)
+        serializer = ParametersSerializer(output_folder, gen_id, output_frequency)
         metadata = Metadata.create(
             game_generator,
             population_size,

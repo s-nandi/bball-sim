@@ -8,13 +8,32 @@ SPEED_SCALE = 5.0
 
 
 def load(args):
-    game, metadata, parameters_list = ga.load(
+    generation_number, game, metadata, parameters_list = ga.load(
         folder=args.input_folder, generation_number=args.generation
     )
+    args.generation = generation_number
     args.fps = metadata.fps if args.fps is None else args.fps
     args.duration = metadata.duration if args.duration is None else args.duration
     args.speed_scale *= metadata.speed_scale
-    if args.visualize:
+    if args.evaluate:
+
+        def comparator(parameters_1, parameters_2):
+            return ga.compare(
+                game,
+                parameters_1,
+                parameters_2,
+                duration=args.duration,
+                fps=args.fps,
+                speed_scale=args.speed_scale,
+            )
+
+        serializer = ga.parameters.ParametersSerializer(
+            args.input_folder
+        ).jump_to_generation(args.generation)
+        _, evaluation = ga.tournament(comparator, parameters_list)
+        pprint.pprint(asdict(evaluation))
+        serializer.serialize_evaluation(evaluation)
+    elif args.visualize:
         index_1 = args.index_1
         index_2 = args.index_2
         if index_1 is not None and index_2 is None:
@@ -62,17 +81,17 @@ def learn(args):
 def simulate(args, game=None):
     if game is None:
         game = initiate.canonical_game(2)
-    if args.duration is not None:
-        run.headless(
-            game, fps=args.fps, speed_scale=args.speed_scale, duration=args.duration
-        )
-    else:
-        assert args.display_scale is not None
+    if args.display_scale is not None:
         run.visualize(
             game,
             fps=args.fps,
             speed_scale=args.speed_scale,
             display_scale=args.display_scale,
+        )
+    else:
+        assert args.duration is not None
+        run.headless(
+            game, fps=args.fps, speed_scale=args.speed_scale, duration=args.duration
         )
 
 

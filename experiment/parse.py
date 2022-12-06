@@ -43,6 +43,7 @@ def _build_loading_subparser(parser: argparse.ArgumentParser):
     parser.add_argument(DISPLAY_SCALE_SHORT, DISPLAY_SCALE_LONG, type=float)
     parser.add_argument("-i1", "--index_1", type=int)
     parser.add_argument("-i2", "--index_2", type=int)
+    parser.add_argument("-e", "--evaluate", action="store_true")
 
 
 def _build_parser(parser: argparse.ArgumentParser):
