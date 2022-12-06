@@ -13,6 +13,13 @@ def generation_file_name(generation_number: int):
     return f"generation_{generation_number}.json"
 
 
+def generation_index(file_name: str) -> Optional[int]:
+    try:
+        return int(file_name.replace("generation_", "").replace(".json", ""))
+    except ValueError:
+        return None
+
+
 def metadata_file_name():
     return "metadata.json"
 
@@ -86,12 +93,14 @@ class ParametersDeserializer:
         assert self._basepath.is_dir()
 
     def _find_max_generation_in_folder(self) -> int:
-        generation_number = 0
-        while generation_number == self._max_generation_that_exists_below(
-            generation_number
-        ):
-            generation_number += 1
-        return max(0, generation_number - 1)
+        file_names = [path.name for path in self._basepath.glob("*.json")]
+        highest_generation = 0
+        for file_name in file_names:
+            generation_number = generation_index(file_name)
+            if generation_number is None:
+                continue
+            highest_generation = max(highest_generation, generation_number)
+        return highest_generation
 
     def _max_generation_that_exists_below(self, generation_number: int) -> int:
         original_number = generation_number

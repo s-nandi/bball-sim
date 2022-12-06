@@ -7,7 +7,7 @@ LOAD = "load"
 
 DURATION_SHORT = "-d"
 DURATION_LONG = "--duration"
-DISPLAY_SCALE_SHORT = "-s"
+DISPLAY_SCALE_SHORT = "-k"
 DISPLAY_SCALE_LONG = "--display-scale"
 
 
@@ -22,7 +22,7 @@ def _build_learning_subparser(parser: argparse.ArgumentParser):
     parser.add_argument("player_count", type=int)
     parser.add_argument("population_size", type=int)
     parser.add_argument("output_folder", type=str)
-    parser.add_argument("--output_frequency", type=int, default=1)
+    parser.add_argument("--output_frequency", type=int, default=10)
     parser.add_argument("--generations", type=int)
 
 
@@ -33,15 +33,14 @@ def _build_loading_subparser(parser: argparse.ArgumentParser):
     parser.add_argument(DURATION_SHORT, DURATION_LONG, type=float)
     parser.add_argument(DISPLAY_SCALE_SHORT, DISPLAY_SCALE_LONG, type=float)
     parser.add_argument("-fps", "--fps", type=int, default=90)
-    parser.add_argument(
-        "-speed", "--speed_scale", dest="speed_scale", type=float, default=1.0
-    )
-    parser.add_argument("--index_1", type=int, default=0)
-    parser.add_argument("--index_2", type=int, default=1)
+    parser.add_argument("-s", "--speed", dest="speed_scale", type=float, default=1.0)
+    parser.add_argument("-i1", "--index_1", type=int)
+    parser.add_argument("-i2", "--index_2", type=int)
 
 
 def _build_parser(parser: argparse.ArgumentParser):
     subparsers = parser.add_subparsers(dest="type")
+    subparsers.required = True
     _build_simulation_parser(subparsers.add_parser(SIMULATE))
     _build_learning_subparser(subparsers.add_parser(LEARN))
     _build_loading_subparser(subparsers.add_parser(LOAD))

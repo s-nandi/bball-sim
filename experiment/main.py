@@ -12,12 +12,44 @@ def load(args):
         folder=args.input_folder, generation_number=args.generation
     )
     if args.visualize:
-        game.assign_team_strategy(0, parameters_list[args.index_1].strategy())
-        game.assign_team_strategy(1, parameters_list[args.index_2].strategy())
+        index_1 = args.index_1
+        index_2 = args.index_2
+        if index_1 is not None and index_2 is None:
+            index_2 = index_1
+        if index_2 is None and index_1 is not None:
+            index_1 = index_2
+        if index_1 is None and index_2 is None:
+            index_1 = 0
+            index_2 = 1
+        game.assign_team_strategy(0, parameters_list[index_1].strategy())
+        game.assign_team_strategy(1, parameters_list[index_2].strategy())
         simulate(args, game)
     else:
-        pprint.pprint([asdict(parameters) for parameters in parameters_list])
+        indices = []
+        if args.index_1 is not None:
+            indices.append(args.index_1)
+        if args.index_2 is not None:
+            indices.append(args.index_2)
+        if not indices:
+            indices = list(range(len(parameters_list)))
+        pprint.pprint([asdict(parameters_list[index]) for index in indices])
         pprint.pprint(f"# parameters: {len(parameters_list)}")
+        if (
+            args.index_1 is not None
+            and args.index_2 is not None
+            and args.duration is not None
+            and args.fps is not None
+            and args.speed_scale is not None
+        ):
+            delta = ga.compare(
+                game,
+                parameters_list[args.index_1],
+                parameters_list[args.index_2],
+                duration=args.duration,
+                fps=args.fps,
+                speed_scale=args.speed_scale,
+            )
+            print(f"delta = {delta}")
 
 
 def learn(args):
