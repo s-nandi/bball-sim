@@ -13,7 +13,7 @@ from ga.parameters import (
     combine,
 )
 from ga.evolution import evolve
-from ga.metadata import Metadata
+from ga.metadata import Metadata, TeamMetadata
 
 if TYPE_CHECKING:
     from bball import Game
@@ -49,16 +49,14 @@ def genalgo(
     do_serialization = output_folder is not None
     if do_serialization:
         game = game_generator()
-        teams = [
-            {
-                "player_attributes": [
-                    asdict(player._attributes) for player in game.teams[team_index]
-                ],
-                "team_index": team_index,
-            }
+        teams = tuple(
+            TeamMetadata(
+                [asdict(player._attributes) for player in game.teams[team_index]],
+                team_index,
+            )
             for team_index in range(2)
-        ]
-        metadata = Metadata(teams, population_size, generation_limit)
+        )
+        metadata = Metadata((teams[0], teams[1]), population_size, generation_limit)
         assert output_folder is not None
         serializer = ParametersSerializer(gen_id, output_folder, output_frequency)
         serializer.serialize_metadata(metadata)

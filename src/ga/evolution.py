@@ -8,7 +8,7 @@ def rotated(lis):
     return lis[1:] + lis[:1]
 
 
-DELTA = 0.1
+DELTA = 0.2
 P_CHANGE = 0.1
 P_FIRST = 0.5
 

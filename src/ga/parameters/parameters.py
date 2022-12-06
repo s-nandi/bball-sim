@@ -1,4 +1,5 @@
 from __future__ import annotations
+from random import random
 from copy import deepcopy
 from typing import Union, TYPE_CHECKING
 from runner import run_headless
@@ -31,11 +32,24 @@ def combine(
 
     assert isinstance(parameters_1, RegularParameters)
     assert isinstance(parameters_2, SpacedParameters)
-    return parameters_1.crossover(
-        RegularParameters(
-            parameters_2.spacing_distance,
-            parameters_2.defensive_tightness,
-            parameters_2.width,
+
+    if random() < 0.5:
+        return parameters_1.crossover(
+            RegularParameters(
+                parameters_2.spacing_distance,
+                parameters_2.defensive_tightness,
+                parameters_2.width,
+            ),
+            probability,
+        )
+    return parameters_2.crossover(
+        SpacedParameters(
+            parameters_1.shooting_distance,
+            parameters_2.shot_quality_threshold,
+            parameters_2.pass_probability,
+            parameters_2.dive_to_basket,
+            parameters_1.defensive_tightness,
+            parameters_1.width,
         ),
         probability,
     )
