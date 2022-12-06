@@ -4,13 +4,14 @@ from random import uniform
 from bball.create import create_strategy
 from bball.utils import clamp
 from ga.utils import crossover, mutate
+from ga.evolution_types import IndividualInterface
 
 SHOOTING_DISTANCE_RANGE = (0.0, 1.0)
 DEFENSIVE_TIGHTNESS_RANGE = (0.0, 1.0)
 
 
 @dataclass
-class RegularParameters:
+class RegularParameters(IndividualInterface):
     shooting_distance: float
     defensive_tightness: float
     width: float

@@ -1,6 +1,6 @@
 from __future__ import annotations
 import uuid
-from typing import Optional, List, Callable, TYPE_CHECKING
+from typing import Optional, Callable, TYPE_CHECKING
 from tqdm import tqdm
 from ga.evaluation_game import evaluation_game
 from ga.parameters import (
@@ -11,7 +11,7 @@ from ga.parameters import (
     compare,
     combine,
 )
-from ga.evolution import evolve, tournament
+from ga.evolution import evolve, tournament, Population
 from ga.metadata import Metadata
 
 if TYPE_CHECKING:
@@ -25,18 +25,18 @@ FPS = 60
 SPEED_SCALE = 3.0
 
 
-def create_initial_population(population_size: int, width: float) -> List[Parameters]:
+def create_initial_population(population_size: int, width: float) -> Population:
     num_init_spaced_parameters = population_size // 2
     num_init_regular_parameters = population_size - num_init_spaced_parameters
-    spaced_parameters = [
+    spaced_parameters: Population = [
         SpacedParameters.generate_random(width)
         for _ in range(num_init_spaced_parameters)
     ]
-    regular_parameters = [
+    regular_parameters: Population = [
         RegularParameters.generate_random(width)
         for _ in range(num_init_regular_parameters)
     ]
-    return spaced_parameters + regular_parameters
+    return list(spaced_parameters) + list(regular_parameters)
 
 
 def genalgo(
@@ -77,8 +77,8 @@ def genalgo(
             parameters_list = evolve(comparator, combine, parameters_list, serialize)
             generation_number += 1
             progress_bar.update(1)
-    evaluations = tournament(comparator, parameters_list)
-    serialize(parameters_list, evaluations, True)
+    _, evaluation = tournament(comparator, parameters_list)
+    serialize(parameters_list, evaluation, True)
 
 
 def learn(

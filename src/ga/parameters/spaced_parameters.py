@@ -4,6 +4,7 @@ from random import uniform, choice
 from bball.create import created_spaced_strategy
 from bball.utils import clamp
 from ga.utils import crossover, mutate
+from ga.evolution_types import IndividualInterface
 
 SPACING_DISTANCE_RANGE = (0.0, 1.0)
 SHOT_QUALITY_RANGE = (0.0, 3.0)
@@ -12,7 +13,7 @@ DEFENSIVE_TIGHTNESS_RANGE = (0.0, 1.0)
 
 
 @dataclass
-class SpacedParameters:
+class SpacedParameters(IndividualInterface):
     spacing_distance: float
     shot_quality_threshold: float
     pass_probability: float

@@ -1,9 +1,10 @@
 from __future__ import annotations
-from typing import List, Callable, TypeVar, Tuple
+from typing import Callable, Tuple
 from copy import deepcopy
 from random import shuffle
 import multiprocess as mp  # type: ignore
 from ga.evaluation import Evaluation
+from ga.evolution_types import IndividualComparator, IndividualCreator, Population
 
 
 def rotated(lis):
@@ -13,11 +14,6 @@ def rotated(lis):
 DELTA = 0.1
 P_CHANGE = 0.2
 P_FIRST = 0.5
-
-Individual = TypeVar("Individual")
-IndividualComparator = Callable[[Individual, Individual], float]
-IndividualCreator = Callable[[Individual, Individual, float], Individual]
-Population = List[Individual]
 
 
 def tournament(
@@ -50,8 +46,8 @@ def tournament(
 
 def next_generation(creator: IndividualCreator, population: Population) -> Population:
     children = []
-    for parameters_1, parameters_2 in zip(population, rotated(population)):
-        child = creator(parameters_1, parameters_2, P_FIRST)
+    for individuals_1, individuals_2 in zip(population, rotated(population)):
+        child = creator(individuals_1, individuals_2, P_FIRST)
         children.append(child)
     return children
 
@@ -78,5 +74,5 @@ def evolve(
     )
     assert len(children) == len(winners), population_str
     assert len(children) + len(winners) == len(population), population_str
-    mutated = [parameters.mutate(DELTA, P_CHANGE) for parameters in children]
-    return mutated + winners
+    mutated = [individual.mutate(DELTA, P_CHANGE) for individual in children]
+    return mutated + list(winners)
