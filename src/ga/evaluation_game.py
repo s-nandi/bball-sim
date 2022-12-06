@@ -20,7 +20,7 @@ def evaluation_game(num_players: int) -> Game:
     )
     width = 28.65
     height = 15.24
-    shot_clock = 24
+    shot_clock = 35
     court = create_court(width, height)
     teams = []
     for _ in range(2):

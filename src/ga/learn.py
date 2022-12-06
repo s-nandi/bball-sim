@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     GameGenerator = Callable[[], Game]
     Comparator = Callable[[Parameters, Parameters], bool]
 
-DURATION = 50
+DURATION = 100
 FPS = 60
 SPEED_SCALE = 3.0
 
