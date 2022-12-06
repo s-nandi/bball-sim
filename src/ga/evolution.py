@@ -2,7 +2,6 @@ from __future__ import annotations
 from typing import List, Callable, TypeVar
 from copy import deepcopy
 from random import shuffle
-import multiprocess as mp  # type: ignore
 
 
 def rotated(lis):
@@ -22,8 +21,6 @@ Population = List[Individual]
 def tournament(comparator: IndividualComparator, population: Population) -> Population:
     if len(population) % 2 != 0:
         population.append(deepcopy(population[0]))
-    shuffle(population)
-
     evaluation_indices = [
         (i, j) for i in range(0, len(population)) for j in range(i + 1, len(population))
     ]
@@ -31,8 +28,7 @@ def tournament(comparator: IndividualComparator, population: Population) -> Popu
     for i, j in evaluation_indices:
         evaluations = [(population[i], population[j])]
 
-    with mp.Pool(mp.cpu_count() - 2) as pool:  # pylint: disable=no-member,not-callable
-        deltas = pool.starmap(comparator, evaluations)  # pylint: disable=no-member
+    deltas = [comparator(*evaluation) for evaluation in evaluations]
 
     scores = [float("inf") for _ in population]
     for (i, j), deltas in zip(evaluation_indices, deltas):
@@ -46,25 +42,26 @@ def tournament(comparator: IndividualComparator, population: Population) -> Popu
 
 
 def next_generation(creator: IndividualCreator, population: Population) -> Population:
-    shuffle(population)
     children = []
     for parameters_1, parameters_2 in zip(population, rotated(population)):
         child = creator(parameters_1, parameters_2, P_FIRST)
         children.append(child)
-    return population + children
+    return children
 
 
 def evolve(
     comparator: IndividualComparator, creator: IndividualCreator, population: Population
 ) -> Population:
+    shuffle(population)
     winners = tournament(comparator, population)
     shuffle(winners)
-    new_population = next_generation(creator, winners)
+    children = next_generation(creator, winners)
     population_str = (
         f"{len(population)} population,"
         f" {len(winners)} survivors,"
-        f" {len(new_population)} new population"
+        f" {len(children)} children"
     )
-    assert len(new_population) == len(population), population_str
-    mutated = [parameters.mutate(DELTA, P_CHANGE) for parameters in new_population]
-    return mutated
+    assert len(children) == len(winners), population_str
+    assert len(children) + len(winners) == len(population), population_str
+    mutated = [parameters.mutate(DELTA, P_CHANGE) for parameters in children]
+    return mutated + winners
