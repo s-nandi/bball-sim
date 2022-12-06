@@ -1,6 +1,5 @@
 from __future__ import annotations
 import uuid
-from dataclasses import asdict
 from typing import Optional, List, Callable, TYPE_CHECKING
 from tqdm import tqdm
 from ga.evaluation_game import evaluation_game
@@ -12,8 +11,8 @@ from ga.parameters import (
     compare,
     combine,
 )
-from ga.evolution import evolve
-from ga.metadata import Metadata, TeamMetadata
+from ga.evolution import evolve, tournament
+from ga.metadata import Metadata
 
 if TYPE_CHECKING:
     from bball import Game
@@ -50,27 +49,23 @@ def genalgo(
     output_folder: Optional[str],
     output_frequency: int,
 ):
-    do_serialization = output_folder is not None
-    if do_serialization:
-        game = game_generator()
-        teams = tuple(
-            TeamMetadata(
-                [asdict(player._attributes) for player in game.teams[team_index]],
-                team_index,
-            )
-            for team_index in range(2)
-        )
-        metadata = Metadata(
-            (teams[0], teams[1]),
+    serializer = None
+    if output_folder is not None:
+        serializer = ParametersSerializer(gen_id, output_folder, output_frequency)
+        metadata = Metadata.create(
+            game_generator,
             population_size,
             generation_limit,
-            DURATION,
-            FPS,
-            SPEED_SCALE,
+            duration=DURATION,
+            fps=FPS,
+            speed_scale=SPEED_SCALE,
         )
-        assert output_folder is not None
-        serializer = ParametersSerializer(gen_id, output_folder, output_frequency)
         serializer.serialize_metadata(metadata)
+
+    def serialize(parameters_list, evaluations, force: bool = False):
+        if serializer is not None:
+            serializer.serialize_evaluation(evaluations, force)
+            serializer.serialize_parameters(parameters_list, force)
 
     parameters_list = create_initial_population(
         population_size, game_generator().court.width
@@ -79,12 +74,11 @@ def genalgo(
     generation_number = 0
     with tqdm(total=generation_limit) as progress_bar:
         while generation_limit is None or generation_number < generation_limit:
-            parameters_list = evolve(comparator, combine, parameters_list)
-            if do_serialization:
-                serializer.serialize_parameters(parameters_list)
+            parameters_list = evolve(comparator, combine, parameters_list, serialize)
             generation_number += 1
             progress_bar.update(1)
-    serializer.serialize_parameters(parameters_list, force=True)
+    evaluations = tournament(comparator, parameters_list)
+    serialize(parameters_list, evaluations, True)
 
 
 def learn(

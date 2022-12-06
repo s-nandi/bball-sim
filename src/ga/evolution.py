@@ -1,7 +1,9 @@
 from __future__ import annotations
-from typing import List, Callable, TypeVar
+from typing import List, Callable, TypeVar, Tuple
 from copy import deepcopy
 from random import shuffle
+import multiprocess as mp  # type: ignore
+from ga.evaluation import Evaluation
 
 
 def rotated(lis):
@@ -18,27 +20,32 @@ IndividualCreator = Callable[[Individual, Individual, float], Individual]
 Population = List[Individual]
 
 
-def tournament(comparator: IndividualComparator, population: Population) -> Population:
-    if len(population) % 2 != 0:
-        population.append(deepcopy(population[0]))
+def tournament(
+    comparator: IndividualComparator, population: Population
+) -> Tuple[Population, Evaluation]:
+    assert len(population) % 2 == 0
     evaluation_indices = [
         (i, j) for i in range(0, len(population)) for j in range(i + 1, len(population))
     ]
-    evaluations = []
-    for i, j in evaluation_indices:
-        evaluations = [(population[i], population[j])]
+    evaluations = [(population[i], population[j]) for i, j in evaluation_indices]
 
-    deltas = [comparator(*evaluation) for evaluation in evaluations]
+    with mp.Pool(mp.cpu_count() - 2) as pool:  # pylint: disable=no-member,not-callable
+        # pylint: disable=no-member
+        score_differences = pool.starmap(comparator, evaluations)
 
     scores = [float("inf") for _ in population]
-    for (i, j), deltas in zip(evaluation_indices, deltas):
-        scores[i] = min(scores[i], -deltas)
-        scores[j] = min(scores[j], deltas)
+    deltas = []
+    for (i, j), delta in zip(evaluation_indices, score_differences):
+        scores[i] = min(scores[i], delta)
+        scores[j] = min(scores[j], -delta)
+        deltas.append((i, j, delta))
 
-    indices = [i for _ in population]
-    winning_indices = sorted(indices, key=lambda ind: scores[ind], reverse=True)
-    half_length = len(population) // 2
-    return [population[ind] for ind in winning_indices[:half_length]]
+    indices = list(range(len(population)))
+    sorted_indices = sorted(indices, key=lambda ind: scores[ind], reverse=True)
+    winning_indices = sorted_indices[: len(population) // 2]
+
+    evaluation = Evaluation(deltas, scores, winning_indices)
+    return [population[ind] for ind in winning_indices], evaluation
 
 
 def next_generation(creator: IndividualCreator, population: Population) -> Population:
@@ -50,10 +57,18 @@ def next_generation(creator: IndividualCreator, population: Population) -> Popul
 
 
 def evolve(
-    comparator: IndividualComparator, creator: IndividualCreator, population: Population
+    comparator: IndividualComparator,
+    creator: IndividualCreator,
+    population: Population,
+    serialize: Callable[[Population, Evaluation], None],
 ) -> Population:
     shuffle(population)
-    winners = tournament(comparator, population)
+    if len(population) % 2 != 0:
+        population.append(deepcopy(population[0]))
+
+    winners, metrics = tournament(comparator, population)
+    serialize(population, metrics)
+
     shuffle(winners)
     children = next_generation(creator, winners)
     population_str = (

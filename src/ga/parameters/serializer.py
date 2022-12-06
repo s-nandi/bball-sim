@@ -4,6 +4,7 @@ from pathlib import Path
 import json
 from tqdm import tqdm
 from ga.metadata import Metadata, TeamMetadata
+from ga.evaluation import Evaluation
 from ga.parameters.parameters import Parameters
 from ga.parameters.regular_parameters import RegularParameters
 from ga.parameters.spaced_parameters import SpacedParameters
@@ -18,6 +19,10 @@ def generation_index(file_name: str) -> Optional[int]:
         return int(file_name.replace("generation_", "").replace(".json", ""))
     except ValueError:
         return None
+
+
+def evaluations_file_name(generation_number: int):
+    return f"evaluations_{generation_number}.json"
 
 
 def metadata_file_name():
@@ -49,16 +54,19 @@ class ParametersSerializer:
     _last_serialized_generation: int = field(init=False, default=0)
 
     def __post_init__(self):
+        print(self.identifier)
         self._basepath = Path(self.folder).joinpath(self.identifier)
         self._basepath.mkdir(exist_ok=False, parents=False)
+
+    def _should_serialize(self):
+        is_first = self._generation_number == 0
+        gap = self._generation_number - self._last_serialized_generation
+        return is_first or gap >= self.serialize_frequency
 
     def serialize_parameters(
         self, parameters_list: Sequence[Parameters], force: bool = False
     ):
-        is_first = self._generation_number == 0
-        gap = self._generation_number - self._last_serialized_generation
-        should_serialize = force or is_first or gap >= self.serialize_frequency
-        if should_serialize:
+        if self._should_serialize() or force:
             file_name = generation_file_name(self._generation_number)
             path = self._basepath.joinpath(file_name)
             _write_json(
@@ -67,10 +75,16 @@ class ParametersSerializer:
             self._last_serialized_generation = self._generation_number
         self._generation_number += 1
 
+    def serialize_evaluation(self, evaluations: Evaluation, force: bool = False):
+        if self._should_serialize() or force:
+            file_name = evaluations_file_name(self._generation_number)
+            path = self._basepath.joinpath(file_name)
+            _write_json(path, asdict(evaluations), log=True)
+
     def serialize_metadata(self, metadata: Metadata):
         file_name = metadata_file_name()
         path = self._basepath.joinpath(file_name)
-        _write_json(path, asdict(metadata), log=True)
+        _write_json(path, asdict(metadata), log=False)
 
 
 def to_parameters(obj) -> Parameters:

@@ -9,12 +9,17 @@ DURATION_SHORT = "-d"
 DURATION_LONG = "--duration"
 DISPLAY_SCALE_SHORT = "-k"
 DISPLAY_SCALE_LONG = "--display-scale"
+SPEED_SHORT = "-s"
+SPEED_LONG = "--speed"
+SPEED_DEST = "speed_scale"
 
 
 def _build_simulation_parser(parser: argparse.ArgumentParser):
     parser.add_argument("fps", type=int)
-    parser.add_argument("speed_scale", type=float)
     parser.add_argument(DURATION_SHORT, DURATION_LONG, type=float)
+    parser.add_argument(
+        SPEED_SHORT, SPEED_LONG, dest=SPEED_DEST, type=float, default=1.0
+    )
     parser.add_argument(DISPLAY_SCALE_SHORT, DISPLAY_SCALE_LONG, type=float)
 
 
@@ -30,10 +35,12 @@ def _build_loading_subparser(parser: argparse.ArgumentParser):
     parser.add_argument("input_folder", type=str)
     parser.add_argument("-g", "--generation", type=int)
     parser.add_argument("-v", "--visualize", action="store_true")
+    parser.add_argument("-fps", "--fps", type=int)
     parser.add_argument(DURATION_SHORT, DURATION_LONG, type=float)
+    parser.add_argument(
+        SPEED_SHORT, SPEED_LONG, dest=SPEED_DEST, type=float, default=1.0
+    )
     parser.add_argument(DISPLAY_SCALE_SHORT, DISPLAY_SCALE_LONG, type=float)
-    parser.add_argument("-fps", "--fps", type=int, default=90)
-    parser.add_argument("-s", "--speed", dest="speed_scale", type=float, default=1.0)
     parser.add_argument("-i1", "--index_1", type=int)
     parser.add_argument("-i2", "--index_2", type=int)
 

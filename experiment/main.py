@@ -8,9 +8,12 @@ SPEED_SCALE = 5.0
 
 
 def load(args):
-    game, parameters_list = ga.load(
+    game, metadata, parameters_list = ga.load(
         folder=args.input_folder, generation_number=args.generation
     )
+    args.fps = metadata.fps if args.fps is None else args.fps
+    args.duration = metadata.duration if args.duration is None else args.duration
+    args.speed_scale *= metadata.speed_scale
     if args.visualize:
         index_1 = args.index_1
         index_2 = args.index_2
@@ -34,19 +37,13 @@ def load(args):
             indices = list(range(len(parameters_list)))
         pprint.pprint([asdict(parameters_list[index]) for index in indices])
         pprint.pprint(f"# parameters: {len(parameters_list)}")
-        if (
-            args.index_1 is not None
-            and args.index_2 is not None
-            and args.duration is not None
-            and args.fps is not None
-            and args.speed_scale is not None
-        ):
+        if args.index_1 is not None and args.index_2 is not None:
             delta = ga.compare(
                 game,
                 parameters_list[args.index_1],
                 parameters_list[args.index_2],
-                duration=args.duration,
                 fps=args.fps,
+                duration=args.duration,
                 speed_scale=args.speed_scale,
             )
             print(f"delta = {delta}")
