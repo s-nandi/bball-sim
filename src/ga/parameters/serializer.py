@@ -31,21 +31,25 @@ def metadata_file_name():
 
 
 def file_name_with_index(file_name: str, index: int) -> str:
-    pos = file_name.find("(")
+    pos = file_name.find(" (")
     if pos == -1:
         prefix = file_name
     else:
         prefix = file_name[:pos]
-    return f"{prefix}({index})"
+    return f"{prefix} ({index})"
+
+
+def get_safe_path(file_path: Path) -> Path:
+    safe_index = 1
+    while file_path.exists():
+        indexed_stem = file_name_with_index(file_path.stem, safe_index)
+        file_path = file_path.with_name(indexed_stem).with_suffix(file_path.suffix)
+        safe_index += 1
+    return file_path
 
 
 def _write_json(file_path: Path, obj, *, log=False):
-    safe_index = 0
-    while file_path.exists():
-        indexed_name = file_name_with_index(file_path.name, safe_index)
-        file_path = file_path.with_name(indexed_name).with_suffix(file_path.suffix)
-        safe_index += 1
-
+    file_path = get_safe_path(file_path)
     if log:
         tqdm.write(f"writing {file_path}")
     json_obj = json.dumps(obj)
