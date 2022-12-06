@@ -13,3 +13,6 @@ class Metadata:
     teams: Tuple[TeamMetadata, TeamMetadata]
     population_size: int
     generation_limit: Optional[int]
+    duration: float
+    fps: int
+    speed_scale: float

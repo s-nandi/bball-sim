@@ -28,12 +28,14 @@ def _build_learning_subparser(parser: argparse.ArgumentParser):
 
 def _build_loading_subparser(parser: argparse.ArgumentParser):
     parser.add_argument("input_folder", type=str)
-    parser.add_argument("generation", type=int)
+    parser.add_argument("-g", "--generation", type=int)
     parser.add_argument("-v", "--visualize", action="store_true")
     parser.add_argument(DURATION_SHORT, DURATION_LONG, type=float)
     parser.add_argument(DISPLAY_SCALE_SHORT, DISPLAY_SCALE_LONG, type=float)
-    parser.add_argument("--fps", type=int, default=90)
-    parser.add_argument("--speed_scale", type=float, default=1.0)
+    parser.add_argument("-fps", "--fps", type=int, default=90)
+    parser.add_argument(
+        "-speed", "--speed_scale", dest="speed_scale", type=float, default=1.0
+    )
     parser.add_argument("--index_1", type=int, default=0)
     parser.add_argument("--index_2", type=int, default=1)
 

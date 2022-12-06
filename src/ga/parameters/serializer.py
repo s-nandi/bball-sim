@@ -1,9 +1,9 @@
 from dataclasses import dataclass, asdict, field
-from typing import Sequence
+from typing import Sequence, Optional
 from pathlib import Path
 import json
 from tqdm import tqdm
-from ga.metadata import Metadata
+from ga.metadata import Metadata, TeamMetadata
 from ga.parameters.parameters import Parameters
 from ga.parameters.regular_parameters import RegularParameters
 from ga.parameters.spaced_parameters import SpacedParameters
@@ -85,6 +85,14 @@ class ParametersDeserializer:
         self._basepath = Path(self.folder)
         assert self._basepath.is_dir()
 
+    def _find_max_generation_in_folder(self) -> int:
+        generation_number = 0
+        while generation_number == self._max_generation_that_exists_below(
+            generation_number
+        ):
+            generation_number += 1
+        return max(0, generation_number - 1)
+
     def _max_generation_that_exists_below(self, generation_number: int) -> int:
         original_number = generation_number
         while generation_number >= 0:
@@ -95,8 +103,15 @@ class ParametersDeserializer:
             generation_number -= 1
         return original_number
 
-    def deserialize_parameters(self, generation_number: int) -> Sequence[Parameters]:
-        generation_number = self._max_generation_that_exists_below(generation_number)
+    def deserialize_parameters(
+        self, generation_number: Optional[int]
+    ) -> Sequence[Parameters]:
+        if generation_number is None:
+            generation_number = self._find_max_generation_in_folder()
+        else:
+            generation_number = self._max_generation_that_exists_below(
+                generation_number
+            )
         file_name = generation_file_name(generation_number)
         path = self._basepath.joinpath(file_name)
         assert isinstance(path, Path)
@@ -109,4 +124,8 @@ class ParametersDeserializer:
     def deserialize_metadata(self) -> Metadata:
         file_name = metadata_file_name()
         path = self._basepath.joinpath(file_name)
-        return Metadata(**_read_json(path))
+        json_data = _read_json(path)
+        team_metadata_1 = TeamMetadata(**json_data["teams"][0])
+        team_metadata_2 = TeamMetadata(**json_data["teams"][0])
+        json_data.pop("teams")
+        return Metadata((team_metadata_1, team_metadata_2), **json_data)

@@ -21,6 +21,10 @@ if TYPE_CHECKING:
     GameGenerator = Callable[[], Game]
     Comparator = Callable[[Parameters, Parameters], bool]
 
+DURATION = 50
+FPS = 60
+SPEED_SCALE = 3.0
+
 
 def create_initial_population(population_size: int, width: float) -> List[Parameters]:
     num_init_spaced_parameters = population_size // 2
@@ -56,7 +60,14 @@ def genalgo(
             )
             for team_index in range(2)
         )
-        metadata = Metadata((teams[0], teams[1]), population_size, generation_limit)
+        metadata = Metadata(
+            (teams[0], teams[1]),
+            population_size,
+            generation_limit,
+            DURATION,
+            FPS,
+            SPEED_SCALE,
+        )
         assert output_folder is not None
         serializer = ParametersSerializer(gen_id, output_folder, output_frequency)
         serializer.serialize_metadata(metadata)
@@ -74,11 +85,6 @@ def genalgo(
             generation_number += 1
             progress_bar.update(1)
     serializer.serialize_parameters(parameters_list, force=True)
-
-
-DURATION = 50
-FPS = 60
-SPEED_SCALE = 3.0
 
 
 def learn(
