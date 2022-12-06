@@ -13,7 +13,7 @@ P_CHANGE = 0.1
 P_FIRST = 0.5
 
 Individual = TypeVar("Individual")
-IndividualComparator = Callable[[Individual, Individual], bool]
+IndividualComparator = Callable[[Individual, Individual], float]
 IndividualCreator = Callable[[Individual, Individual, float], Individual]
 Population = List[Individual]
 
@@ -27,7 +27,7 @@ def tournament(comparator: IndividualComparator, population: Population) -> Popu
         individual_1 = population[i]
         individual_2 = population[i + 1]
         winner_is_1 = comparator(individual_1, individual_2)
-        if winner_is_1:
+        if winner_is_1 > 0.0:
             winners.append(individual_1)
         else:
             winners.append(individual_2)

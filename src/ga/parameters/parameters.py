@@ -63,7 +63,7 @@ def compare(
     duration: float,
     fps: int,
     speed_scale: float = 1.0,
-) -> bool:
+) -> float:
     indexed_strategies = [
         (0, parameters_1.strategy()),
         (1, parameters_2.strategy()),
@@ -83,5 +83,4 @@ def compare(
             total_scores[indexed_strategy[0]] += scoreboard.score[team_index]
         indexed_strategies = list(reversed(indexed_strategies))
 
-    winner_is_1 = total_scores[0] > total_scores[1]
-    return winner_is_1
+    return total_scores[0] - total_scores[1]
