@@ -1,11 +1,36 @@
+from dataclasses import asdict
+import pprint
 from experiment import initiate, run, parse
+import ga
 
 FPS = 90
 SPEED_SCALE = 5.0
 
 
-def simulate(args):
-    game = initiate.canonical_game(2)
+def load(args):
+    game, parameters_list = ga.load(
+        folder=args.input_folder, generation_number=args.generation
+    )
+    if args.visualize:
+        game.assign_team_strategy(0, parameters_list[0].strategy())
+        game.assign_team_strategy(1, parameters_list[1].strategy())
+        simulate(args, game)
+    else:
+        pprint.pprint([asdict(parameters) for parameters in parameters_list])
+
+
+def learn(args):
+    ga.learn(
+        num_players=args.player_count,
+        population_size=args.population_size,
+        generation_limit=args.generations,
+        output_folder=args.output_folder,
+    )
+
+
+def simulate(args, game=None):
+    if game is None:
+        game = initiate.canonical_game(2)
     if args.duration is not None:
         run.headless(
             game, fps=args.fps, speed_scale=args.speed_scale, duration=args.duration
@@ -22,7 +47,7 @@ def simulate(args):
 
 def main():
     args = parse.parse()
-    table = {parse.SIMULATE: simulate}
+    table = {parse.SIMULATE: simulate, parse.LEARN: learn, parse.LOAD: load}
     table[args.type](args)
 
 
