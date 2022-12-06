@@ -37,9 +37,11 @@ class ShotClock:
             return False
         return self.possession_time <= 0.0
 
-    def possession_ended(self):
+    def possession_ended(self) -> Optional[int]:
+        previous_active_possession = self.active_possession
         self.possession_time = self.shot_clock_duration
         self.active_possession = None
+        return previous_active_possession
 
     def possession_started(self, team_index: int) -> bool:
         if self.active_possession != team_index:
@@ -122,12 +124,13 @@ class Game:
 
     def check_shot_clock(self, time_frame: float) -> bool:
         if self.ball.mode in [BallMode.DEAD, BallMode.MIDSHOT, BallMode.REACHEDSHOT]:
-            self._clock.possession_ended()
+            team_with_last_possession = self._clock.possession_ended()
+            if team_with_last_possession is not None:
+                self._scoreboard.increment_possessions(team_with_last_possession)
         else:
             team_with_possession = self.team_with_last_possession
             assert team_with_possession is not None
-            if self._clock.possession_started(team_with_possession):
-                self._scoreboard.increment_possessions(team_with_possession)
+            self._clock.possession_started(team_with_possession)
         if self._clock.did_expire_after_step(time_frame):
             self.ball.shot_clock_expired()
             return True
