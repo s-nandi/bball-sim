@@ -31,8 +31,6 @@ class SpacedParameters:
         self.defensive_tightness = clamp(
             self.defensive_tightness, *DEFENSIVE_TIGHTNESS_RANGE
         )
-
-        self.spacing_distance *= self.width
         self.spacing_distance = clamp(self.spacing_distance, 0, self.width)
 
     @staticmethod
@@ -75,7 +73,7 @@ class SpacedParameters:
 
     def strategy(self):
         return created_spaced_strategy(
-            self.spacing_distance,
+            self.spacing_distance * self.width,
             self.shot_quality_threshold,
             self.pass_probability,
             self.dive_to_basket,

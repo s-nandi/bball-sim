@@ -22,7 +22,6 @@ class RegularParameters:
         self.defensive_tightness = clamp(
             self.defensive_tightness, *DEFENSIVE_TIGHTNESS_RANGE
         )
-        self.shooting_distance *= self.width
 
     @staticmethod
     def generate_random(width: float) -> RegularParameters:
@@ -45,4 +44,6 @@ class RegularParameters:
         )
 
     def strategy(self):
-        return create_strategy(self.shooting_distance, self.defensive_tightness)
+        return create_strategy(
+            self.shooting_distance * self.width, self.defensive_tightness
+        )

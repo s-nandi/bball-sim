@@ -44,6 +44,7 @@ def genalgo(
     population_size: int,
     generation_limit: Optional[int],
     output_folder: Optional[str],
+    output_frequency: int,
 ):
     do_serialization = output_folder is not None
     if do_serialization:
@@ -59,7 +60,7 @@ def genalgo(
         ]
         metadata = Metadata(teams, population_size, generation_limit)
         assert output_folder is not None
-        serializer = ParametersSerializer(gen_id, output_folder, 0)
+        serializer = ParametersSerializer(gen_id, output_folder, output_frequency)
         serializer.serialize_metadata(metadata)
 
     parameters_list = create_initial_population(
@@ -77,9 +78,9 @@ def genalgo(
     serializer.serialize_parameters(parameters_list, force=True)
 
 
-DURATION = 1  # 200
+DURATION = 50
 FPS = 60
-SPEED_SCALE = 1.0
+SPEED_SCALE = 3.0
 
 
 def learn(
@@ -87,6 +88,7 @@ def learn(
     population_size: int,
     generation_limit: Optional[int] = None,
     output_folder: Optional[str] = None,
+    output_frequency: int = 1,
 ):
     gen_id = str(uuid.uuid1()).replace("-", "")[:16]
 
@@ -111,4 +113,5 @@ def learn(
         population_size=population_size,
         generation_limit=generation_limit,
         output_folder=output_folder,
+        output_frequency=output_frequency,
     )

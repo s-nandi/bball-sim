@@ -12,11 +12,12 @@ def load(args):
         folder=args.input_folder, generation_number=args.generation
     )
     if args.visualize:
-        game.assign_team_strategy(0, parameters_list[0].strategy())
-        game.assign_team_strategy(1, parameters_list[1].strategy())
+        game.assign_team_strategy(0, parameters_list[args.index_1].strategy())
+        game.assign_team_strategy(1, parameters_list[args.index_2].strategy())
         simulate(args, game)
     else:
         pprint.pprint([asdict(parameters) for parameters in parameters_list])
+        pprint.pprint(f"# parameters: {len(parameters_list)}")
 
 
 def learn(args):
@@ -25,6 +26,7 @@ def learn(args):
         population_size=args.population_size,
         generation_limit=args.generations,
         output_folder=args.output_folder,
+        output_frequency=args.output_frequency,
     )
 
 

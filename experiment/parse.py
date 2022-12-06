@@ -22,6 +22,7 @@ def _build_learning_subparser(parser: argparse.ArgumentParser):
     parser.add_argument("player_count", type=int)
     parser.add_argument("population_size", type=int)
     parser.add_argument("output_folder", type=str)
+    parser.add_argument("output_frequency", type=int, default=1)
     parser.add_argument("--generations", type=int)
 
 
@@ -29,6 +30,12 @@ def _build_loading_subparser(parser: argparse.ArgumentParser):
     parser.add_argument("input_folder", type=str)
     parser.add_argument("generation", type=int)
     parser.add_argument("--visualize", action="store_true")
+    parser.add_argument(DURATION_SHORT, DURATION_LONG, type=float)
+    parser.add_argument(DISPLAY_SCALE_SHORT, DISPLAY_SCALE_LONG, type=float)
+    parser.add_argument("--fps", type=int, default=90)
+    parser.add_argument("--speed_scale", type=float, default=1.0)
+    parser.add_argument("--index_1", type=int, default=0)
+    parser.add_argument("--index_2", type=int, default=1)
 
 
 def _build_parser(parser: argparse.ArgumentParser):
