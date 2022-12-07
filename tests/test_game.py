@@ -171,9 +171,7 @@ def setup_scoring_test(use_ev: bool) -> ScoringTest:
     target_hoop = game.target_hoop(player)
     distance_to_target = distance_between(player.position, target_hoop.position)
     concrete_value = target_hoop.value_of_shot_from(player.position)
-    probability = player._attributes.skill.shot_probability.probability(
-        distance_to_target
-    )
+    probability = player._attributes.skill.shot_probability(distance_to_target)
     _check_probability_in_threshold(probability, 0.45, 0.55)
     expected_value = concrete_value * probability
     player.shoot_at(target_hoop.position)

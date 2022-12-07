@@ -35,6 +35,6 @@ class Hoop:
     def expected_value_of_shot_by(self, player: Player) -> float:
         distance = distance_between(player.position, self.position)
         probability_function = player.skill_attributes.shot_probability
-        probability = probability_function.probability(distance)
+        probability = probability_function(distance)
         value = self.value_of_shot_from(player.position)
         return value * probability

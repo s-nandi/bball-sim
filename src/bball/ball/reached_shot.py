@@ -21,12 +21,12 @@ class ReachedShot(BallState):
 
     def parameters(self):
         distance = distance_between(self.location, self.target)
-        shot_probability = self.shooter._attributes.skill.shot_probability
+        probability_function = self.shooter._attributes.skill.shot_probability
         return ShotParameters(
             self.shooter,
             self.target,
             self.location,
-            shot_probability.probability(distance),
+            probability_function(distance),
         )
 
     @staticmethod

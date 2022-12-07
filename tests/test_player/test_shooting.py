@@ -50,8 +50,8 @@ def test_shot_probability():
     shot_probability = create_linear_shot_probability(
         max_shot_distance=max_shot_distance
     )
-    assert approx(shot_probability.probability(0), 1.0)
-    assert approx(shot_probability.probability(max_shot_distance), 0.0)
-    assert approx(shot_probability.probability(max_shot_distance / 2), 0.5)
-    assert approx(shot_probability.probability(7), 3 / 10)
-    assert approx(shot_probability.probability(3), 7 / 10)
+    assert approx(shot_probability(0), 1.0)
+    assert approx(shot_probability(max_shot_distance), 0.0)
+    assert approx(shot_probability(max_shot_distance / 2), 0.5)
+    assert approx(shot_probability(7), 3 / 10)
+    assert approx(shot_probability(3), 7 / 10)
