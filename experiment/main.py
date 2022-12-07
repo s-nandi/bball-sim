@@ -65,7 +65,7 @@ def load(args):
                 duration=args.duration,
                 speed_scale=args.speed_scale,
             )
-            print(f"delta = {delta}")
+            pprint.pprint(f"delta = {delta}")
 
 
 def learn(args):

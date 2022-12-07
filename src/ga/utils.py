@@ -4,9 +4,11 @@ from random import uniform, random
 
 
 def crossover(val1, val2, p_first: float):
-    if random() < p_first:
-        return val1
-    return val2
+    if random() < 0.5:
+        if random() < p_first:
+            return val1
+        return val2
+    return (val1 + val2) / 2.0
 
 
 T = TypeVar("T", float, bool)

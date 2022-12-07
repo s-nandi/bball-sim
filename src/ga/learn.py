@@ -26,15 +26,15 @@ SPEED_SCALE = 3.0
 
 
 def create_initial_population(population_size: int, width: float) -> Population:
-    num_init_spaced_parameters = population_size // 2
-    num_init_regular_parameters = population_size - num_init_spaced_parameters
+    num_types = 2
+    while population_size % (2 * num_types) != 0:
+        population_size += 1
+    individuals_per_type = population_size // num_types
     spaced_parameters: Population = [
-        SpacedParameters.generate_random(width)
-        for _ in range(num_init_spaced_parameters)
+        SpacedParameters.generate_random(width) for _ in range(individuals_per_type)
     ]
     regular_parameters: Population = [
-        RegularParameters.generate_random(width)
-        for _ in range(num_init_regular_parameters)
+        RegularParameters.generate_random(width) for _ in range(individuals_per_type)
     ]
     return list(spaced_parameters) + list(regular_parameters)
 
