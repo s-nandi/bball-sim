@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
-from bball.utils import coords_to_string, ROUND_DIGITS
+from bball.utils import coords_to_string, ROUND_DIGITS, angle_degrees_to_vector
 from bball.validator import valid_multiplier, valid_angle_degrees
 from bball.player.player_attributes import PlayerAttributes
 from bball.player.player_physics import PlayerPhysics
@@ -84,6 +84,12 @@ class Player:
         self._physics.reset_velocity()
         self._physics.position = position
         self._physics.orientation_degrees = orientation_degrees
+        return self
+
+    def with_velocity(self, velocity_magnitude: float) -> Player:
+        self._physics.velocity = angle_degrees_to_vector(
+            self.orientation_degrees, velocity_magnitude
+        )
         return self
 
     def turn(self, multiplier: float) -> Player:

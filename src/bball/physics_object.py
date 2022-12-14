@@ -76,8 +76,12 @@ class PhysicsObject:
         assert self.is_initialized
         return convert_to_tuple(self._body.velocity)
 
+    @velocity.setter
+    def velocity(self, velocity: Vector):
+        self._body.velocity = pymunk.Vec2d(*velocity)
+
     def reset_velocity(self) -> None:
-        self._body.velocity = (0, 0)
+        self.velocity = (0, 0)
 
     @property
     def acceleration(self) -> Vector:
