@@ -1,15 +1,14 @@
-from dataclasses import dataclass
 from copy import deepcopy
-from typing import Tuple
 from random import uniform, seed
 import torch
 from torch.utils.data import Dataset
 from bball import Player, Court, Hoop
 from experiment.initiate import canonical_game
-from bball.utils import angle_degrees_to_vector, divide_by
-from neural import normalize
+from bball.utils import divide_by
 
 seed(5)
+
+game = canonical_game(1)
 
 
 def create_player_on_court(base_player: Player, court: Court) -> Player:
@@ -35,7 +34,6 @@ def evaluate_state(player: Player, hoop: Hoop):
 
 
 def generate_data():
-    game = canonical_game(1)
     base_player = game.teams[0][0]
     target_hoop = game.target_hoop(base_player)
     random_player = create_player_on_court(base_player, game.court)
@@ -70,7 +68,7 @@ class PlayerDataset(Dataset):
 
     def __getitem__(self, idx):
         point = self.points[idx].unsqueeze(0)
-        label = self.labels[idx].squeeze()
+        label = self.labels[idx]
         if self.transform:
             point = self.transform(point)
         if self.target_transform:
