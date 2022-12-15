@@ -8,6 +8,7 @@ from bball.utils import angle_degrees_to_vector, sum_of, multiply_by
 from bball.draw.draw_interface import DrawInterface, Color
 
 BALL_RADIUS = 0.5
+HOOP_RADIUS = 2 * BALL_RADIUS
 DEFAULT_PLAYER_RADIUS = 0.9
 PLAYER_ORIENTATION_THICKNESS = 5
 
@@ -67,7 +68,7 @@ def draw_three_point_line(draw_object: DrawInterface, line: ThreePointLine):
 
 def draw_hoop(draw_object: DrawInterface, hoop: Hoop):
     draw_object.draw_circle(
-        hoop.position, 2 * BALL_RADIUS, HOOP_COLOR, COURT_LINE_THICKNESS
+        hoop.position, HOOP_RADIUS, HOOP_COLOR, COURT_LINE_THICKNESS
     )
 
 
