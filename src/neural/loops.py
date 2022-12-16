@@ -1,3 +1,4 @@
+from tqdm import tqdm
 import torch
 from torch.nn import Module
 from torch.utils.data import DataLoader
@@ -19,7 +20,7 @@ def train_loop(
         if batch % 100 == 0:
             loss, current = loss.item(), batch * len(X)
             if verbose:
-                print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
+                tqdm.write(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
 
 def test_loop(dataloader: DataLoader, model: Module, loss_fn, verbose=False) -> float:
@@ -34,5 +35,5 @@ def test_loop(dataloader: DataLoader, model: Module, loss_fn, verbose=False) -> 
 
     test_loss /= num_batches
     if verbose:
-        print(f"Test Error: \n MSE: {(mse):>8f}, Avg loss: {test_loss:>8f} \n")
+        tqdm.write(f"Test Error: \n MSE: {(mse):>8f}, Avg loss: {test_loss:>8f} \n")
     return test_loss

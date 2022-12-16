@@ -1,11 +1,9 @@
 from copy import deepcopy
-from random import uniform, seed
+from random import uniform
 import torch
 from torch.utils.data import Dataset
 from bball import Game, Player, Court, Hoop
 from bball.utils import divide_by
-
-seed(5)
 
 
 def create_player_on_court(base_player: Player, court: Court) -> Player:
@@ -26,7 +24,8 @@ def to_tensor(player: Player, court: Court):
 
 
 def evaluate_state(player: Player, hoop: Hoop):
-    shot_value = hoop.expected_value_of_shot_by(player)
+    shot_value = hoop.expected_value_of_shot_by(player) / 3
+    assert 0 <= shot_value <= 1
     return shot_value
 
 
@@ -56,6 +55,7 @@ def generate_data_n(n: int, game: Game):
 
 class PlayerDataset(Dataset):
     def __init__(self, n: int, game: Game, transform=None, target_transform=None):
+        game = deepcopy(game)
         self.points, self.labels = generate_data_n(n, game)
         self.game = game
         self.transform = transform

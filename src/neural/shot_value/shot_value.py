@@ -1,64 +1,30 @@
-import torch
-from torch import nn
-from torch.utils.data import DataLoader
-from matplotlib import pyplot as plt
-from experiment.initiate import canonical_game
-from neural.datasets import PlayerDataset
-from neural.loops import test_loop, train_loop
-from neural.shot_value.plot import plot_model, plot_loss
+from pathlib import Path
+from neural.shot_value import parse, model
 
 
-class Model(nn.Module):
-    input_factors = 5
-    hidden_nodes = 8
-    output_factors = 1
-
-    def __init__(self):
-        super(Model, self).__init__()
-        self.flatten = nn.Flatten()
-        self.layers = nn.Sequential(
-            nn.Linear(self.input_factors, self.hidden_nodes),
-            nn.ReLU(),
-            nn.Linear(self.hidden_nodes, self.output_factors),
-        )
-
-    def forward(self, x):
-        x = self.flatten(x)
-        x = self.layers(x)
-        return x
+def learn(args):
+    Path(args.output_folder).mkdir(parents=True, exist_ok=True)
+    model.train(
+        args.num_samples,
+        args.batch_size,
+        args.learning_rate,
+        args.epochs,
+        args.checkpoint_interval,
+        Path(args.output_folder),
+    )
 
 
-def main():
-    verbose = True
-
-    n = 500
-    game = canonical_game(1)
-    dataset = PlayerDataset(n, game)
-
-    batch_size = 250
-    learning_rate = 0.3
-    epochs = 500
-
-    model = Model()
-    loss_fn = nn.MSELoss()
-    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
-
-    losses = []
-    for t in range(epochs):
-        if verbose:
-            print(f"Epoch {t+1}\n-------------------------------")
-        train_loop(dataloader, model, loss_fn, optimizer, verbose)
-        loss = test_loop(dataloader, model, loss_fn, verbose)
-        losses.append(loss)
-    if verbose:
-        print("Done!")
-
-    plot_model(dataloader, model)
-    plt.show()
-    plot_loss(losses)
-    plt.show()
+def load(args):
+    model.test(args.num_samples, Path(args.input_folder), args.epoch)
 
 
-if __name__ == "__main__":
-    main()
+fast_learn_args = "learn 3000 500 0.8 100 25 output/test"
+slow_learn_args = "learn 3000 500 0.8 100000 10000 output/test"
+load_args = "load 2000 output/test"
+
+
+def main(args=None):
+    args = parse.parse(args)
+
+    table = {parse.LEARN: learn, parse.LOAD: load}
+    table[args.type](args)

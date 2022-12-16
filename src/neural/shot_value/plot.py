@@ -52,43 +52,49 @@ def draw_hoop(ax: plt.Axes, game):
     ax.add_patch(circle)
 
 
-def plot_model(dataloader, model):
-    xs = []
-    ys = []
-    evaluations = []
-    expecteds = []
-    game = dataloader.dataset.game
-    _, axs = create_subplots(1, 2, game)
-    ax_1, ax_2 = axs
-    ax_1.set_title("Expected")
-    ax_2.set_title("Output")
-    for data, expected in dataloader:
-        batch_size = data.shape[0]
+def plot_model(dataloaders, model):
+    if not dataloaders:
+        return
 
-        assert data.shape == (batch_size, 1, 5)
-        positions = data.squeeze()[:, 0:2]
+    game = dataloaders[0].dataset.game
+    _, axes = create_subplots(len(dataloaders), 2, game)
+    if len(np.array(axes).shape) == 1:
+        axes = [axes]
+    for axs, dataloader in zip(axes, dataloaders):
+        xs = []
+        ys = []
+        evaluations = []
+        expecteds = []
 
-        assert expected.shape == (batch_size, 1)
+        ax_1, ax_2 = axs
+        ax_1.set_title("Expected")
+        ax_2.set_title("Output")
+        for data, expected in dataloader:
+            batch_size = data.shape[0]
+            assert data.shape == (batch_size, 1, 5)
+            positions = data.squeeze(1)[:, 0:2]
 
-        outputs = model(data)
-        assert outputs.shape == (batch_size, 1)
+            assert expected.shape == (batch_size, 1)
 
-        for position, output, expected in zip(positions, outputs, expected):
-            xs.append(position[0].item())
-            ys.append(position[1].item())
-            expecteds.append(expected.item())
-            evaluations.append(output.item())
-    max_value = max(max(expecteds), max(evaluations))
-    expected_colors = to_colors(expecteds, max_value)
-    output_colors = to_colors(evaluations, max_value)
-    for ax, colors in zip(axs, [expected_colors, output_colors]):
-        ax.scatter(xs, ys, c=colors)
-        draw_hoop(ax, game)
+            outputs = model(data)
+            assert outputs.shape == (batch_size, 1)
+
+            for position, output, expected in zip(positions, outputs, expected):
+                xs.append(position[0].item())
+                ys.append(position[1].item())
+                expecteds.append(expected.item())
+                evaluations.append(output.item())
+        max_value = max(max(expecteds), max(evaluations))
+        expected_colors = to_colors(expecteds, max_value)
+        output_colors = to_colors(evaluations, max_value)
+        for ax, colors in zip(axs, [expected_colors, output_colors]):
+            ax.scatter(xs, ys, c=colors)
+            draw_hoop(ax, game)
 
 
 def plot_loss(losses):
     plt.plot(losses)
     plt.xlabel("Epoch")
-    plt.ylim([-1, max(plt.ylim())])
+    plt.ylim([0, max(plt.ylim())])
     plt.ylabel("Loss")
     plt.title("Training progress")
