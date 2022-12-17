@@ -6,9 +6,9 @@ from torch import nn
 from torch.utils.data import DataLoader
 from matplotlib import pyplot as plt
 from experiment.initiate import canonical_game
-from neural.datasets import PlayerDataset
 from neural.save import save_model, model_file_name, suffix_for
 from neural.loops import test_loop, train_loop
+from neural.shot_value.datasets import PlayerDataset
 from neural.shot_value.plot import plot_model, plot_loss
 
 num_players = 1
