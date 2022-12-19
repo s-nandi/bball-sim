@@ -84,8 +84,11 @@ def multiple_players(num_players_per_team: int) -> Game:
     return game
 
 
-def canonical_game(num_players: int) -> Game:
-    game = evaluation_game(num_players)
+canonical_game = evaluation_game
+
+
+def automated_canonical_game(num_players: int) -> Game:
+    game = canonical_game(num_players)
     game.assign_team_strategy(0, created_spaced_strategy(4, 3.0, 1.0, True, 0.5))
     game.assign_team_strategy(1, create_strategy(10, 0.5))
     return game

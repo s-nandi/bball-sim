@@ -80,7 +80,7 @@ def learn(args):
 
 def simulate(args, game=None):
     if game is None:
-        game = initiate.canonical_game(2)
+        game = initiate.automated_canonical_game(2)
     if args.display_scale is not None:
         run.visualize(
             game,
