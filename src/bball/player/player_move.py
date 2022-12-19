@@ -44,6 +44,7 @@ class PlayerShot:
 PlayerAction = Union[PlayerPass, PlayerShot]
 
 
+@dataclass
 class PlayerMove:
     _acceleration: Optional[float] = None
     _turn_degrees: Optional[float] = None
