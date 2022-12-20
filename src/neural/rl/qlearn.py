@@ -1,12 +1,6 @@
-from pathlib import Path
 from tqdm import tqdm
-import gym
 import numpy as np
-from neural.qlearn import parse
-
-
-def makeenv(render_mode=None):
-    return gym.make("FrozenLake-v1", render_mode=render_mode, is_slippery=True)
+from neural.rl import frozen
 
 
 def updated_q(Q, state, action, new_state, learning_rate, reward, discount_factor):
@@ -23,7 +17,7 @@ def updated_q(Q, state, action, new_state, learning_rate, reward, discount_facto
 def learn(
     steps, learning_rate, discount_factor, epsilon_decay, min_epsilon, output_path
 ):
-    env = makeenv()
+    env = frozen.makegymnasium()
 
     epsilon = 1.0
     Q = np.zeros((env.observation_space.n, env.action_space.n))
@@ -62,7 +56,7 @@ def load(episodes, max_steps, visualize, input_path):
         Q = np.loadtxt(f)
 
     print(Q)
-    env = makeenv("human" if visualize else None)
+    env = frozen.makegymnasium("human" if visualize else None)
     succeed = 0
     for _ in tqdm(range(episodes)):
         observation, _ = env.reset()
@@ -86,19 +80,3 @@ def load(episodes, max_steps, visualize, input_path):
         if reached:
             succeed += 1
     print(f"{round(succeed / episodes, 3)} [{succeed} / {episodes}]")
-
-
-def main(args=None):
-    args = parse.parse(args)
-    if args.type == parse.LEARN:
-        learn(
-            args.steps,
-            args.learning_rate,
-            args.discount_factor,
-            args.epsilon_decay,
-            args.min_epsilon,
-            Path(args.output_path),
-        )
-    else:
-        assert args.type == parse.LOAD
-        load(args.episodes, args.max_steps, args.visualize, Path(args.input_path))
