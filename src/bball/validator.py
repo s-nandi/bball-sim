@@ -2,6 +2,10 @@ def valid_max_acceleration(acceleration: float) -> bool:
     return acceleration >= 0
 
 
+def valid_max_velocity(velocity: float) -> bool:
+    return velocity > 0
+
+
 def valid_max_turn_degrees(turn_degrees: float) -> bool:
     return 0 <= turn_degrees
 

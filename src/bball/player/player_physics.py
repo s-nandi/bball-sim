@@ -9,6 +9,7 @@ class PlayerPhysics(PhysicsObject):
         super().__init__(
             physical_attributes.size,
             physical_attributes.mass,
+            physical_attributes.max_velocity,
             physical_attributes.velocity_decay,
         )
 

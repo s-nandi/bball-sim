@@ -14,11 +14,15 @@ from bball.utils import (
 from bball.validator import valid_angle_degrees
 
 
-def velocity_func_with_decay(velocity_decay: float):
+def velocity_func_with_limit_and_decay(max_velocity: float, velocity_decay: float):
     custom_damping = 1.0 - velocity_decay
 
     def velocity_func(body, gravity, _damping, delta_time):
         pymunk.Body.update_velocity(body, gravity, custom_damping, delta_time)
+        velocity_length = body.velocity.length
+        if velocity_length > max_velocity:
+            scale = max_velocity / velocity_length
+            body.velocity = body.velocity * scale
 
     return velocity_func
 
@@ -30,7 +34,9 @@ class PhysicsObject:
     _has_position: bool
     _has_orientation: bool
 
-    def __init__(self, size: float, mass: float, velocity_decay: float):
+    def __init__(
+        self, size: float, mass: float, max_velocity: float, velocity_decay: float
+    ):
         if size > 0:
             self._body = pymunk.Body()
             self._shape = pymunk.Circle(self._body, size)
@@ -39,7 +45,9 @@ class PhysicsObject:
             moment = pymunk.moment_for_circle(mass, 0, 1)
             self._body = pymunk.Body(mass, moment)
             self._shape = None
-        self._body.velocity_func = velocity_func_with_decay(velocity_decay)
+        self._body.velocity_func = velocity_func_with_limit_and_decay(
+            max_velocity, velocity_decay
+        )
 
         self._last_acceleration = 0.0
         self._has_position = False

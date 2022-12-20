@@ -9,6 +9,7 @@ def create_player_attributes(
     *,
     mass: float = 1.0,
     size: float = 0,
+    max_velocity: float = 8.0,
     max_acceleration: float = 1.0,
     max_turn_degrees: float = 90.0,
     velocity_decay: float = 0.0,
@@ -20,6 +21,7 @@ def create_player_attributes(
         PlayerAttributes.Physical(
             mass=mass,
             size=size,
+            max_velocity=max_velocity,
             max_acceleration=max_acceleration,
             max_turn_degrees=max_turn_degrees,
             velocity_decay=velocity_decay,
