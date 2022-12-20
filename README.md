@@ -4,15 +4,19 @@
 * Python 3
     * Pygame
     * Pymunk
+    * Pytorch
+    * Stable Baselines 3
+    * Tqdm
     * Pylint
     * Pytest
     * Black
 
 ## Setup
-Run 
-```
-python -m pip install pygame pymunk pylint mypy pytest black
-```
+1. Install [pytorch](https://pytorch.org/get-started/locally/) 
+2. Run 
+    ```
+    python -m pip install pygame pymunk stable-baselines3 pylint mypy pytest black tqdm
+    ```
 
 ## Linting
 Run `python -m pylint src experiment tests && python -m mypy src tests experiment`
