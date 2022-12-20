@@ -179,7 +179,7 @@ class Game:
                 base_orientation + delta for delta in inbounding_data.orientation_deltas
             ]
             for player, position, orientation in zip(team, positions, orientations):
-                player.place_at(position, orientation)
+                player.place_at(position, orientation).with_velocity(0.0)
         return True
 
     def transfer_possession(self) -> bool:
