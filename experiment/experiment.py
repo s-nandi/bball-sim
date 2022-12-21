@@ -99,7 +99,3 @@ def main():
     args = parse.parse()
     table = {parse.SIMULATE: simulate, parse.LEARN: learn, parse.LOAD: load}
     table[args.type](args)
-
-
-if __name__ == "__main__":
-    main()
