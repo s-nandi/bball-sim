@@ -7,7 +7,7 @@ from gym import spaces
 from experiment.initiate import canonical_game
 from bball import BallMode
 from bball.create import create_space
-from bball.utils import interpolation_coefficient, vector_length, in_range
+from bball.utils import interpolation_coefficient, vector_length, in_range, close_to
 from stable_baselines3.common.env_checker import check_env
 
 import pygame
@@ -159,8 +159,9 @@ class Environment(gym.Env):
         observation = self._get_observation()
         done = self._is_out_of_bounds() or self._lost_possession()
         if done:
+            out_of_bounds_penalty = 10**2
             fraction_time_left = self.game.shot_clock / self.game.shot_clock_duration
-            reward = -(10**2) * (fraction_time_left / time_frame)
+            reward = -1 * out_of_bounds_penalty * (fraction_time_left / time_frame)
         else:
             reward = self._shot_value(player_action) - self._energy_cost(player_action)
         self.total_reward += reward
@@ -195,14 +196,17 @@ class Environment(gym.Env):
             self.space.step(0.0)
             place_at_random_state()
 
+        assert close_to(self.player.velocity, (0.0, 0.0))
         observation = self._get_observation()
         return observation
 
     def _energy_cost(self, action: PlayerAction):
-        energy_penalty = 0.05
-        energy_consumed = (
-            1 + abs(action.turn_multiplier) + abs(action.acceleration_multiplier)
-        )
+        energy_penalty = 0.025
+        player_velocity = vector_length(self.player.velocity)
+        max_velocity = self.player.physical_attributes.max_velocity
+        velocity_scale = player_velocity / max_velocity
+        assert in_range(velocity_scale, 0.0, 1.0)
+        energy_consumed = 1 + abs(action.turn_multiplier) + velocity_scale
         return energy_penalty * energy_consumed
 
     def _shot_value(self, action: PlayerAction):
