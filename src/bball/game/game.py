@@ -104,6 +104,10 @@ class Game:
         return self._clock.possession_time
 
     @property
+    def shot_clock_duration(self) -> float:
+        return self._clock.shot_clock_duration
+
+    @property
     def scoreboard(self) -> Scoreboard:
         return self._scoreboard
 
