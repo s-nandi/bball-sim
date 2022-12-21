@@ -29,7 +29,7 @@ display_scale = 0.3
 action_shape = (3,)
 action_dtype = np.float32
 Action = np.ndarray
-observation_shape = (5,)
+observation_shape = (6,)
 observation_dtype = np.float32
 Observation = np.ndarray
 
@@ -51,6 +51,7 @@ class PlayerState:
     orientation: float
     velocity_x: float
     velocity_y: float
+    has_ball: bool
 
     @staticmethod
     def from_observation(
@@ -61,13 +62,16 @@ class PlayerState:
 
         coeffs = [coeff.item() for coeff in observation]
         coeffs = [(coeff + 1) / 2 for coeff in coeffs]
-        position_x, position_y, orientation, velocity_x, velocity_y = coeffs
+        position_x, position_y, orientation, velocity_x, velocity_y, has_ball_f = coeffs
         position_x *= court.width
         position_y *= court.height
         orientation *= 360
         velocity_x *= max_velocity
         velocity_y *= max_velocity
-        return PlayerState(position_x, position_y, orientation, velocity_x, velocity_y)
+        has_ball = has_ball_f > 0.0
+        return PlayerState(
+            position_x, position_y, orientation, velocity_x, velocity_y, has_ball
+        )
 
     def to_observation(
         self: PlayerState, player: Player, court: Court, checked=False
@@ -79,7 +83,12 @@ class PlayerState:
         orientation = interpolation_coefficient(self.orientation, -180, 180)
         vel_x = interpolation_coefficient(self.velocity_x, -max_velocity, max_velocity)
         vel_y = interpolation_coefficient(self.velocity_y, -max_velocity, max_velocity)
-        coeffs = [position_x, position_y, orientation, vel_x, vel_y]
+        has_ball_f = (
+            np.random.uniform(0.0, 0.25)
+            if not self.has_ball
+            else np.random.uniform(0.75, 1.0)
+        )
+        coeffs = [position_x, position_y, orientation, vel_x, vel_y, has_ball_f]
         if checked:
             assert all([in_range(val, 0.0, 1.0) for val in coeffs]), coeffs
         coeffs = [2 * val - 1 for val in coeffs]
@@ -96,6 +105,7 @@ class PlayerState:
             player.orientation_degrees,
             player.velocity[0],
             player.velocity[1],
+            player.has_ball,
         )
 
 
@@ -152,16 +162,32 @@ class Environment(gym.Env):
         self.player.turn(player_action.turn_multiplier).accelerate(
             player_action.acceleration_multiplier
         )
+        invalid_action = False
+        if player_action.shoot:
+            if not self.player.has_ball:
+                invalid_action = True
+            else:
+                self.player.shoot_at(self.target_hoop.position)
         step_space(self.space, time_frame)
 
         observation = self._get_observation()
-        done = self._is_out_of_bounds() or self._lost_possession()
+        done = self._lost_possession()
+        shot_value = self._shot_value(player_action)
+        energy_cost = self._energy_cost(player_action)
+        fraction_time_left = self._fraction_time_left()
         if done:
-            out_of_bounds_penalty = 10**2
-            fraction_time_left = self.game.shot_clock / self.game.shot_clock_duration
-            reward = -1 * out_of_bounds_penalty * (fraction_time_left / time_frame)
+            out_of_bounds_penalty = -1 * 10**3
+            reward = out_of_bounds_penalty * fraction_time_left
         else:
-            reward = self._shot_value(player_action) - self._energy_cost(player_action)
+            if invalid_action:
+                incorrect_action_penalty = -1 * 10**1
+                reward = incorrect_action_penalty * fraction_time_left
+            elif player_action.shoot:
+                reward = shot_value - energy_cost
+            else:
+                assert not invalid_action
+                assert not player_action.shoot
+                reward = -energy_cost
         self.total_reward += reward
 
         info = {}
@@ -197,6 +223,9 @@ class Environment(gym.Env):
         assert close_to(self.player.velocity, (0.0, 0.0))
         observation = self._get_observation()
         return observation
+
+    def _fraction_time_left(self):
+        return self.game.shot_clock / self.game.shot_clock_duration
 
     def _energy_cost(self, action: PlayerAction):
         energy_penalty = 0.025
@@ -241,7 +270,8 @@ class Environment(gym.Env):
         return not self.court.is_inbounds(self.player)
 
     def _lost_possession(self):
-        return not self.player.has_ball
+        team_index = self.game.team_index_of(self.player)
+        return self.game.team_with_last_possession != team_index
 
     def render(self):
         try:
