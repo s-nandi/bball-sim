@@ -7,7 +7,7 @@ from gym import spaces
 from experiment.initiate import canonical_game
 from bball import BallMode
 from bball.create import create_space
-from bball.utils import interpolation_coefficient, vector_length
+from bball.utils import interpolation_coefficient, vector_length, in_range
 from stable_baselines3.common.env_checker import check_env
 
 import pygame
@@ -24,14 +24,22 @@ num_players = 1
 fps = 60
 speed_scale = 3.0
 time_frame = time_frame_for(fps, speed_scale)
-display_scale = 0.5
+display_scale = 0.3
 
 action_shape = (2,)
+action_dtype = np.float32
+Action = np.ndarray
 observation_shape = (5,)
 observation_dtype = np.float32
+Observation = np.ndarray
 
 
-def _validate_observation(observation: np.array):
+def _validate_action(action: Action):
+    assert action.shape == action_shape
+    assert action.dtype == action_dtype
+
+
+def _validate_observation(observation: Observation):
     assert observation.shape == observation_shape
     assert observation.dtype == observation_dtype
 
@@ -46,7 +54,7 @@ class PlayerState:
 
     @staticmethod
     def from_observation(
-        observation: np.array, player: Player, court: Court
+        observation: Observation, player: Player, court: Court
     ) -> PlayerState:
         _validate_observation(observation)
         max_velocity = player.physical_attributes.max_velocity
@@ -61,7 +69,9 @@ class PlayerState:
         velocity_y *= max_velocity
         return PlayerState(position_x, position_y, orientation, velocity_x, velocity_y)
 
-    def to_observation(self: PlayerState, player: Player, court: Court, checked=False):
+    def to_observation(
+        self: PlayerState, player: Player, court: Court, checked=False
+    ) -> Observation:
         max_velocity = player.physical_attributes.max_velocity
 
         position_x = interpolation_coefficient(self.position_x, 0, court.width)
@@ -71,7 +81,7 @@ class PlayerState:
         vel_y = interpolation_coefficient(self.velocity_y, -max_velocity, max_velocity)
         coeffs = [position_x, position_y, orientation, vel_x, vel_y]
         if checked:
-            assert all([0 <= val <= 1 for val in coeffs]), coeffs
+            assert all([in_range(val, 0.0, 1.0) for val in coeffs]), coeffs
         coeffs = [2 * val - 1 for val in coeffs]
         observation = np.array(coeffs, dtype=np.float32)
 
@@ -86,6 +96,22 @@ class PlayerState:
             player.orientation_degrees,
             player.velocity[0],
             player.velocity[1],
+        )
+
+
+@dataclass
+class PlayerAction:
+    acceleration_multiplier: float
+    turn_multiplier: float
+
+    @staticmethod
+    def from_action(action: Action) -> PlayerAction:
+        _validate_action(action)
+        coeffs = [coeff.item() for coeff in action]
+        acceleration_multiplier, turn_multiplier = coeffs
+        return PlayerAction(
+            acceleration_multiplier,
+            turn_multiplier,
         )
 
 
@@ -124,26 +150,21 @@ class Environment(gym.Env):
             self.render_settings = self.engine.render_settings
 
     def step(self, action):
-        turn_degrees, acceleration = action
-        turn_degrees = turn_degrees.item()
-        acceleration = acceleration.item()
-        self.player.turn(turn_degrees).accelerate(acceleration)
+        player_action = PlayerAction.from_action(action)
+        self.player.turn(player_action.turn_multiplier).accelerate(
+            player_action.acceleration_multiplier
+        )
         step_space(self.space, time_frame)
-
-        if self._is_out_of_bounds():
-            reward = -(10**3)
-        else:
-            shot_value_multiplier = 1 + self._standstill_bonus() + self._noturn_bonus()
-            reward = (
-                shot_value_multiplier * self._shot_value()
-                - 0.05
-                - 0.05 * abs(turn_degrees)
-                - 0.05 * abs(acceleration)
-            )
-        self.total_reward += reward
 
         observation = self._get_observation()
         done = self._is_out_of_bounds() or self._lost_possession()
+        if done:
+            fraction_time_left = self.game.shot_clock / self.game.shot_clock_duration
+            reward = -(10**2) * (fraction_time_left / time_frame)
+        else:
+            reward = self._shot_value(player_action) - self._energy_cost(player_action)
+        self.total_reward += reward
+
         info = {}
         return observation, reward, done, info
 
@@ -159,13 +180,14 @@ class Environment(gym.Env):
         if not self.player.has_ball:
             self.game.ball.turnover()
 
-        state = PlayerState.from_observation(
+        player_state = PlayerState.from_observation(
             self.observation_space.sample(), self.player, self.court
         )
 
         def place_at_random_state():
             self.player.place_at(
-                (state.position_x, state.position_y), state.orientation
+                (player_state.position_x, player_state.position_y),
+                player_state.orientation,
             )
 
         place_at_random_state()
@@ -176,8 +198,21 @@ class Environment(gym.Env):
         observation = self._get_observation()
         return observation
 
-    def _shot_value(self):
-        return self.target_hoop.expected_value_of_shot_by(self.player)
+    def _energy_cost(self, action: PlayerAction):
+        energy_penalty = 0.05
+        energy_consumed = (
+            1 + abs(action.turn_multiplier) + abs(action.acceleration_multiplier)
+        )
+        return energy_penalty * energy_consumed
+
+    def _shot_value(self, action: PlayerAction):
+        standstill_bonus = self._standstill_bonus()
+        no_turn_bonus = self._noturn_bonus(action)
+        assert in_range(standstill_bonus, 0.0, 1.0)
+        assert in_range(no_turn_bonus, 0.0, 1.0)
+        no_movement_multiplier = 1 + standstill_bonus + no_turn_bonus
+        raw_shot_value = self.target_hoop.expected_value_of_shot_by(self.player)
+        return no_movement_multiplier * raw_shot_value
 
     def _standstill_bonus(self):
         current_speed = vector_length(self.player.velocity)
@@ -188,8 +223,11 @@ class Environment(gym.Env):
             assert scale > -(10**-6)
             return 1 - scale
 
-    def _noturn_bonus(self):
-        return 0
+    def _noturn_bonus(self, action: PlayerAction):
+        turn_multiplier = action.turn_multiplier
+        assert in_range(turn_multiplier, -1.0, 1.0)
+        scale = 1 - abs(turn_multiplier)
+        return scale
 
     def _get_observation(self):
         is_in_bounds = not self._is_out_of_bounds()

@@ -34,6 +34,7 @@ def learn(epochs, checkpoint_interval, output_folder: Path):
         best_model_save_path=output_folder.joinpath("best"),
         deterministic=True,
         render=False,
+        eval_freq=checkpoint_interval // 4,
     )
     callback_list = CallbackList(
         [checkpoint_callback, eval_callback, ProgressBarCallback()]
@@ -65,14 +66,14 @@ def load(episodes, visualize, input_folder: Path, epoch=None):
             observation, reward, done, _ = env.step(action)
             episode_reward += reward
             if done:
-                print("-", end="")
+                print("last reward", reward)
             steps += 1
         if episode_reward > 0.0:
             succeed += 1
         print("episode reward", episode_reward)
         episode_average_reward = episode_reward / steps
+        print("episode average reward", episode_average_reward)
         acc_reward += episode_average_reward
-        print("acc is now", acc_reward)
     env.close()
     print()
     average_reward = acc_reward / episodes
