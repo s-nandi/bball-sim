@@ -17,8 +17,8 @@ seed = randint(0, 10**8)
 
 
 def learn(epochs, checkpoint_interval, output_folder: Path):
-    env = environment.makegym()
-    eval_env = Monitor(environment.makegym())
+    env = environment.Environment()
+    eval_env = Monitor(environment.Environment())
     env.reset()
     model = Algo(
         "MlpPolicy",

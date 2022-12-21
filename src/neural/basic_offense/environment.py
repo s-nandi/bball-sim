@@ -272,12 +272,4 @@ class Environment(gym.Env):
             pygame.quit()
 
 
-def makegym():
-    return Environment()
-
-
-def makegymnasium():
-    return Environment()
-
-
 check_env(Environment())
