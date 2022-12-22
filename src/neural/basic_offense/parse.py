@@ -18,7 +18,7 @@ def _build_sb3_learning_subparser(parser: argparse.ArgumentParser):
 def _build_sb3_loading_subparser(parser: argparse.ArgumentParser):
     parser.add_argument("episodes", type=int)
     parser.add_argument("input_path", type=str)
-    parser.add_argument("--visualize", action="store_true")
+    parser.add_argument("--visualize", "-v", action="store_true")
     parser.add_argument("--epoch", type=int, default=None)
 
 

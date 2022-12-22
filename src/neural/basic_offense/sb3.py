@@ -34,9 +34,6 @@ def learn(
             env,
             tensorboard_log=output_folder.joinpath(f"logs_{seed}"),
             seed=seed,
-            device="cuda",
-            normalize_advantage=True,
-            n_steps=16384,
         )
     else:
         print(f"Continuing training from {continue_from_epoch}")
