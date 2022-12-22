@@ -7,7 +7,13 @@ from gym import spaces
 from experiment.initiate import canonical_game
 from bball import BallMode
 from bball.create import create_space
-from bball.utils import interpolation_coefficient, vector_length, in_range, close_to
+from bball.utils import (
+    interpolation_coefficient,
+    interpolate,
+    vector_length,
+    in_range,
+    close_to,
+)
 from stable_baselines3.common.env_checker import check_env
 
 import pygame
@@ -17,7 +23,7 @@ from engine import Engine
 from bball.draw import draw_game
 
 if TYPE_CHECKING:
-    from bball import Player, Court
+    from bball import Player, Court, Game
 
 game_template = canonical_game
 num_players = 1
@@ -29,7 +35,7 @@ display_scale = 0.3
 action_shape = (3,)
 action_dtype = np.float32
 Action = np.ndarray
-observation_shape = (6,)
+observation_shape = (7,)
 observation_dtype = np.float32
 Observation = np.ndarray
 
@@ -52,29 +58,57 @@ class PlayerState:
     velocity_x: float
     velocity_y: float
     has_ball: bool
+    shot_clock: float
 
     @staticmethod
     def from_observation(
-        observation: Observation, player: Player, court: Court
+        observation: Observation, player: Player, court: Court, game: Game
     ) -> PlayerState:
         _validate_observation(observation)
         max_velocity = player.physical_attributes.max_velocity
 
         coeffs = [coeff.item() for coeff in observation]
         coeffs = [(coeff + 1) / 2 for coeff in coeffs]
-        position_x, position_y, orientation, velocity_x, velocity_y, has_ball_f = coeffs
-        position_x *= court.width
-        position_y *= court.height
-        orientation *= 360
-        velocity_x *= max_velocity
-        velocity_y *= max_velocity
-        has_ball = has_ball_f > 0.0
-        return PlayerState(
-            position_x, position_y, orientation, velocity_x, velocity_y, has_ball
+        (
+            position_x,
+            position_y,
+            orientation,
+            velocity_x,
+            velocity_y,
+            has_ball_f,
+            shot_clock,
+        ) = coeffs
+
+        position_x = interpolate(0, court.width, position_x)
+        position_y = interpolate(0, court.height, position_y)
+        orientation = interpolate(-180, 180, orientation)
+        velocity_x = interpolate(-max_velocity, max_velocity, velocity_x)
+        velocity_y = interpolate(-max_velocity, max_velocity, velocity_y)
+        has_ball = has_ball_f > 0.5
+        shot_clock = interpolate(0.0, game.shot_clock_duration, shot_clock)
+
+        state = PlayerState(
+            position_x,
+            position_y,
+            orientation,
+            velocity_x,
+            velocity_y,
+            has_ball,
+            shot_clock,
         )
 
+        round_trip_observation = state.to_observation(player, court, game)
+        if has_ball:
+            observation[5] = 1.0
+        else:
+            observation[5] = -1.0
+        closeness = np.isclose(round_trip_observation, observation).all()
+        assert closeness, f"{round_trip_observation} vs {observation}"
+
+        return state
+
     def to_observation(
-        self: PlayerState, player: Player, court: Court, checked=False
+        self: PlayerState, player: Player, court: Court, game: Game, checked=False
     ) -> Observation:
         max_velocity = player.physical_attributes.max_velocity
 
@@ -83,12 +117,20 @@ class PlayerState:
         orientation = interpolation_coefficient(self.orientation, -180, 180)
         vel_x = interpolation_coefficient(self.velocity_x, -max_velocity, max_velocity)
         vel_y = interpolation_coefficient(self.velocity_y, -max_velocity, max_velocity)
-        has_ball_f = (
-            np.random.uniform(0.0, 0.25)
-            if not self.has_ball
-            else np.random.uniform(0.75, 1.0)
+        has_ball_f = 0.0 if not self.has_ball else 1.0
+
+        shot_clock = interpolation_coefficient(
+            self.shot_clock, 0.0, game.shot_clock_duration
         )
-        coeffs = [position_x, position_y, orientation, vel_x, vel_y, has_ball_f]
+        coeffs = [
+            position_x,
+            position_y,
+            orientation,
+            vel_x,
+            vel_y,
+            has_ball_f,
+            shot_clock,
+        ]
         if checked:
             assert all([in_range(val, 0.0, 1.0) for val in coeffs]), coeffs
         coeffs = [2 * val - 1 for val in coeffs]
@@ -98,7 +140,7 @@ class PlayerState:
         return observation
 
     @staticmethod
-    def from_player(player: Player) -> PlayerState:
+    def from_player(player: Player, game: Game) -> PlayerState:
         return PlayerState(
             player.position[0],
             player.position[1],
@@ -106,6 +148,7 @@ class PlayerState:
             player.velocity[0],
             player.velocity[1],
             player.has_ball,
+            game.shot_clock,
         )
 
 
@@ -218,7 +261,7 @@ class Environment(gym.Env):
             self.game.ball.turnover()
 
         player_state = PlayerState.from_observation(
-            self.observation_space.sample(), self.player, self.court
+            self.observation_space.sample(), self.player, self.court, self.game
         )
 
         def place_at_random_state():
@@ -275,8 +318,8 @@ class Environment(gym.Env):
 
     def _get_observation(self):
         is_in_bounds = not self._is_out_of_bounds()
-        return PlayerState.from_player(self.player).to_observation(
-            self.player, self.court, is_in_bounds
+        return PlayerState.from_player(self.player, self.game).to_observation(
+            self.player, self.court, self.game, is_in_bounds
         )
 
     def _is_out_of_bounds(self):
