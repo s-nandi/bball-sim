@@ -12,6 +12,7 @@ def _build_sb3_learning_subparser(parser: argparse.ArgumentParser):
     parser.add_argument("epochs", type=int)
     parser.add_argument("checkpoint_interval", type=int)
     parser.add_argument("output_path", type=str)
+    parser.add_argument("--continue", "--epoch", dest="epoch", type=int, default=None)
 
 
 def _build_sb3_loading_subparser(parser: argparse.ArgumentParser):

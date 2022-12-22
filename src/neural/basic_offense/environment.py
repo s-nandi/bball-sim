@@ -165,28 +165,40 @@ class Environment(gym.Env):
         invalid_action = False
         if player_action.shoot:
             if not self.player.has_ball:
+                if self.visualize:
+                    print("invalid")
                 invalid_action = True
             else:
                 self.player.shoot_at(self.target_hoop.position)
         step_space(self.space, time_frame)
 
+        shot_value_scale = 10.0
+        incorrect_action_scale = 10**1
+        out_of_bounds_scale = 10**2
+        energy_scale = 2.5 * 10**-3
+
         observation = self._get_observation()
         done = self._lost_possession()
-        shot_value = self._shot_value(player_action)
-        energy_cost = self._energy_cost(player_action)
+
         fraction_time_left = self._fraction_time_left()
-        if done:
-            out_of_bounds_penalty = -1 * 10**3
-            reward = out_of_bounds_penalty * fraction_time_left
+        shot_value = shot_value_scale * self._shot_value(player_action)
+        energy_cost = energy_scale * self._energy_consumed(player_action)
+        out_of_bounds_cost = out_of_bounds_scale * fraction_time_left
+        incorrect_action_cost = incorrect_action_scale * fraction_time_left
+        assert shot_value >= 0
+        assert energy_cost >= 0
+        assert out_of_bounds_cost >= 0
+        assert incorrect_action_cost >= 0
+
+        if done and self._is_out_of_bounds():
+            reward = -out_of_bounds_cost
         else:
             if invalid_action:
-                incorrect_action_penalty = -1 * 10**1
-                reward = incorrect_action_penalty * fraction_time_left
+                reward = -incorrect_action_cost
             elif player_action.shoot:
-                reward = shot_value - energy_cost
+                reward = shot_value
             else:
-                assert not invalid_action
-                assert not player_action.shoot
+                assert not invalid_action and not player_action.shoot
                 reward = -energy_cost
         self.total_reward += reward
 
@@ -227,16 +239,17 @@ class Environment(gym.Env):
     def _fraction_time_left(self):
         return self.game.shot_clock / self.game.shot_clock_duration
 
-    def _energy_cost(self, action: PlayerAction):
-        energy_penalty = 0.025
+    def _energy_consumed(self, action: PlayerAction):
         player_velocity = vector_length(self.player.velocity)
         max_velocity = self.player.physical_attributes.max_velocity
         velocity_scale = player_velocity / max_velocity
         assert in_range(velocity_scale, 0.0, 1.0)
         energy_consumed = 1 + abs(action.turn_multiplier) + velocity_scale
-        return energy_penalty * energy_consumed
+        return energy_consumed
 
-    def _shot_value(self, action: PlayerAction):
+    def _shot_value(
+        self, action: PlayerAction
+    ):  # TODO: Move movement modifiers into bball/game.py
         standstill_bonus = self._standstill_bonus()
         no_turn_bonus = self._noturn_bonus(action)
         assert in_range(standstill_bonus, 0.0, 1.0)
