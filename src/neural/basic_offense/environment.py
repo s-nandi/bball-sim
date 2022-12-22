@@ -307,7 +307,7 @@ class Environment(gym.Env):
         if scale > 1:
             return 0
         else:
-            assert scale > -(10**-6)
+            assert in_range(scale, 0.0, 1.0)
             return 1 - scale
 
     def _noturn_bonus(self, action: PlayerAction):
