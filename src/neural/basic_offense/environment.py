@@ -172,10 +172,10 @@ class Environment(gym.Env):
                 self.player.shoot_at(self.target_hoop.position)
         step_space(self.space, time_frame)
 
-        shot_value_scale = 10.0
-        incorrect_action_scale = 10**1
-        out_of_bounds_scale = 10**2
-        energy_scale = 2.5 * 10**-3
+        shot_value_scale = 1.0 * 10**0
+        incorrect_action_scale = 1.0 * 10**1
+        out_of_bounds_scale = 0  # 1.0 * 10**0
+        energy_scale = 0.0  # 2.5 * 10**-3
 
         observation = self._get_observation()
         done = self._lost_possession()
@@ -190,7 +190,7 @@ class Environment(gym.Env):
         assert out_of_bounds_cost >= 0
         assert incorrect_action_cost >= 0
 
-        if done and self._is_out_of_bounds():
+        if done:
             reward = -out_of_bounds_cost
         else:
             if invalid_action:
