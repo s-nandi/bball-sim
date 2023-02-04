@@ -239,6 +239,10 @@ class Environment(gym.Env):
             if invalid_action:
                 reward = -incorrect_action_cost
             elif player_action.shoot:
+                if self.visualize:
+                    print(
+                        f"standstill: {self._standstill_bonus()} noturn: {self._noturn_bonus(player_action)}"
+                    )
                 reward = shot_value
             else:
                 assert not invalid_action and not player_action.shoot
