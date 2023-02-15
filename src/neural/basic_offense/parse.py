@@ -4,7 +4,7 @@ LEARN = "learn"
 LOAD = "load"
 
 sb3_learn_args = "learn 10000000000 10000000 output/basic_offense"
-sb3_load_args = "load 10 output/basic_offense --visualize"
+sb3_load_args = "load 20 output/basic_offense -v"
 sb3_noviz_load_args = "load 80 output/basic_offense"
 
 
